@@ -29,6 +29,7 @@ googledataResource::googledataResource( const QString &id )
 googledataResource::~googledataResource()
 {
 	gcal_delete(gcal);
+	gcal_cleanup_contacts(&all_contacts);
 }
 
 void googledataResource::retrieveCollections()
@@ -42,11 +43,21 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
 
-	// TODO: this method is called when Akonadi wants to know about all the
-	// items in the given collection. You can but don't have to provide all the
-	// data for each item, remote ID and MIME type are enough at this stage.
-	// Depending on how your resource accesses the data, there are several
-	// different ways to tell Akonadi when you are done.
+	Item::List items;
+	int result;
+
+	if ((result = gcal_get_contacts(gcal, &all_contacts)))
+		exit(1);
+
+	/* Each google entry has a unique ID and edit_url */
+	for (size_t i = 0; i < all_contacts.length; ++i) {
+
+		Item item(QLatin1String("what_is_the_mime_type?"));
+		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
+		item.setRemoteId(gcal_contact_get_id(contact));
+	}
+
+	itemsRetrieved(items);
 }
 
 bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
