@@ -46,6 +46,9 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 	Item::List items;
 	int result;
 
+	/* Downloading the contacts can be slow and it is blocking. Will
+	 * it mess up with akonadi?
+	 */
 	if ((result = gcal_get_contacts(gcal, &all_contacts)))
 		exit(1);
 
@@ -62,14 +65,29 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 
 bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
-	Q_UNUSED( item );
 	Q_UNUSED( parts );
+	const QString entry_id = item.remoteId();
+	QString xml_entry;
+	/* I assume that here I can report the atom::entry data?
+	 */
+	Item newItem(item);
+	gcal_contact_t contact;
 
-	// TODO: this method is called when Akonadi wants more data for a given item.
-	// You can only provide the parts that have been requested but you are allowed
-	// to provide all in one go
+	/*
+	 * And another question, are the requests in the same sequence that
+	 * I informed in 'retrieveItems'? For while, I try to locate the entry...
+	 */
+	for (size_t i = 0; i < all_contacts.length; ++i) {
+		contact = gcal_contact_element(&all_contacts, i);
+		if (entry_id == gcal_contact_get_id(contact)) {
+			xml_entry = gcal_contact_get_xml(contact);
+			newItem.setPayload<QString>(xml_entry);
+			return true;
+		}
 
-	return true;
+	}
+
+	return false;
 }
 
 void googledataResource::aboutToQuit()
