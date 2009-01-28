@@ -2,6 +2,9 @@
 #define GOOGLEDATARESOURCE_H
 
 #include <akonadi/resourcebase.h>
+extern "C" {
+#include <gcalendar.h>
+}
 
 class googledataResource : public Akonadi::ResourceBase,
                            public Akonadi::AgentBase::Observer
@@ -26,6 +29,8 @@ class googledataResource : public Akonadi::ResourceBase,
     virtual void itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection );
     virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
     virtual void itemRemoved( const Akonadi::Item &item );
+
+    gcal_t gcal;
 };
 
 #endif

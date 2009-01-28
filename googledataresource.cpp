@@ -20,7 +20,10 @@ googledataResource::googledataResource( const QString &id )
   QDBusConnection::sessionBus().registerObject( QLatin1String( "/Settings" ),
                             Settings::self(), QDBusConnection::ExportAdaptors );
 
-  // TODO: you can put any resource specific initialization code here.
+
+  if (!(gcal = gcal_new(GCONTACT)))
+      exit(1);
+  gcal_set_store_xml(gcal, 1);
 }
 
 googledataResource::~googledataResource()
