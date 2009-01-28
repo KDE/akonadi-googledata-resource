@@ -28,6 +28,8 @@ googledataResource::googledataResource( const QString &id )
 
 googledataResource::~googledataResource()
 {
+    gcal_delete(gcal);
+
 }
 
 void googledataResource::retrieveCollections()
