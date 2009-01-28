@@ -71,12 +71,10 @@ void googledataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
 
-	// TODO: this method is usually called when a new resource is being
-	// added to the Akonadi setup. You can do any kind of user interaction here,
-	// e.g. showing dialogs.
-	// The given window ID is usually useful to get the correct
-	// "on top of parent" behavior if the running window manager applies any kind
-	// of focus stealing prevention technique
+	/* TODO:
+	 * what kind of dialog to collect google acount username + password ?
+	 */
+	synchronize();
 }
 
 void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
