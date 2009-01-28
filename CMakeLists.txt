@@ -1,5 +1,8 @@
 project(googledata)
 
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules" )
+
+
 # search packages used by KDE
 find_package (KDE4 REQUIRED)
 include(KDE4Defaults)
@@ -7,6 +10,10 @@ include(MacroLibrary)
 include(MacroOptionalAddSubdirectory)
 include(CheckIncludeFiles)
 include(FindKdepimLibs)
+
+#libgcal implements google data protocols 2.0
+FIND_PACKAGE( LibGcal REQUIRED )
+
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
 macro_log_feature(XSLTPROC_EXECUTABLE "xsltproc" "The command line XSLT processor from libxslt" "http://xmlsoft.org/XSLT/" FALSE "" "Needed for building Akonadi resources. Recommended.")
@@ -36,7 +43,7 @@ endif(WIN32)
 set(KDE4_ICON_DIR ${KDE4_INSTALL_DIR}/share/icons)
 
 include_directories(
-    ${KDE4_INCLUDES}
+    ${KDE4_INCLUDES} ${LIBGCAL_INCLUDE_DIRS}
 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
@@ -58,6 +65,6 @@ qt4_add_dbus_adaptor(googledataresource_SRCS
 
 kde4_add_executable(akonadi_googledata_resource RUN_UNINSTALLED ${googledataresource_SRCS})
 
-target_link_libraries(akonadi_googledata_resource ${KDE4_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS})
+target_link_libraries(akonadi_googledata_resource ${KDE4_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS} ${LIBGCAL_LIBRARIES})
 
 install(TARGETS akonadi_googledata_resource ${INSTALL_TARGETS_DEFAULT_ARGS})

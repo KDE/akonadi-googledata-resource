@@ -5,6 +5,12 @@
 
 #include <QtDBus/QDBusConnection>
 
+extern "C" {
+#include <gcalendar.h>
+#include <gcontact.h>
+#include <gcal_status.h>
+}
+
 using namespace Akonadi;
 
 googledataResource::googledataResource( const QString &id )
