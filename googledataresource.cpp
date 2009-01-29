@@ -6,6 +6,7 @@
 #include <QtDBus/QDBusConnection>
 #include <kabc/addressee.h>
 #include <kabc/phonenumber.h>
+#include <kabc/key.h>
 
 extern "C" {
 #include <gcalendar.h>
@@ -74,6 +75,7 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	gcal_contact_t contact;
 	KABC::Addressee addressee;
 	KABC::PhoneNumber number;
+	KABC::Key key;
 
 	/*
 	 * And another question, are the requests in the same sequence that
@@ -94,7 +96,12 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 			temp = gcal_contact_get_url(contact);
 			addressee.setUid(temp);
 
-			/* TODO: add ETag/etc  on libgcal */
+			/* ETag: required by Google Data protocol 2.0 */
+			temp = gcal_contact_get_etag(contact);
+			key.setId(temp);
+			addressee.insertKey(key);
+
+			/* TODO: telefone, address, etc */
 
 			newItem.setPayload<KABC::Addressee>(addressee);
 			return true;
