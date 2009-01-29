@@ -65,6 +65,6 @@ qt4_add_dbus_adaptor(googledataresource_SRCS
 
 kde4_add_executable(akonadi_googledata_resource RUN_UNINSTALLED ${googledataresource_SRCS})
 
-target_link_libraries(akonadi_googledata_resource ${KDE4_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS} ${LIBGCAL_LIBRARIES})
+target_link_libraries(akonadi_googledata_resource ${KDE4_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS} ${KDE4_KABC_LIBS} ${LIBGCAL_LIBRARIES})
 
 install(TARGETS akonadi_googledata_resource ${INSTALL_TARGETS_DEFAULT_ARGS})

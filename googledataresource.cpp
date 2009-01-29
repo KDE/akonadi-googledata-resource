@@ -4,6 +4,8 @@
 #include "settingsadaptor.h"
 
 #include <QtDBus/QDBusConnection>
+#include <kabc/addressee.h>
+#include <kabc/phonenumber.h>
 
 extern "C" {
 #include <gcalendar.h>
@@ -67,11 +69,13 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 {
 	Q_UNUSED( parts );
 	const QString entry_id = item.remoteId();
-	QString xml_entry;
+	QString temp;
 	/* I assume that here I can report the atom::entry data?
 	 */
 	Item newItem(item);
 	gcal_contact_t contact;
+	KABC::Addressee addressee;
+	KABC::PhoneNumber number;
 
 	/*
 	 * And another question, are the requests in the same sequence that
@@ -80,8 +84,21 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	for (size_t i = 0; i < all_contacts.length; ++i) {
 		contact = gcal_contact_element(&all_contacts, i);
 		if (entry_id == gcal_contact_get_id(contact)) {
-			xml_entry = gcal_contact_get_xml(contact);
-			newItem.setPayload<QString>(xml_entry);
+			/* name */
+			temp = gcal_contact_get_title(contact);
+			addressee.setNameFromString(temp);
+
+			/* email */
+			temp = gcal_contact_get_email(contact);
+			addressee.insertEmail(temp, true);
+
+			/* edit url: required to do edit/delete */
+			temp = gcal_contact_get_url(contact);
+			addressee.setUid(temp);
+
+			/* TODO: add ETag/etc  on libgcal */
+
+			newItem.setPayload<KABC::Addressee>(addressee);
 			return true;
 		}
 
