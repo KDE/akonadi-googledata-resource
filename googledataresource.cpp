@@ -70,8 +70,6 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	Q_UNUSED( parts );
 	const QString entry_id = item.remoteId();
 	QString temp;
-	/* I assume that here I can report the atom::entry data?
-	 */
 	Item newItem(item);
 	gcal_contact_t contact;
 	KABC::Addressee addressee;
