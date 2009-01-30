@@ -58,7 +58,7 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 	/* Each google entry has a unique ID and edit_url */
 	for (size_t i = 0; i < all_contacts.length; ++i) {
 
-		Item item(QLatin1String("what_is_the_mime_type?"));
+		Item item(QLatin1String("text/directory"));
 		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
 		item.setRemoteId(gcal_contact_get_id(contact));
 
