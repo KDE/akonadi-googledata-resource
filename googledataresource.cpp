@@ -147,7 +147,6 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
 	QString temp;
-	QByteArray ugly;
 	int result;
 
 	if (item.hasPayload<KABC::Addressee>())
@@ -160,12 +159,10 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	 * What about the good and old .c_str()?
 	 */
 	temp = addressee.realName();
-	ugly = temp.toAscii();
-	gcal_contact_set_title(contact, const_cast<char *>(ugly.constData()));
+	gcal_contact_set_title(contact, const_cast<char *>(qPrintable(temp)));
 
 	temp = addressee.fullEmail();
-	ugly = temp.toAscii();
-	gcal_contact_set_email(contact, const_cast<char *>(ugly.constData()));
+	gcal_contact_set_email(contact, const_cast<char *>(qPrintable(temp)));
 
 	/* TODO: add remaining fields */
 
