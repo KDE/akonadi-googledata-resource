@@ -7,6 +7,7 @@
 #include <kabc/addressee.h>
 #include <kabc/phonenumber.h>
 #include <kabc/key.h>
+#include <qstring.h>
 
 extern "C" {
 #include <gcalendar.h>
@@ -142,14 +143,35 @@ void googledataResource::configure( WId windowId )
 
 void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
-	Q_UNUSED( item );
-	Q_UNUSED( collection );
 
-	// TODO: this method is called when somebody else, e.g. a client application,
-	// has created an item in a collection managed by your resource.
+	KABC::Addressee addressee;
+	gcal_contact_t contact;
+	QString temp;
+	QByteArray ugly;
+	int result;
 
-	// NOTE: There is an equivalent method for collections, but it isn't part
-	// of this template code to keep it simple
+	if (item.hasPayload<KABC::Addressee>())
+		addressee = item.payload<KABC::Addressee>();
+
+	if (!(contact = gcal_contact_new(NULL)))
+		exit(1);
+
+	/* Common... there must exist a better way! I'm using Qt 4.5.
+	 * What about the good and old .c_str()?
+	 */
+	temp = addressee.realName();
+	ugly = temp.toAscii();
+	gcal_contact_set_title(contact, const_cast<char *>(ugly.constData()));
+
+	temp = addressee.fullEmail();
+	ugly = temp.toAscii();
+	gcal_contact_set_email(contact, const_cast<char *>(ugly.constData()));
+
+	if ((result = gcal_add_contact(gcal, contact)))
+		exit(1);
+
+	gcal_contact_delete(contact);
+
 }
 
 void googledataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
