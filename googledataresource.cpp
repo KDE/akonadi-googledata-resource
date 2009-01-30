@@ -155,9 +155,6 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
 
-	/* Common... there must exist a better way! I'm using Qt 4.5.
-	 * What about the good and old .c_str()?
-	 */
 	temp = addressee.realName();
 	gcal_contact_set_title(contact, const_cast<char *>(qPrintable(temp)));
 
