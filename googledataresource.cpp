@@ -61,6 +61,8 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 		Item item(QLatin1String("what_is_the_mime_type?"));
 		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
 		item.setRemoteId(gcal_contact_get_id(contact));
+
+		items << item;
 	}
 
 	itemsRetrieved(items);
