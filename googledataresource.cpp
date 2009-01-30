@@ -39,7 +39,7 @@ void googledataResource::retrieveCollections()
 {
 	Collection c;
 	c.setParent(Collection::root());
-	c.setRemoteId(Settings::self()->path());
+	c.setRemoteId("google-contacts");
 	c.setName(name());
 
 	QStringList mimeTypes;
