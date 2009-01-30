@@ -37,9 +37,19 @@ googledataResource::~googledataResource()
 
 void googledataResource::retrieveCollections()
 {
-	// TODO: this method is called when Akonadi wants to have all the
-	// collections your resource provides.
-	// Be sure to set the remote ID and the content MIME types
+	Collection c;
+	c.setParent(Collection::root());
+	c.setRemoteId(Settings::self()->path());
+	c.setName(name());
+
+	QStringList mimeTypes;
+	mimeTypes << "text/directory";
+	c.setContentMimeTypes(mimeTypes);
+
+	Collection::List list;
+	list << c;
+	collectionsRetrieved(list);
+
 }
 
 void googledataResource::retrieveItems( const Akonadi::Collection &collection )
