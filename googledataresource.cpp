@@ -224,13 +224,31 @@ void googledataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 void googledataResource::itemRemoved( const Akonadi::Item &item )
 {
-	Q_UNUSED( item );
+	KABC::Addressee addressee;
+	gcal_contact_t contact;
+	KABC::Key key;
+	QString temp;
+	int result;
 
-	// TODO: this method is called when somebody else, e.g. a client application,
-	// has deleted an item managed by your resource.
+	if (item.hasPayload<KABC::Addressee>())
+		addressee = item.payload<KABC::Addressee>();
 
-	// NOTE: There is an equivalent method for collections, but it isn't part
-	// of this template code to keep it simple
+	if (!(contact = gcal_contact_new(NULL)))
+		exit(1);
+
+	temp = addressee.uid();
+	gcal_contact_set_id(contact, const_cast<char *>(qPrintable(temp)));
+
+	/* I suppose that this retrieves the first element in the key list */
+	key = addressee.keys()[0];
+	temp = key.id();
+	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
+
+	if ((result = gcal_erase_contact(gcal, contact)))
+		exit(1);
+
+	gcal_contact_delete(contact);
+
 }
 
 AKONADI_RESOURCE_MAIN( googledataResource )
