@@ -167,6 +167,8 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	ugly = temp.toAscii();
 	gcal_contact_set_email(contact, const_cast<char *>(ugly.constData()));
 
+	/* TODO: add remaining fields */
+
 	if ((result = gcal_add_contact(gcal, contact)))
 		exit(1);
 
@@ -176,14 +178,51 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 void googledataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
-	Q_UNUSED( item );
-	Q_UNUSED( parts );
 
-	// TODO: this method is called when somebody else, e.g. a client application,
-	// has changed an item managed by your resource.
+	KABC::Addressee addressee;
+	gcal_contact_t contact;
+	KABC::Key key;
+	QString temp;
+	int result;
 
-	// NOTE: There is an equivalent method for collections, but it isn't part
-	// of this template code to keep it simple
+	if (item.hasPayload<KABC::Addressee>())
+		addressee = item.payload<KABC::Addressee>();
+
+	if (!(contact = gcal_contact_new(NULL)))
+		exit(1);
+
+	temp = addressee.realName();
+	gcal_contact_set_title(contact, const_cast<char *>(qPrintable(temp)));
+
+	temp = addressee.fullEmail();
+	gcal_contact_set_email(contact, const_cast<char *>(qPrintable(temp)));
+
+	temp = addressee.uid();
+	gcal_contact_set_id(contact, const_cast<char *>(qPrintable(temp)));
+
+	/* I suppose that this retrieves the first element in the key list */
+	key = addressee.keys()[0];
+	temp = key.id();
+	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
+
+
+	/* TODO: add remaining fields */
+
+	if ((result = gcal_update_contact(gcal, contact)))
+		exit(1);
+
+
+	/* Updates the ETag/url: I suppose that akonadi will save this object */
+	temp = gcal_contact_get_url(contact);
+	addressee.setUid(temp);
+
+	temp = gcal_contact_get_etag(contact);
+	key.setId(temp);
+	addressee.insertKey(key);
+
+
+	gcal_contact_delete(contact);
+
 }
 
 void googledataResource::itemRemoved( const Akonadi::Item &item )
