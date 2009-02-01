@@ -7,6 +7,7 @@
 #include <kabc/addressee.h>
 #include <kabc/phonenumber.h>
 #include <kabc/key.h>
+#include <kabc/errorhandler.h>
 #include <qstring.h>
 
 extern "C" {
@@ -17,7 +18,7 @@ extern "C" {
 
 using namespace Akonadi;
 
-googledataResource::googledataResource( const QString &id )
+GoogleDataResource::GoogleDataResource( const QString &id )
 	: ResourceBase( id )
 {
 	new SettingsAdaptor( Settings::self() );
@@ -30,14 +31,23 @@ googledataResource::googledataResource( const QString &id )
 	gcal_set_store_xml(gcal, 1);
 }
 
-googledataResource::~googledataResource()
+GoogleDataResource::~GoogleDataResource()
 {
 	gcal_delete(gcal);
 	gcal_cleanup_contacts(&all_contacts);
 }
 
-void googledataResource::retrieveCollections()
+void GoogleDataResource::retrieveCollections()
 {
+// 	if ( mBaseResource == 0 ) {
+// 		kError() << "No Google Contacts resource";
+// 		const QString message = i18nc( "@info:status", "No  Google Contact configured yet" );
+// 		emit error( message );
+
+// 		emit status( Broken, message );
+// 		return;
+// 	}
+
 	Collection c;
 	c.setParent(Collection::root());
 	c.setRemoteId("google-contacts");
@@ -53,7 +63,7 @@ void googledataResource::retrieveCollections()
 
 }
 
-void googledataResource::retrieveItems( const Akonadi::Collection &collection )
+void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
 
@@ -79,7 +89,7 @@ void googledataResource::retrieveItems( const Akonadi::Collection &collection )
 	itemsRetrieved(items);
 }
 
-bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
+bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED( parts );
 	const QString entry_id = item.remoteId();
@@ -125,13 +135,13 @@ bool googledataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	return false;
 }
 
-void googledataResource::aboutToQuit()
+void GoogleDataResource::aboutToQuit()
 {
 	// TODO: any cleanup you need to do while there is still an active
 	// event loop. The resource will terminate after this method returns
 }
 
-void googledataResource::configure( WId windowId )
+void GoogleDataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
 
@@ -141,7 +151,7 @@ void googledataResource::configure( WId windowId )
 	synchronize();
 }
 
-void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
+void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 
 	KABC::Addressee addressee;
@@ -170,7 +180,7 @@ void googledataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 }
 
-void googledataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
+void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 
 	KABC::Addressee addressee;
@@ -219,7 +229,7 @@ void googledataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 }
 
-void googledataResource::itemRemoved( const Akonadi::Item &item )
+void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 {
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
@@ -248,6 +258,6 @@ void googledataResource::itemRemoved( const Akonadi::Item &item )
 
 }
 
-AKONADI_RESOURCE_MAIN( googledataResource )
+AKONADI_RESOURCE_MAIN( GoogleDataResource )
 
 #include "googledataresource.moc"

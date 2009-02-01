@@ -7,13 +7,13 @@ extern "C" {
 #include <gcontact.h>
 }
 
-class googledataResource : public Akonadi::ResourceBase,
+class GoogleDataResource : public Akonadi::ResourceBase,
                            public Akonadi::AgentBase::Observer
 {
 Q_OBJECT
 public:
-	googledataResource( const QString &id );
-	~googledataResource();
+	GoogleDataResource( const QString &id );
+	~GoogleDataResource();
 
 public Q_SLOTS:
 	virtual void configure( WId windowId );
