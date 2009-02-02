@@ -154,8 +154,14 @@ void GoogleDataResource::configure( WId windowId )
 	char *user, *pass;
 	int result = -1;
 
-	dlgGoogleDataConf *dlgConf = new dlgGoogleDataConf;
+	dlgGoogleDataConf *dlgConf;
+	if (windowId)
+		dlgConf = new dlgGoogleDataConf(QWidget::find(windowId));
+	else
+		dlgConf = new dlgGoogleDataConf;
+ 
 	dlgConf->show();
+	sleep(10);
 
 	user = const_cast<char *>(qPrintable(dlgConf->eAccount->text()));
 	pass = const_cast<char *>(qPrintable(dlgConf->ePass->text()));
