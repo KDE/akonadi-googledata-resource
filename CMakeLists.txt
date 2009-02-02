@@ -53,8 +53,10 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
 
 set( googledataresource_SRCS
   googledataresource.cpp
+  dlgGoogleDataConf.cpp
 )
 
+kde4_add_ui_files( googledataresource_SRCS GoogleData.ui )
 install( FILES googledataresource.desktop DESTINATION "${CMAKE_INSTALL_PREFIX}/share/akonadi/agents" )
 
 kde4_add_kcfg_files(googledataresource_SRCS settings.kcfgc)
