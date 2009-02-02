@@ -20,7 +20,7 @@ extern "C" {
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
-	: ResourceBase( id )
+	: ResourceBase( id ), authenticated(false)
 {
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject( QLatin1String( "/Settings" ),
@@ -71,6 +71,9 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	Item::List items;
 	int result;
 
+	if (!authenticated)
+		exit(1);
+
 	/* Downloading the contacts can be slow and it is blocking. Will
 	 * it mess up with akonadi?
 	 */
@@ -100,6 +103,9 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	KABC::Addressee addressee;
 	KABC::PhoneNumber number;
 	KABC::Key key;
+
+	if (!authenticated)
+		exit(1);
 
 	/*
 	 * And another question, are the requests in the same sequence that
@@ -160,6 +166,8 @@ void GoogleDataResource::configure( WId windowId )
 	/* TODO: in case of authentication error, display an error
 	 * message.
 	 */
+	if (!result)
+		authenticated = true;
 
 	synchronize();
 	delete dlgConf;
@@ -172,6 +180,9 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	gcal_contact_t contact;
 	QString temp;
 	int result;
+
+	if (!authenticated)
+		exit(1);
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -202,6 +213,9 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	KABC::Key key;
 	QString temp;
 	int result;
+
+	if (!authenticated)
+		exit(1);
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -250,6 +264,9 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	KABC::Key key;
 	QString temp;
 	int result;
+
+	if (!authenticated)
+		exit(1);
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();

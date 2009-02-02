@@ -30,6 +30,8 @@ protected:
 	virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
 	virtual void itemRemoved( const Akonadi::Item &item );
 
+	/* Flag with authentication */
+	bool authenticated;
 	/* Google data context: holds user account name/password */
 	gcal_t gcal;
 	/* Contact array */
