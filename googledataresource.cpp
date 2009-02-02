@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "settingsadaptor.h"
+#include "dlgGoogleDataConf.h"
 
 #include <QtDBus/QDBusConnection>
 #include <kabc/addressee.h>
@@ -144,11 +145,14 @@ void GoogleDataResource::aboutToQuit()
 void GoogleDataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
+	dlgGoogleDataConf *dlgConf = new dlgGoogleDataConf;
+	dlgConf->show();
 
-	/* TODO:
-	 * what kind of dialog to collect google acount username + password ?
-	 */
+	/* TODO: retrieve user + password */
+
 	synchronize();
+
+	delete dlgConf;
 }
 
 void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
