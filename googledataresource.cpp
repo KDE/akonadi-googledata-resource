@@ -145,13 +145,23 @@ void GoogleDataResource::aboutToQuit()
 void GoogleDataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
+	char *user, *pass;
+	int result = -1;
+
 	dlgGoogleDataConf *dlgConf = new dlgGoogleDataConf;
 	dlgConf->show();
 
-	/* TODO: retrieve user + password */
+	user = const_cast<char *>(qPrintable(dlgConf->eAccount->text()));
+	pass = const_cast<char *>(qPrintable(dlgConf->ePass->text()));
+	if (user)
+		if (pass)
+			result = gcal_get_authentication(gcal, user, pass);
+
+	/* TODO: in case of authentication error, display an error
+	 * message.
+	 */
 
 	synchronize();
-
 	delete dlgConf;
 }
 
