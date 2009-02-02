@@ -5,6 +5,6 @@ dlgGoogleDataConf::dlgGoogleDataConf(QWidget *parent): QDialog(parent)
 {
 	setupUi(this);
 
-	/* TODO: connect signals here */
-
+	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
