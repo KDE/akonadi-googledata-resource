@@ -28,7 +28,7 @@ extern "C" {
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
-	: ResourceBase(id), authenticated(false), dlgConf(NULL)
+	: ResourceBase(id), dlgConf(0), authenticated(false)
 {
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject( QLatin1String( "/Settings" ),
