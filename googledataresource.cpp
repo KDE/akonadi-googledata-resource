@@ -20,7 +20,7 @@ extern "C" {
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
-	: ResourceBase( id ), authenticated(false), dlgConf(NULL)
+	: ResourceBase(id), authenticated(false), dlgConf(NULL)
 {
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject( QLatin1String( "/Settings" ),
@@ -42,14 +42,16 @@ GoogleDataResource::~GoogleDataResource()
 
 void GoogleDataResource::retrieveCollections()
 {
-// 	if ( mBaseResource == 0 ) {
-// 		kError() << "No Google Contacts resource";
-// 		const QString message = i18nc( "@info:status", "No  Google Contact configured yet" );
-// 		emit error( message );
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
 
-// 		emit status( Broken, message );
-// 		return;
-// 	}
+		emit status(Broken, message);
+		return;
+	}
 
 	Collection c;
 	c.setParent(Collection::root());
@@ -73,8 +75,16 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	Item::List items;
 	int result;
 
-	if (!authenticated)
-		exit(1);
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
+
+		emit status(Broken, message);
+		return;
+	}
 
 	/* Downloading the contacts can be slow and it is blocking. Will
 	 * it mess up with akonadi?
@@ -106,8 +116,16 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	KABC::PhoneNumber number;
 	KABC::Key key;
 
-	if (!authenticated)
-		exit(1);
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
+
+		emit status(Broken, message);
+		return false;
+	}
 
 	/*
 	 * And another question, are the requests in the same sequence that
@@ -185,13 +203,23 @@ void GoogleDataResource::configure( WId windowId )
 void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 
+	Q_UNUSED(collection);
+
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
 	QString temp;
 	int result;
 
-	if (!authenticated)
-		exit(1);
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
+
+		emit status(Broken, message);
+		return;
+	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -216,6 +244,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
+	Q_UNUSED(parts);
 
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
@@ -223,8 +252,16 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	QString temp;
 	int result;
 
-	if (!authenticated)
-		exit(1);
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
+
+		emit status(Broken, message);
+		return;
+	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -274,8 +311,16 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	QString temp;
 	int result;
 
-	if (!authenticated)
-		exit(1);
+	if (!authenticated) {
+		kError() << "No athentication for Google Contacts available";
+		const QString message = i18nc("@info:status",
+					      "No  yet authenticated for"
+					      " use of Google Contacts");
+		emit error(message);
+
+		emit status(Broken, message);
+		return;
+	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
