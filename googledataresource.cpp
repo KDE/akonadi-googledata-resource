@@ -2,7 +2,6 @@
 
 #include "settings.h"
 #include "settingsadaptor.h"
-#include "dlgGoogleDataConf.h"
 
 #include <QtDBus/QDBusConnection>
 #include <kabc/addressee.h>
@@ -10,6 +9,7 @@
 #include <kabc/key.h>
 #include <kabc/errorhandler.h>
 #include <qstring.h>
+#include <KWindowSystem>
 
 extern "C" {
 #include <gcalendar.h>
@@ -20,7 +20,7 @@ extern "C" {
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
-	: ResourceBase( id ), authenticated(false)
+	: ResourceBase( id ), authenticated(false), dlgConf(NULL)
 {
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject( QLatin1String( "/Settings" ),
@@ -36,6 +36,8 @@ GoogleDataResource::~GoogleDataResource()
 {
 	gcal_delete(gcal);
 	gcal_cleanup_contacts(&all_contacts);
+	if (dlgConf)
+		delete dlgConf;
 }
 
 void GoogleDataResource::retrieveCollections()
@@ -153,18 +155,20 @@ void GoogleDataResource::configure( WId windowId )
 	Q_UNUSED( windowId );
 	char *user, *pass;
 	int result = -1;
+	QByteArray byteUser, bytePass;
 
-	dlgGoogleDataConf *dlgConf;
-	if (windowId)
-		dlgConf = new dlgGoogleDataConf(QWidget::find(windowId));
-	else
+	if (!dlgConf)
 		dlgConf = new dlgGoogleDataConf;
- 
-	dlgConf->show();
-	sleep(10);
 
-	user = const_cast<char *>(qPrintable(dlgConf->eAccount->text()));
-	pass = const_cast<char *>(qPrintable(dlgConf->ePass->text()));
+	if (windowId && dlgConf)
+		KWindowSystem::setMainWindow(dlgConf, windowId);
+
+	dlgConf->exec();
+
+	byteUser = dlgConf->eAccount->text().toLocal8Bit();
+	bytePass = dlgConf->ePass->text().toLocal8Bit();
+	user = const_cast<char *>(byteUser.constData());
+	pass = const_cast<char *>(bytePass.constData());
 	if (user)
 		if (pass)
 			result = gcal_get_authentication(gcal, user, pass);
@@ -176,7 +180,6 @@ void GoogleDataResource::configure( WId windowId )
 		authenticated = true;
 
 	synchronize();
-	delete dlgConf;
 }
 
 void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )

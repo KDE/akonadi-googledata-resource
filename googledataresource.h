@@ -2,6 +2,7 @@
 #define GOOGLEDATARESOURCE_H
 
 #include <akonadi/resourcebase.h>
+#include "dlgGoogleDataConf.h"
 extern "C" {
 #include <gcalendar.h>
 #include <gcontact.h>
@@ -30,6 +31,8 @@ protected:
 	virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
 	virtual void itemRemoved( const Akonadi::Item &item );
 
+	/* Config dialog */
+	dlgGoogleDataConf *dlgConf;
 	/* Flag with authentication */
 	bool authenticated;
 	/* Google data context: holds user account name/password */
