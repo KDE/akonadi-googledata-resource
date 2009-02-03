@@ -1,14 +1,14 @@
 project(googledata)
 
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules" )
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules" )
 
 # search packages used by KDE
+find_package (KDE4 REQUIRED)
 include(KDE4Defaults)
 include(MacroLibrary)
 include(MacroOptionalAddSubdirectory)
 include(CheckIncludeFiles)
 
-find_package (KDE4 REQUIRED)
 find_package (KdepimLibs REQUIRED)
 
 #libgcal implements google data protocols 2.0
