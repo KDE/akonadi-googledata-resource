@@ -2,7 +2,6 @@ project(googledata)
 
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules" )
 
-
 # search packages used by KDE
 find_package (KDE4 REQUIRED)
 include(KDE4Defaults)
@@ -43,7 +42,7 @@ endif(WIN32)
 set(KDE4_ICON_DIR ${KDE4_INSTALL_DIR}/share/icons)
 
 include_directories(
-    ${KDE4_INCLUDES} ${LIBGCAL_INCLUDE_DIRS}
+    ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS}
 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
