@@ -17,6 +17,14 @@ extern "C" {
 #include <gcal_status.h>
 }
 
+
+/** FIXME: for some reason the 'retrieveItem' functions is not being called.
+ * this makes the entries to lack its contents (name, email, etc).
+ * I should investigate why and fix, for while this is a workaround:
+ * I report the payload in the 'retrieveItems' function.
+ */
+#define ITEM_BUG_WTF
+
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
@@ -94,10 +102,35 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 
 	/* Each google entry has a unique ID and edit_url */
 	for (size_t i = 0; i < all_contacts.length; ++i) {
-
 		Item item(QLatin1String("text/directory"));
 		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
+
+#ifdef ITEM_BUG_WTF
+		KABC::Addressee addressee;
+		KABC::PhoneNumber number;
+		KABC::Key key;
+		QString temp;
+
+		/* name */
+		temp = gcal_contact_get_title(contact);
+		addressee.setNameFromString(temp);
+		/* email */
+		temp = gcal_contact_get_email(contact);
+		addressee.insertEmail(temp, true);
+		/* edit url: required to do edit/delete */
+		temp = gcal_contact_get_url(contact);
+		addressee.setUid(temp);
+		/* ETag: required by Google Data protocol 2.0 */
+		temp = gcal_contact_get_etag(contact);
+		key.setId(temp);
+		addressee.insertKey(key);
+		/* TODO: telefone, address, etc */
+
+		item.setPayload<KABC::Addressee>(addressee);
+#endif
+
 		item.setRemoteId(gcal_contact_get_id(contact));
+
 
 		items << item;
 	}
