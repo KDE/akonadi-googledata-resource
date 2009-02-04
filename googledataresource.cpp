@@ -359,6 +359,7 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	gcal_contact_t contact;
 	KABC::Key key;
 	QString temp;
+	QByteArray t_byte;
 	int result;
 
 	if (!authenticated) {
@@ -379,15 +380,27 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 		exit(1);
 
 	temp = addressee.uid();
-	gcal_contact_set_id(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_id(contact, const_cast<char *>(t_byte.constData()));
 
 	/* I suppose that this retrieves the first element in the key list */
 	key = addressee.keys()[0];
 	temp = key.id();
 	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
 
-	if ((result = gcal_erase_contact(gcal, contact)))
-		exit(1);
+	if ((result = gcal_erase_contact(gcal, contact))) {
+		kError() << "Failed deleting contact"
+			 << "name: " << addressee.realName()
+			 << "etag: " << addressee.keys()[0].id()
+			 << "uid: " << addressee.uid();
+		const QString message = i18nc("@info:status",
+					      "Failed adding new contact");
+		emit error(message);
+		emit status(Broken, message);
+
+	}
+
+
 
 	gcal_contact_delete(contact);
 
