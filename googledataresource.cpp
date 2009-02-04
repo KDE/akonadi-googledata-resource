@@ -10,6 +10,8 @@
 #include <kabc/errorhandler.h>
 #include <qstring.h>
 #include <KWindowSystem>
+#include <akonadi/changerecorder.h>
+#include <akonadi/itemfetchscope.h>
 
 extern "C" {
 #include <gcalendar.h>
@@ -35,6 +37,7 @@ GoogleDataResource::GoogleDataResource( const QString &id )
 		QLatin1String( "/Settings" ), Settings::self(),
 		QDBusConnection::ExportAdaptors );
 
+	changeRecorder()->itemFetchScope().fetchFullPayload();
 
 	if (!(gcal = gcal_new(GCONTACT)))
 		exit(1);
