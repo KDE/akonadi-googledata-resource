@@ -245,9 +245,11 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	Q_UNUSED(collection);
 
 	KABC::Addressee addressee;
+	KABC::Key key;
 	gcal_contact_t contact;
 	QString temp;
 	QByteArray t_byte;
+	Item newItem;
 	int result;
 
 	if (!authenticated) {
@@ -288,6 +290,17 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 	}
 
+	/* report back the ID+Etag */
+	temp = gcal_contact_get_url(contact);
+	addressee.setUid(temp);
+	temp = gcal_contact_get_etag(contact);
+	key.setId(temp);
+	addressee.insertKey(key);
+
+	newItem.setPayload<KABC::Addressee>(addressee);
+	itemRetrieved(newItem);
+
+	/* cleanup */
 	gcal_contact_delete(contact);
 
 }
@@ -384,7 +397,7 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	gcal_contact_set_id(contact, const_cast<char *>(t_byte.constData()));
 
 	/* I suppose that this retrieves the first element in the key list */
-	key = addressee.keys()[0];
+	key = addressee.key(KABC::Key::Custom);
 	temp = key.id();
 	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
 
@@ -400,7 +413,10 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 
 	}
 
-
+	kError() << "Succeeded deleting contact"
+		 << "name: " << addressee.realName()
+		 << "etag: " << addressee.keys()[0].id()
+		 << "uid: " << addressee.uid();
 
 	gcal_contact_delete(contact);
 
