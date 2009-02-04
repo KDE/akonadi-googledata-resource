@@ -187,6 +187,8 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 			/* TODO: telefone, address, etc */
 
 			newItem.setPayload<KABC::Addressee>(addressee);
+
+                        itemRetrieved(newItem);
 			return true;
 		}
 
