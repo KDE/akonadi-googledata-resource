@@ -271,8 +271,16 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 	/* TODO: add remaining fields */
 
-	if ((result = gcal_add_contact(gcal, contact)))
-		exit(1);
+	if ((result = gcal_add_contact(gcal, contact))) {
+		kError() << "Failed adding new contact"
+			 << "name: " << addressee.realName()
+			 << "email: " << addressee.fullEmail();
+		const QString message = i18nc("@info:status",
+					      "Failed adding new contact");
+		emit error(message);
+		emit status(Broken, message);
+
+	}
 
 	gcal_contact_delete(contact);
 
