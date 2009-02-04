@@ -244,6 +244,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
 	QString temp;
+	QByteArray t_byte;
 	int result;
 
 	if (!authenticated) {
@@ -264,10 +265,12 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		exit(1);
 
 	temp = addressee.realName();
-	gcal_contact_set_title(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
 
 	temp = addressee.fullEmail();
-	gcal_contact_set_email(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_email(contact, const_cast<char *>(t_byte.constData()));
 
 	/* TODO: add remaining fields */
 
