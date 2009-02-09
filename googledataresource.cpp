@@ -43,6 +43,8 @@ GoogleDataResource::GoogleDataResource( const QString &id )
 	if (!(gcal = gcal_new(GCONTACT)))
 		exit(1);
 	gcal_set_store_xml(gcal, 1);
+	all_contacts.length = 0;
+	all_contacts.entries = NULL;
 }
 
 GoogleDataResource::~GoogleDataResource()
