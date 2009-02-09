@@ -356,7 +356,6 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 {
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
-	KABC::Key key;
 	QString temp;
 	QByteArray t_byte;
 	int result;
@@ -372,44 +371,27 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 		return;
 	}
 
-	if (item.hasPayload<KABC::Addressee>())
-		addressee = item.payload<KABC::Addressee>();
-
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
 
-	/* Required fields: ID (edit_url) and ETag */
-	temp = addressee.uid();
-	t_byte = temp.toAscii();
-	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
-
-	key = addressee.key(KABC::Key::Custom);
-	temp = key.id();
+	KUrl url(item.remoteId());
+	temp = url.queryItem("etag");
 	t_byte = temp.toAscii();
 	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
 
-	/* Not really necessary to delete, but help debugging */
-	temp = addressee.realName();
+	url.removeQueryItem("etag");
+	temp = url.url();
 	t_byte = temp.toAscii();
-	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
-
-	temp = addressee.preferredEmail();
-	t_byte = temp.toAscii();
-	gcal_contact_set_email(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
 
 	if ((result = gcal_erase_contact(gcal, contact))) {
-		kError() << "Failed deleting contact"
-			 << "name: " << gcal_contact_get_title(contact)
-			 << "email: " << gcal_contact_get_email(contact)
-			 << "edit_url: " << gcal_contact_get_url(contact)
-			 << "etag: " << gcal_contact_get_etag(contact);
+		kError() << "Failed deleting contact";
 		const QString message = i18nc("@info:status",
-					      "Failed adding new contact");
+					      "Failed deleting new contact");
 		emit error(message);
 		emit status(Broken, message);
 
 	}
-
 
 	gcal_contact_delete(contact);
 }
