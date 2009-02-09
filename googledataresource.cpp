@@ -58,7 +58,7 @@ GoogleDataResource::~GoogleDataResource()
 void GoogleDataResource::retrieveCollections()
 {
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
@@ -91,7 +91,7 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	int result;
 
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
@@ -152,7 +152,7 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	KABC::PhoneNumber number;
 
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
@@ -246,7 +246,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	int result;
 
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
@@ -304,7 +304,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	int result;
 
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
@@ -363,18 +363,24 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	int result;
 
 	if (!authenticated) {
-		kError() << "No athentication for Google Contacts available";
+		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
 		emit error(message);
-
 		emit status(Broken, message);
 		return;
 	}
 
-	if (!(contact = gcal_contact_new(NULL)))
-		exit(1);
+	if (!(contact = gcal_contact_new(NULL))) {
+		kError() << "Memory allocation error!";
+		const QString message = i18nc("@info:status",
+					      "Failed to create gcal_contact");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
+
 
 	KUrl url(item.remoteId());
 	temp = url.queryItem("etag");
