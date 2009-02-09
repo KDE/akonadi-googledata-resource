@@ -202,6 +202,7 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	 */
 	for (size_t i = 0; i < all_contacts.length; ++i) {
 		contact = gcal_contact_element(&all_contacts, i);
+		/* FIXME: remoteID == edit_url + ETag */
 		if (entry_id == gcal_contact_get_id(contact)) {
 			/* name */
 			temp = gcal_contact_get_title(contact);
@@ -276,7 +277,6 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	gcal_contact_t contact;
 	QString temp;
 	QByteArray t_byte;
-	Item newItem;
 	int result;
 
 	if (!authenticated) {
@@ -316,11 +316,16 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		emit status(Broken, message);
 
 	}
+
 	/* remoteID: etag+edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
 	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
-	//FIXME: this guy is const... how to supply the etag/url?
-	//item.setRemoteId(urlEtag.url());
+
+	Item newItem(item);
+	newItem.setPayload<KABC::Addressee>(addressee);
+	newItem.setRemoteId(urlEtag.url());
+	itemRetrieved(newItem);
+
 
 	/* cleanup */
 	gcal_contact_delete(contact);
@@ -392,8 +397,11 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	/* remoteID: etag+edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
 	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
-	//FIXME: this guy is const... how to supply the etag/url?
-	//item.setRemoteId(urlEtag.url());
+
+	Item newItem(item);
+	newItem.setPayload<KABC::Addressee>(addressee);
+	newItem.setRemoteId(urlEtag.url());
+	itemRetrieved(newItem);
 
 	gcal_contact_delete(contact);
 }
