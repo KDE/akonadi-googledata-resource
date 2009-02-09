@@ -112,7 +112,6 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 #ifdef ITEM_BUG_WTF
 		KABC::Addressee addressee;
 		KABC::PhoneNumber number;
-		KABC::Key key;
 		QString temp;
 
 		/* name */
@@ -121,19 +120,15 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		/* email */
 		temp = gcal_contact_get_email(contact);
 		addressee.insertEmail(temp, true);
-		/* edit url: required to do edit/delete */
-		temp = gcal_contact_get_url(contact);
-		addressee.setUid(temp);
-		/* ETag: required by Google Data protocol 2.0 */
-		temp = gcal_contact_get_etag(contact);
-		key.setId(temp);
-		addressee.insertKey(key);
 		/* TODO: telefone, address, etc */
 
 		item.setPayload<KABC::Addressee>(addressee);
+
+		temp = gcal_contact_get_etag(contact);
+
 #endif
 
-		item.setRemoteId(gcal_contact_get_id(contact));
+		item.setRemoteId(gcal_contact_get_url(contact));
 
 
 		items << item;
@@ -151,7 +146,6 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 	gcal_contact_t contact;
 	KABC::Addressee addressee;
 	KABC::PhoneNumber number;
-	KABC::Key key;
 
 	if (!authenticated) {
 		kError() << "No athentication for Google Contacts available";
@@ -179,19 +173,11 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 			temp = gcal_contact_get_email(contact);
 			addressee.insertEmail(temp, true);
 
-			/* edit url: required to do edit/delete */
-			temp = gcal_contact_get_url(contact);
-			addressee.setUid(temp);
-
-			/* ETag: required by Google Data protocol 2.0 */
-			temp = gcal_contact_get_etag(contact);
-			key.setId(temp);
-			addressee.insertKey(key);
-
 			/* TODO: telefone, address, etc */
 
 			newItem.setPayload<KABC::Addressee>(addressee);
-
+			newItem.setRemoteId(gcal_contact_get_url(contact));
+			temp = gcal_contact_get_etag(contact);
                         itemRetrieved(newItem);
 			return true;
 		}
