@@ -394,18 +394,19 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 
 	temp = addressee.uid();
 	t_byte = temp.toLocal8Bit();
-	gcal_contact_set_id(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
 
 	/* I suppose that this retrieves the first element in the key list */
 	key = addressee.key(KABC::Key::Custom);
 	temp = key.id();
-	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
 
 	if ((result = gcal_erase_contact(gcal, contact))) {
 		kError() << "Failed deleting contact"
-			 << "name: " << addressee.realName()
-			 << "etag: " << addressee.keys()[0].id()
-			 << "uid: " << addressee.uid();
+			 << "name: " << gcal_contact_get_title(contact)
+			 << "etag: " << gcal_contact_get_etag(contact)
+			 << "uid: " << gcal_contact_get_url(contact);
 		const QString message = i18nc("@info:status",
 					      "Failed adding new contact");
 		emit error(message);
@@ -413,13 +414,8 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 
 	}
 
-	kError() << "Succeeded deleting contact"
-		 << "name: " << addressee.realName()
-		 << "etag: " << addressee.keys()[0].id()
-		 << "uid: " << addressee.uid();
 
 	gcal_contact_delete(contact);
-
 }
 
 AKONADI_RESOURCE_MAIN( GoogleDataResource )
