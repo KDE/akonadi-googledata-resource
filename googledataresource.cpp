@@ -124,12 +124,12 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 
 		item.setPayload<KABC::Addressee>(addressee);
 
+		/* remoteID: etag+edit_url */
 		temp = gcal_contact_get_etag(contact);
-
+		temp += gcal_contact_get_url(contact);
 #endif
 
-		item.setRemoteId(gcal_contact_get_url(contact));
-
+		item.setRemoteId(temp);
 
 		items << item;
 	}
@@ -175,9 +175,12 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 
 			/* TODO: telefone, address, etc */
 
-			newItem.setPayload<KABC::Addressee>(addressee);
-			newItem.setRemoteId(gcal_contact_get_url(contact));
+			/* remoteID: etag+edit_url */
 			temp = gcal_contact_get_etag(contact);
+			temp += gcal_contact_get_url(contact);
+
+			newItem.setPayload<KABC::Addressee>(addressee);
+			newItem.setRemoteId(temp);
                         itemRetrieved(newItem);
 			return true;
 		}
@@ -231,7 +234,6 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	Q_UNUSED(collection);
 
 	KABC::Addressee addressee;
-	KABC::Key key;
 	gcal_contact_t contact;
 	QString temp;
 	QByteArray t_byte;
