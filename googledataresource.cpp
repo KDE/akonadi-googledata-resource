@@ -298,11 +298,11 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 	temp = addressee.realName();
 	t_byte = temp.toLocal8Bit();
-	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.fullEmail();
 	t_byte = temp.toLocal8Bit();
-	gcal_contact_set_email(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_email(contact, t_byte.data());
 
 	/* TODO: add remaining fields */
 
@@ -362,23 +362,23 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 	temp = addressee.realName();
 	t_byte = temp.toLocal8Bit();
-	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.fullEmail();
 	t_byte = temp.toLocal8Bit();
-	gcal_contact_set_email(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_email(contact, t_byte.data());
 
 	/* TODO: add remaining fields */
 
 	KUrl url(item.remoteId());
 	temp = url.queryItem("etag");
 	t_byte = temp.toAscii();
-	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_etag(contact, t_byte.data());
 
 	url.removeQueryItem("etag");
 	temp = url.url();
 	t_byte = temp.toAscii();
-	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_url(contact, t_byte.data());
 
 	if ((result = gcal_update_contact(gcal, contact))) {
 		kError() << "Failed editing contact";
@@ -429,12 +429,12 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	KUrl url(item.remoteId());
 	temp = url.queryItem("etag");
 	t_byte = temp.toAscii();
-	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_etag(contact, t_byte.data());
 
 	url.removeQueryItem("etag");
 	temp = url.url();
 	t_byte = temp.toAscii();
-	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
+	gcal_contact_set_url(contact, t_byte.data());
 
 	if ((result = gcal_erase_contact(gcal, contact))) {
 		kError() << "Failed deleting contact";
