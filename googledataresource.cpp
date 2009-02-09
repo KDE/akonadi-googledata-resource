@@ -321,10 +321,12 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 		exit(1);
 
 	temp = addressee.realName();
-	gcal_contact_set_title(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
 
 	temp = addressee.fullEmail();
-	gcal_contact_set_email(contact, const_cast<char *>(qPrintable(temp)));
+	t_byte = temp.toLocal8Bit();
+	gcal_contact_set_email(contact, const_cast<char *>(t_byte.constData()));
 
 	/* TODO: add remaining fields */
 
