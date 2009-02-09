@@ -1,3 +1,37 @@
+/*  Copyright (C) 2009  Adenilson Cavalcanti <savagobr@yahoo.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; by version 2 of the License or (at your
+ *  choice) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+/* TODO:
+ * - inform to akonadi new edit_url/etag (after each operation they will
+ * change).
+ * - store user account details somewhere (config file?)
+ * - delete/edit: test further, seems to fail from time to time (maybe related
+ * with previous)
+ * - support more fields: address, fax, photo, etc. This will require new
+ * code in libgcal
+ * - test with lots of contacts (blocking retrieve of contacts can mess with
+ * akonadi)
+ * - proxy support (already implemented in libgcal): show an advanced option
+ * in configuration dialog so user can setup its proxy
+ * - code cleanup
+ * - unit tests: not sure if really required, libgcal already has lots
+ * of tests
+ */
 #include "googledataresource.h"
 
 #include "settings.h"
