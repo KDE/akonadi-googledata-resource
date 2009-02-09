@@ -392,6 +392,7 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
 
+	/* Required fields: ID (edit_url) and ETag */
 	temp = addressee.uid();
 	t_byte = temp.toAscii();
 	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
@@ -401,6 +402,7 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	t_byte = temp.toAscii();
 	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
 
+	/* Not really necessary to delete, but help debugging */
 	temp = addressee.realName();
 	t_byte = temp.toAscii();
 	gcal_contact_set_title(contact, const_cast<char *>(t_byte.constData()));
