@@ -17,13 +17,12 @@
  */
 
 /* TODO:
- * - inform to akonadi new edit_url/etag (after each operation they will
- * change).
- * - store user account details somewhere (config file?)
+ * - store user account details somewhere (KWallet seems a safer approach)
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
  * - support more fields: address, fax, photo, etc. This will require new
  * code in libgcal
+ * - test with special characters (unicode > 256)
  * - test with lots of contacts (blocking retrieve of contacts can mess with
  * akonadi)
  * - proxy support (already implemented in libgcal): show an advanced option
