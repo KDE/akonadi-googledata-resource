@@ -299,7 +299,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
-	KABC::Key key;
+	QByteArray t_byte;
 	QString temp;
 	int result;
 
@@ -326,32 +326,34 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	temp = addressee.fullEmail();
 	gcal_contact_set_email(contact, const_cast<char *>(qPrintable(temp)));
 
-	temp = addressee.uid();
-	gcal_contact_set_id(contact, const_cast<char *>(qPrintable(temp)));
-
-	/* I suppose that this retrieves the first element in the key list */
-	key = addressee.keys()[0];
-	temp = key.id();
-	gcal_contact_set_etag(contact, const_cast<char *>(qPrintable(temp)));
-
-
 	/* TODO: add remaining fields */
 
-	if ((result = gcal_update_contact(gcal, contact)))
-		exit(1);
+	KUrl url(item.remoteId());
+	temp = url.queryItem("etag");
+	t_byte = temp.toAscii();
+	gcal_contact_set_etag(contact, const_cast<char *>(t_byte.constData()));
 
+	url.removeQueryItem("etag");
+	temp = url.url();
+	t_byte = temp.toAscii();
+	gcal_contact_set_url(contact, const_cast<char *>(t_byte.constData()));
 
-	/* Updates the ETag/url: I suppose that akonadi will save this object */
-	temp = gcal_contact_get_url(contact);
-	addressee.setUid(temp);
+	if ((result = gcal_update_contact(gcal, contact))) {
+		kError() << "Failed editing contact";
+		const QString message = i18nc("@info:status",
+					      "Failed editing new contact");
+		emit error(message);
+		emit status(Broken, message);
 
-	temp = gcal_contact_get_etag(contact);
-	key.setId(temp);
-	addressee.insertKey(key);
+	}
 
+	/* remoteID: etag+edit_url */
+	KUrl urlEtag(gcal_contact_get_url(contact));
+	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
+	//FIXME: this guy is const... how to supply the etag/url?
+	//item.setRemoteId(urlEtag.url());
 
 	gcal_contact_delete(contact);
-
 }
 
 void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
