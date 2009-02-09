@@ -18,6 +18,7 @@
 
 /* TODO:
  * - store user account details somewhere (KWallet seems a safer approach)
+ * - make libgcal function parameters 'const'
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
  * - support more fields: address, fax, photo, etc. This will require new
@@ -30,6 +31,7 @@
  * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
  * of tests
+ * - nice to have: a libqcal (using Qt for both networking and XML/XPath parsing)
  */
 #include "googledataresource.h"
 
