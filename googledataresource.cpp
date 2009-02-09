@@ -317,8 +317,14 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
 
-	if (!(contact = gcal_contact_new(NULL)))
-		exit(1);
+	if (!(contact = gcal_contact_new(NULL))) {
+		kError() << "Memory allocation error!";
+		const QString message = i18nc("@info:status",
+					      "Failed to create gcal_contact");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
 	temp = addressee.realName();
 	t_byte = temp.toLocal8Bit();
