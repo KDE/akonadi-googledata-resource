@@ -12,6 +12,7 @@
 #include <KWindowSystem>
 #include <akonadi/changerecorder.h>
 #include <akonadi/itemfetchscope.h>
+#include <KUrl>
 
 extern "C" {
 #include <gcalendar.h>
@@ -125,11 +126,12 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		item.setPayload<KABC::Addressee>(addressee);
 
 		/* remoteID: etag+edit_url */
-		temp = gcal_contact_get_etag(contact);
-		temp += gcal_contact_get_url(contact);
+		KUrl urlEtag(gcal_contact_get_url(contact));
+		urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
+
 #endif
 
-		item.setRemoteId(temp);
+		item.setRemoteId(urlEtag.url());
 
 		items << item;
 	}
@@ -176,11 +178,12 @@ bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QBy
 			/* TODO: telefone, address, etc */
 
 			/* remoteID: etag+edit_url */
-			temp = gcal_contact_get_etag(contact);
-			temp += gcal_contact_get_url(contact);
+			KUrl urlEtag(gcal_contact_get_url(contact));
+			urlEtag.addQueryItem("etag",
+					     gcal_contact_get_etag(contact));
 
 			newItem.setPayload<KABC::Addressee>(addressee);
-			newItem.setRemoteId(temp);
+			newItem.setRemoteId(urlEtag.url());
                         itemRetrieved(newItem);
 			return true;
 		}
@@ -277,16 +280,11 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		emit status(Broken, message);
 
 	}
-
-	/* report back the ID+Etag */
-	temp = gcal_contact_get_url(contact);
-	addressee.setUid(temp);
-	temp = gcal_contact_get_etag(contact);
-	key.setId(temp);
-	addressee.insertKey(key);
-
-	newItem.setPayload<KABC::Addressee>(addressee);
-	itemRetrieved(newItem);
+	/* remoteID: etag+edit_url */
+	KUrl urlEtag(gcal_contact_get_url(contact));
+	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
+	//FIXME: this guy is const... how to supply the etag/url?
+	//item.setRemoteId(urlEtag.url());
 
 	/* cleanup */
 	gcal_contact_delete(contact);
