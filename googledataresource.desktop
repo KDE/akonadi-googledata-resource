@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Akonadi Google Contacts Resource
+Name[et]=Akonadi Google'i kontaktide ressurss
 Name[ga]=Acmhainn Teagmhálacha Google le haghaidh Akonadi
 Name[pt]=Recurso de Contactos do Google para o Akonadi
 Name[pt_BR]=Recurso de Contactos do Google para o Akonadi
@@ -7,6 +8,7 @@ Name[sv]=Akonadi Google-kontaktresurs
 Name[uk]=Ресурс Контактів Google для Akonadi
 Name[x-test]=xxAkonadi Google Contacts Resourcexx
 Comment=Resource for a google account
+Comment[et]=Google'i konto ressurss
 Comment[ga]=Acmhainn do chuntas Google
 Comment[pt]=Recurso para uma conta no Google
 Comment[pt_BR]=Recurso para uma conta no Google
