@@ -50,14 +50,16 @@ protected:
 	virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
 	virtual void itemRemoved( const Akonadi::Item &item );
 
-	int saveToWallet(QString user, QString pass, WId window,
-			 QString folder = "akonadigoogle",
-			 QString awallet = "kdewallet");
+	int saveToWallet(const QString &user, const QString &pass,
+			 const WId &window,
+			 const QString &folder = "akonadigoogle",
+			 const QString &awallet = "kdewallet");
 
 
-	int retrieveFromWallet(QString &user, QString &pass, WId window,
-			       QString folder = "akonadigoogle",
-			       QString awallet = "kdewallet");
+	int retrieveFromWallet(QString &user, QString &pass,
+			       const WId &window,
+			       const QString &folder = "akonadigoogle",
+			       const QString &awallet = "kdewallet");
 
 
 	/* Config dialog */

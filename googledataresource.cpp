@@ -239,8 +239,9 @@ void GoogleDataResource::aboutToQuit()
 	// event loop. The resource will terminate after this method returns
 }
 
-int GoogleDataResource::saveToWallet(QString user, QString pass, WId window,
-				     QString folder, QString awallet)
+int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
+				     const WId &window, const QString &folder,
+				     const QString &awallet)
 {
 	int result = -1;
 	if (wallet == 0)
@@ -262,9 +263,11 @@ int GoogleDataResource::saveToWallet(QString user, QString pass, WId window,
 	return result;
 }
 
-int GoogleDataResource::retrieveFromWallet(QString &user, QString &pass,
-					   WId window,
-					   QString folder, QString awallet)
+int GoogleDataResource::retrieveFromWallet(QString &user,
+					   QString &pass,
+					   const WId &window,
+					   const QString &folder,
+					   const QString &awallet)
 {
 	int result = -1;
 	if (wallet == 0)
