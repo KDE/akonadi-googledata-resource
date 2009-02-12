@@ -18,6 +18,7 @@
 
 /* TODO:
  * - recover user account details from kwallet
+ * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
  * - support more fields: address, fax, photo, etc. This will require new
