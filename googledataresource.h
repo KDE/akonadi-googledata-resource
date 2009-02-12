@@ -20,6 +20,8 @@
 
 #include <akonadi/resourcebase.h>
 #include "dlgGoogleDataConf.h"
+#include <kwallet.h>
+
 extern "C" {
 #include <gcalendar.h>
 #include <gcontact.h>
@@ -48,6 +50,11 @@ protected:
 	virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
 	virtual void itemRemoved( const Akonadi::Item &item );
 
+	int saveToWallet(QString user, QString pass, WId window,
+			 QString folder = "akonadigoogle",
+			 QString awallet = "kdewallet");
+
+
 	/* Config dialog */
 	dlgGoogleDataConf *dlgConf;
 	/* Flag with authentication */
@@ -56,6 +63,8 @@ protected:
 	gcal_t gcal;
 	/* Contact array */
 	struct gcal_contact_array all_contacts;
+	/* KWallet object pointer */
+	KWallet::Wallet *wallet;
 };
 
 #endif

@@ -17,7 +17,7 @@
  */
 
 /* TODO:
- * - store user account details somewhere (KWallet seems a safer approach)
+ * - recover user account details from kwallet
  * - make libgcal function parameters 'const'
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
@@ -55,6 +55,7 @@ extern "C" {
 #include <gcal_status.h>
 }
 
+using KWallet::Wallet;
 
 /** FIXME: for some reason the 'retrieveItem' functions is not being called.
  * this makes the entries to lack its contents (name, email, etc).
@@ -80,6 +81,8 @@ GoogleDataResource::GoogleDataResource( const QString &id )
 	gcal_set_store_xml(gcal, 1);
 	all_contacts.length = 0;
 	all_contacts.entries = NULL;
+
+	wallet = 0;
 }
 
 GoogleDataResource::~GoogleDataResource()
@@ -237,6 +240,28 @@ void GoogleDataResource::aboutToQuit()
 	// event loop. The resource will terminate after this method returns
 }
 
+int GoogleDataResource::saveToWallet(QString user, QString pass, WId window,
+				     QString folder, QString awallet)
+{
+	int result = -1;
+	if (wallet == 0)
+		wallet = Wallet::openWallet(awallet, window);
+
+	if (wallet == 0)
+		return result;
+
+	if (wallet->isOpen()) {
+		if (!wallet->hasFolder(folder))
+			wallet->createFolder(folder);
+		wallet->setFolder(folder);
+		wallet->writePassword(user, pass);
+		wallet->sync();
+		result = 0;
+	}
+
+	return result;
+}
+
 void GoogleDataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
@@ -256,9 +281,11 @@ void GoogleDataResource::configure( WId windowId )
 	bytePass = dlgConf->ePass->text().toLocal8Bit();
 	user = const_cast<char *>(byteUser.constData());
 	pass = const_cast<char *>(bytePass.constData());
-	if (user)
-		if (pass)
-			result = gcal_get_authentication(gcal, user, pass);
+	if (user && pass)
+		if (!(result = gcal_get_authentication(gcal, user, pass)))
+			result = saveToWallet(dlgConf->eAccount->text(),
+					      dlgConf->ePass->text(),
+					      windowId);
 
 	/* TODO: in case of authentication error, display an error
 	 * message.
