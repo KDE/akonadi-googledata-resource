@@ -55,6 +55,11 @@ protected:
 			 QString awallet = "kdewallet");
 
 
+	int retrieveFromWallet(QString &user, QString &pass, WId window,
+			       QString folder = "akonadigoogle",
+			       QString awallet = "kdewallet");
+
+
 	/* Config dialog */
 	dlgGoogleDataConf *dlgConf;
 	/* Flag with authentication */

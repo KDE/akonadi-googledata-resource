@@ -253,12 +253,37 @@ int GoogleDataResource::saveToWallet(QString user, QString pass, WId window,
 		if (!wallet->hasFolder(folder))
 			wallet->createFolder(folder);
 		wallet->setFolder(folder);
+		/* TODO: could I store proxy settings here too? */
 		wallet->writePassword(user, pass);
 		wallet->sync();
 		result = 0;
 	}
 
 	return result;
+}
+
+int GoogleDataResource::retrieveFromWallet(QString &user, QString &pass,
+					   WId window,
+					   QString folder, QString awallet)
+{
+	int result = -1;
+	if (wallet == 0)
+		wallet = Wallet::openWallet(awallet, window);
+
+	if (wallet == 0)
+		return result;
+
+	if (wallet->isOpen()) {
+		if (!wallet->hasFolder(folder))
+			return result;
+		wallet->setFolder(folder);
+		/* FIXME: but what happens if I dont known the user name? */
+		wallet->readPassword(user, pass);
+		result = 0;
+	}
+
+	return result;
+
 }
 
 void GoogleDataResource::configure( WId windowId )
