@@ -304,9 +304,10 @@ void GoogleDataResource::doSetOnline(bool online)
 	kDebug() << "online" << online;
 	QString user;
 	QString password;
+	WId window = winIdForDialogs();
 
 	if (online)
-		if (!retrieveFromWallet(user, password, 0))
+		if (!retrieveFromWallet(user, password, window))
 			if (!(authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
