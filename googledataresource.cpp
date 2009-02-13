@@ -17,16 +17,20 @@
  */
 
 /* TODO:
+ * - dialog displaying (kwallet + user account) is a bit confusing right
+ * now, should display unlock dialog only if user got authenticated.
+ * - support more than 1 user account
  * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
+ * - fast-sync: get changes/updates from server (libgcal currently supports
+ * query by updates)
  * - support more fields: address, fax, photo, etc. This will require new
  * code in libgcal
  * - test with special characters (unicode > 256)
  * - test with lots of contacts (blocking retrieve of contacts can mess with
  * akonadi)
- * - proxy support (already implemented in libgcal): show an advanced option
- * in configuration dialog so user can setup its proxy
+ * - support google calendar (libgcal already has code for that)
  * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
  * of tests
