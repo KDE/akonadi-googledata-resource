@@ -245,6 +245,7 @@ int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
 				     const QString &awallet)
 {
 	int result = -1;
+	QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(awallet, window);
 
@@ -256,7 +257,11 @@ int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
 			wallet->createFolder(folder);
 		wallet->setFolder(folder);
 		/* TODO: could I store proxy settings here too? */
-		wallet->writePassword(user, pass);
+
+		QMap<QString, QString> data;
+		data["login"] = user;
+		data["password"] = pass;
+		wallet->writeMap(gaccount, data);
 		wallet->sync();
 		result = 0;
 	}
