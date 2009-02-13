@@ -276,6 +276,7 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 					   const QString &awallet)
 {
 	int result = -1;
+	QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(awallet, window);
 
@@ -286,8 +287,10 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 		if (!wallet->hasFolder(folder))
 			return result;
 		wallet->setFolder(folder);
-		/* FIXME: but what happens if I dont known the user name? */
-		wallet->readPassword(user, pass);
+		QMap<QString, QString> data;
+		wallet->readMap(gaccount, data);
+		user = data["login"];
+		pass = data["password"];
 		result = 0;
 	}
 
