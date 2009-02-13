@@ -398,7 +398,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_title(contact, t_byte.data());
 
-	temp = addressee.fullEmail();
+	temp = addressee.preferredEmail();
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_email(contact, t_byte.data());
 
@@ -407,7 +407,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	if ((result = gcal_add_contact(gcal, contact))) {
 		kError() << "Failed adding new contact"
 			 << "name: " << addressee.realName()
-			 << "email: " << addressee.fullEmail();
+			 << "email: " << addressee.preferredEmail();
 		const QString message = i18nc("@info:status",
 					      "Failed adding new contact");
 		emit error(message);
@@ -467,7 +467,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_title(contact, t_byte.data());
 
-	temp = addressee.fullEmail();
+	temp = addressee.preferredEmail();
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_email(contact, t_byte.data());
 
