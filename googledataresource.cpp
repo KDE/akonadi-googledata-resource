@@ -380,7 +380,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	Item newItem(item);
 	newItem.setPayload<KABC::Addressee>(addressee);
 	newItem.setRemoteId(urlEtag.url());
-	itemRetrieved(newItem);
+	changeCommitted(newItem);
 
 
 	/* cleanup */
@@ -457,7 +457,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	Item newItem(item);
 	newItem.setPayload<KABC::Addressee>(addressee);
 	newItem.setRemoteId(urlEtag.url());
-	itemRetrieved(newItem);
+	changeCommitted(newItem);
 
 	gcal_contact_delete(contact);
 }
@@ -510,6 +510,8 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	}
 
 	gcal_contact_delete(contact);
+
+	changeProcessed();
 }
 
 AKONADI_RESOURCE_MAIN( GoogleDataResource )
