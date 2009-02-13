@@ -298,6 +298,22 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 
 }
 
+void GoogleDataResource::doSetOnline(bool online)
+{
+	/* Approach based on kabcresource.cpp */
+	kDebug() << "online" << online;
+	QString user;
+	QString password;
+
+	if (online)
+		if (!retrieveFromWallet(user, password, 0))
+			if (!(authenticate(user, password))) {
+				authenticated = true;
+				ResourceBase::doSetOnline(online);
+			}
+
+}
+
 
 int GoogleDataResource::authenticate(const QString &user,
 				     const QString &password)

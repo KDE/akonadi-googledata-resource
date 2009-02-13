@@ -64,6 +64,8 @@ protected:
 	int authenticate(const QString &user, const QString &password);
 
 
+	virtual void doSetOnline(bool online);
+
 	/* Config dialog */
 	dlgGoogleDataConf *dlgConf;
 	/* Flag with authentication */
