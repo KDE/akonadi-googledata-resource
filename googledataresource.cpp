@@ -17,7 +17,6 @@
  */
 
 /* TODO:
- * - recover user account details from kwallet
  * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
  * - delete/edit: test further, seems to fail from time to time (maybe related
  * with previous)
@@ -288,11 +287,35 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 			return result;
 		wallet->setFolder(folder);
 		QMap<QString, QString> data;
-		wallet->readMap(gaccount, data);
-		user = data["login"];
-		pass = data["password"];
-		result = 0;
+		if (!wallet->readMap(gaccount, data)) {
+			user = data["login"];
+			pass = data["password"];
+			result = 0;
+		}
 	}
+
+	return result;
+
+}
+
+
+int GoogleDataResource::authenticate(const QString &user,
+				     const QString &password)
+{
+
+	QByteArray byteUser, bytePass;
+	char *l_user, *l_pass;
+	int result = -1;
+
+	byteUser = user.toLocal8Bit();
+	bytePass = password.toLocal8Bit();
+
+	l_user = const_cast<char *>(byteUser.constData());
+	l_pass = const_cast<char *>(bytePass.constData());
+
+	if (l_user && l_pass)
+		if (!(result = gcal_get_authentication(gcal, l_user, l_pass)))
+			authenticated = true;
 
 	return result;
 
@@ -301,9 +324,7 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 void GoogleDataResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
-	char *user, *pass;
 	int result = -1;
-	QByteArray byteUser, bytePass;
 
 	if (!dlgConf)
 		dlgConf = new dlgGoogleDataConf;
@@ -312,22 +333,14 @@ void GoogleDataResource::configure( WId windowId )
 		KWindowSystem::setMainWindow(dlgConf, windowId);
 
 	dlgConf->exec();
-
-	byteUser = dlgConf->eAccount->text().toLocal8Bit();
-	bytePass = dlgConf->ePass->text().toLocal8Bit();
-	user = const_cast<char *>(byteUser.constData());
-	pass = const_cast<char *>(bytePass.constData());
-	if (user && pass)
-		if (!(result = gcal_get_authentication(gcal, user, pass)))
-			result = saveToWallet(dlgConf->eAccount->text(),
-					      dlgConf->ePass->text(),
-					      windowId);
-
 	/* TODO: in case of authentication error, display an error
 	 * message.
 	 */
-	if (!result)
-		authenticated = true;
+	if (!(authenticate(dlgConf->eAccount->text(),
+			     dlgConf->ePass->text())))
+		result = saveToWallet(dlgConf->eAccount->text(),
+				      dlgConf->ePass->text(),
+				      windowId);
 
 	synchronize();
 }

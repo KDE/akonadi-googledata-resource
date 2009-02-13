@@ -61,6 +61,8 @@ protected:
 			       const QString &folder = "akonadigoogle",
 			       const QString &awallet = "kdewallet");
 
+	int authenticate(const QString &user, const QString &password);
+
 
 	/* Config dialog */
 	dlgGoogleDataConf *dlgConf;
