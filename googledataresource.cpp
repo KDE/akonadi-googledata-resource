@@ -21,8 +21,6 @@
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
  * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
- * - delete/edit: test further, seems to fail from time to time (maybe related
- * with previous)
  * - fast-sync: get changes/updates from server (libgcal currently supports
  * query by updates)
  * - support more fields: address, fax, photo, etc. This will require new
