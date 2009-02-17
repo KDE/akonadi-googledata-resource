@@ -318,16 +318,17 @@ void GoogleDataResource::doSetOnline(bool online)
 
 }
 
-void retrieveTimestamp(QString &timestamp)
+void GoogleDataResource::retrieveTimestamp(QString &timestamp)
 {
-	//TODO: get timestamp from config file
-
+	//this doesn't compile (I'm going to sleep)
+// 	timestamp = Settings::self()->Path();
 }
 
-void saveTimestamp(QString &timestamp)
+void GoogleDataResource::saveTimestamp(QString &timestamp)
 {
-
-	
+	//this doesn't compile (I'm going to sleep)
+// 	Settings::self()->setPath(timestamp);
+// 	Settings::self()->writeConfig();
 }
 
 int GoogleDataResource::getUpdated(const char *timestamp)
