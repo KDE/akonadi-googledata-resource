@@ -313,10 +313,31 @@ void GoogleDataResource::doSetOnline(bool online)
 			if (!(authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
+				/* TODO: call for getUpdated */
 			}
 
 }
 
+void retrieveTimestamp(QString &timestamp)
+{
+	//TODO: get timestamp from config file
+
+}
+
+void saveTimestamp(QString &timestamp)
+{
+
+	
+}
+
+int GoogleDataResource::getUpdated(const char *timestamp)
+{
+
+	//TODO: use this to report updated items
+	//	void itemsRetrievedIncremental(const Item::List &changedItems,
+	//				       const Item::List &removedItems)
+
+}
 
 int GoogleDataResource::authenticate(const QString &user,
 				     const QString &password)
