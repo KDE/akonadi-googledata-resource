@@ -331,7 +331,7 @@ void GoogleDataResource::saveTimestamp(QString &timestamp)
 
 int GoogleDataResource::getUpdated(const char *timestamp)
 {
-	(void)timestamp;
+	Q_UNUSED(timestamp);
 	//TODO: use this to report updated items
 	//	void itemsRetrievedIncremental(const Item::List &changedItems,
 	//				       const Item::List &removedItems)
