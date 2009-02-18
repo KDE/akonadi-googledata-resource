@@ -320,24 +320,23 @@ void GoogleDataResource::doSetOnline(bool online)
 
 void GoogleDataResource::retrieveTimestamp(QString &timestamp)
 {
-	//this doesn't compile (I'm going to sleep)
-// 	timestamp = Settings::self()->Path();
+	timestamp = Settings::self()->timestamp();
 }
 
 void GoogleDataResource::saveTimestamp(QString &timestamp)
 {
-	//this doesn't compile (I'm going to sleep)
-// 	Settings::self()->setPath(timestamp);
-// 	Settings::self()->writeConfig();
+ 	Settings::self()->setTimestamp(timestamp);
+ 	Settings::self()->writeConfig();
 }
 
 int GoogleDataResource::getUpdated(const char *timestamp)
 {
-
+	(void)timestamp;
 	//TODO: use this to report updated items
 	//	void itemsRetrievedIncremental(const Item::List &changedItems,
 	//				       const Item::List &removedItems)
 
+	return -1;
 }
 
 int GoogleDataResource::authenticate(const QString &user,
