@@ -23,11 +23,7 @@
  * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
  * - fast-sync: get changes/updates from server (libgcal currently supports
  * query by updates)
- * - support more fields: address, fax, photo, etc. This will require new
- * code in libgcal
  * - test with special characters (unicode > 256)
- * - test with lots of contacts (blocking retrieve of contacts can mess with
- * akonadi)
  * - support google calendar (libgcal already has code for that)
  * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
@@ -154,6 +150,7 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 #ifdef ITEM_BUG_WTF
 		KABC::Addressee addressee;
 		KABC::PhoneNumber number;
+		KABC::Address address;
 		QString temp;
 
 		/* name */
@@ -162,7 +159,25 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		/* email */
 		temp = gcal_contact_get_email(contact);
 		addressee.insertEmail(temp, true);
-		/* TODO: telefone, address, etc */
+		/* address */
+		temp = gcal_contact_get_address(contact);
+		address.setExtended(temp);
+		addressee.insertAddress(address);
+		/* telephone */
+		temp = gcal_contact_get_phone(contact);
+		number.setNumber(temp);
+		addressee.insertPhoneNumber(number);
+		/* profission */
+		temp = gcal_contact_get_profission(contact);
+		addressee.setTitle(temp);
+		/* company */
+		temp = gcal_contact_get_organization(contact);
+		addressee.setOrganization(temp);
+		/* description */
+		temp = gcal_contact_get_content(contact);
+		addressee.setNote(temp);
+
+		/* TODO: support contact's photo */
 
 		item.setPayload<KABC::Addressee>(addressee);
 
@@ -391,9 +406,13 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	Q_UNUSED(collection);
 
 	KABC::Addressee addressee;
+	KABC::PhoneNumber number;
+	KABC::Address address;
 	gcal_contact_t contact;
 	QString temp;
 	QByteArray t_byte;
+	QList<KABC::Address> listAddress;
+	QList<KABC::PhoneNumber> listNumber;
 	int result;
 
 	if (!authenticated) {
@@ -413,6 +432,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
 
+	/* This 2 fields are required! */
 	temp = addressee.realName();
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_title(contact, t_byte.data());
@@ -421,7 +441,47 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_email(contact, t_byte.data());
 
-	/* TODO: add remaining fields */
+	/* Bellow are optional */
+	listAddress = addressee.addresses();
+	if (!listAddress.empty()) {
+		address = listAddress.first();
+		temp = address.extended();
+		if (temp.length()) {
+			t_byte = temp.toLocal8Bit();
+			gcal_contact_set_address(contact, t_byte.data());
+		}
+
+	}
+
+	listNumber = addressee.phoneNumbers();
+	if (!listNumber.empty()) {
+		number = listNumber.first();
+		temp = number.number();
+		if (temp.length()) {
+			t_byte = temp.toLocal8Bit();
+			gcal_contact_set_phone(contact, t_byte.data());
+		}
+	}
+
+	temp = addressee.title();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_profission(contact, t_byte.data());
+	}
+
+	temp = addressee.organization();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.note();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_content(contact, t_byte.data());
+	}
+
+	/* TODO: Support contact's photo */
 
 	if ((result = gcal_add_contact(gcal, contact))) {
 		kError() << "Failed adding new contact"
@@ -454,6 +514,10 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	Q_UNUSED(parts);
 
 	KABC::Addressee addressee;
+	KABC::PhoneNumber number;
+	KABC::Address address;
+	QList<KABC::Address> listAddress;
+	QList<KABC::PhoneNumber> listNumber;
 	gcal_contact_t contact;
 	QByteArray t_byte;
 	QString temp;
@@ -482,6 +546,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 		return;
 	}
 
+	/* This 2 fields are required! */
 	temp = addressee.realName();
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_title(contact, t_byte.data());
@@ -490,7 +555,47 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	t_byte = temp.toLocal8Bit();
 	gcal_contact_set_email(contact, t_byte.data());
 
-	/* TODO: add remaining fields */
+	/* Bellow are optional */
+	listAddress = addressee.addresses();
+	if (!listAddress.empty()) {
+		address = listAddress.first();
+		temp = address.extended();
+		if (temp.length()) {
+			t_byte = temp.toLocal8Bit();
+			gcal_contact_set_address(contact, t_byte.data());
+		}
+	}
+
+	listNumber = addressee.phoneNumbers();
+	if (!listNumber.empty()) {
+		number = listNumber.first();
+		temp = number.number();
+		if (temp.length()) {
+			t_byte = temp.toLocal8Bit();
+			gcal_contact_set_phone(contact, t_byte.data());
+		}
+
+	}
+
+	temp = addressee.title();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_profission(contact, t_byte.data());
+	}
+
+	temp = addressee.organization();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.note();
+	if (temp.length()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_contact_set_content(contact, t_byte.data());
+	}
+
+	/* TODO: Support contact's photo */
 
 	KUrl url(item.remoteId());
 	temp = url.queryItem("etag");
