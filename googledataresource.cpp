@@ -413,6 +413,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	QByteArray t_byte;
 	QList<KABC::Address> listAddress;
 	QList<KABC::PhoneNumber> listNumber;
+	KABC::Picture photo;
 	int result;
 
 	if (!authenticated) {
@@ -481,7 +482,12 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
-	/* TODO: Support contact's photo */
+	/* FIXME: google fails to display the photo */
+	photo = addressee.photo();
+	if (!photo.isEmpty()) {
+		QImage raw = photo.data();
+		gcal_contact_set_photo(contact, raw.bits(), raw.numBytes());
+	}
 
 	if ((result = gcal_add_contact(gcal, contact))) {
 		kError() << "Failed adding new contact"
