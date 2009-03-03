@@ -486,7 +486,13 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 	photo = addressee.photo();
 	if (!photo.isEmpty()) {
 		QImage raw = photo.data();
-		gcal_contact_set_photo(contact, raw.bits(), raw.numBytes());
+		QByteArray ba;
+		QBuffer buffer(&ba);
+		buffer.open(QIODevice::WriteOnly);
+		raw.save(&buffer, "PNG");
+		gcal_contact_set_photo(contact,
+				       (const unsigned char *)ba.data(),
+				       ba.size());
 	}
 
 	if ((result = gcal_add_contact(gcal, contact))) {
