@@ -491,8 +491,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		buffer.open(QIODevice::WriteOnly);
 		raw.save(&buffer, "PNG");
 		gcal_contact_set_photo(contact,
-				       /* TODO: use C++ cast */
-				       (const unsigned char *)ba.data(),
+				       ba.data(),
 				       ba.size());
 	}
 
