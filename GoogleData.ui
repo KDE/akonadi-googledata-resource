@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="lbAccount">
        <property name="text">
-        <string>Your google account</string>
+        <string>Your Google mail username (@gmail.com will be appended)</string>
        </property>
        <property name="buddy">
         <cstring>eAccount</cstring>
@@ -44,7 +44,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="ePass"/>
+      <widget class="QLineEdit" name="ePass">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
