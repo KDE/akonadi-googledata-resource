@@ -275,6 +275,9 @@ void GoogleDataResource::doSetOnline(bool online)
 	kDebug() << "online" << online;
 	QString user;
 	QString password;
+	QString timestamp;
+	QByteArray t_byte;
+	int result = 0;
 	WId window = winIdForDialogs();
 
 	if (online)
@@ -282,8 +285,23 @@ void GoogleDataResource::doSetOnline(bool online)
 			if (!(authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
-				/* TODO: call for getUpdated */
+
+				retrieveTimestamp(timestamp);
+				t_byte = timestamp.toLocal8Bit();
+				result = getUpdated(t_byte.data());
+
+
 			}
+
+	if (result) {
+		kError() << "Failed retrieving updated contacts.";
+		const QString message = i18nc("@info:status",
+					      "Failed retrieving updated"
+					      " contacts");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
 }
 
@@ -300,12 +318,13 @@ void GoogleDataResource::saveTimestamp(QString &timestamp)
 
 int GoogleDataResource::getUpdated(const char *timestamp)
 {
-	Q_UNUSED(timestamp);
+	int result = 0;
 	//TODO: use this to report updated items
 	//	void itemsRetrievedIncremental(const Item::List &changedItems,
 	//				       const Item::List &removedItems)
-
-	return -1;
+	//TODO: call gcal_get_updated_contacts and report items
+	kError() << "Timestamp of last updated contact is: " << timestamp;
+	return result;
 }
 
 int GoogleDataResource::authenticate(const QString &user,
