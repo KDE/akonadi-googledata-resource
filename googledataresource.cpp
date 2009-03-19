@@ -482,7 +482,6 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
-	/* FIXME: google fails to display the photo */
 	photo = addressee.photo();
 	if (!photo.isEmpty()) {
 		QImage raw = photo.data();
