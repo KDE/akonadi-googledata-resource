@@ -468,6 +468,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	gcal_contact_t contact;
 	QByteArray t_byte;
 	QString temp;
+	KABC::Picture photo;
 	int result;
 
 	if (!authenticated) {
@@ -542,6 +543,17 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
+	photo = addressee.photo();
+	if (!photo.isEmpty()) {
+		QImage raw = photo.data();
+		QByteArray ba;
+		QBuffer buffer(&ba);
+		buffer.open(QIODevice::WriteOnly);
+		raw.save(&buffer, "PNG");
+		gcal_contact_set_photo(contact,
+				       ba.data(),
+				       ba.size());
+	}
 
 
 	KUrl url(item.remoteId());
