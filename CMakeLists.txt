@@ -12,7 +12,7 @@ include(CheckIncludeFiles)
 find_package (KdepimLibs REQUIRED)
 
 #libgcal implements google data protocols 2.0
-FIND_PACKAGE( LibGcal REQUIRED )
+FIND_PACKAGE( LibGCal REQUIRED )
 
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
