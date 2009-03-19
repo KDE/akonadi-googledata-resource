@@ -289,8 +289,6 @@ void GoogleDataResource::doSetOnline(bool online)
 				retrieveTimestamp(timestamp);
 				t_byte = timestamp.toLocal8Bit();
 				result = getUpdated(t_byte.data());
-
-
 			}
 
 	if (result) {
@@ -302,7 +300,6 @@ void GoogleDataResource::doSetOnline(bool online)
 		emit status(Broken, message);
 		return;
 	}
-
 }
 
 void GoogleDataResource::retrieveTimestamp(QString &timestamp)
