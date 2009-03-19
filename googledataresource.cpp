@@ -117,6 +117,8 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 
 	Item::List items;
 	int result;
+	gcal_contact_t contact;
+	QString timestamp;
 
 	if (!authenticated) {
 		kError() << "No authentication for Google Contacts available";
@@ -124,7 +126,6 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 					      "Not yet authenticated for"
 					      " use of Google Contacts");
 		emit error(message);
-
 		emit status(Broken, message);
 		return;
 	}
@@ -135,10 +136,27 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	if ((result = gcal_get_contacts(gcal, &all_contacts)))
 		exit(1);
 
+	/* Contacts return last updated entry as last element */
+	contact = gcal_contact_element(&all_contacts, all_contacts.length - 1);
+	if (!contact) {
+		kError() << "Failed to retrieve last updated contact.";
+		const QString message = i18nc("@info:status",
+					      "Failed getting last updated"
+					      " contact");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+
+	}
+
+	timestamp = gcal_contact_get_updated(contact);
+	saveTimestamp(timestamp);
+
+
 	/* Each google entry has a unique ID and edit_url */
 	for (size_t i = 0; i < all_contacts.length; ++i) {
 		Item item(QLatin1String("text/directory"));
-		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
+		contact = gcal_contact_element(&all_contacts, i);
 
 		KABC::Addressee addressee;
 		KABC::PhoneNumber number;
