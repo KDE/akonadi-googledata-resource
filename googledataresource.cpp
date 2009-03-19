@@ -54,13 +54,6 @@ extern "C" {
 
 using KWallet::Wallet;
 
-/** FIXME: for some reason the 'retrieveItem' functions is not being called.
- * this makes the entries to lack its contents (name, email, etc).
- * I should investigate why and fix, for while this is a workaround:
- * I report the payload in the 'retrieveItems' function.
- */
-#define ITEM_BUG_WTF
-
 using namespace Akonadi;
 
 GoogleDataResource::GoogleDataResource( const QString &id )
@@ -147,7 +140,6 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		Item item(QLatin1String("text/directory"));
 		gcal_contact_t contact = gcal_contact_element(&all_contacts, i);
 
-#ifdef ITEM_BUG_WTF
 		KABC::Addressee addressee;
 		KABC::PhoneNumber number;
 		KABC::Address address;
@@ -176,19 +168,13 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		/* description */
 		temp = gcal_contact_get_content(contact);
 		addressee.setNote(temp);
-
-		/* TODO: support contact's photo */
-
 		item.setPayload<KABC::Addressee>(addressee);
 
 		/* remoteID: etag+edit_url */
 		KUrl urlEtag(gcal_contact_get_url(contact));
 		urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
-#endif
-
 		item.setRemoteId(urlEtag.url());
-
 		items << item;
 	}
 
@@ -198,56 +184,8 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED( parts );
-	const QString entry_id = item.remoteId();
-	QString temp;
-	Item newItem(item);
-	gcal_contact_t contact;
-	KABC::Addressee addressee;
-	KABC::PhoneNumber number;
-
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts");
-		emit error(message);
-
-		emit status(Broken, message);
-		return false;
-	}
-
-	/*
-	 * And another question, are the requests in the same sequence that
-	 * I informed in 'retrieveItems'? For while, I try to locate the entry...
-	 */
-	for (size_t i = 0; i < all_contacts.length; ++i) {
-		contact = gcal_contact_element(&all_contacts, i);
-		/* FIXME: remoteID == edit_url + ETag */
-		if (entry_id == gcal_contact_get_id(contact)) {
-			/* name */
-			temp = gcal_contact_get_title(contact);
-			addressee.setNameFromString(temp);
-
-			/* email */
-			temp = gcal_contact_get_email(contact);
-			addressee.insertEmail(temp, true);
-
-			/* TODO: telefone, address, etc */
-
-			/* remoteID: etag+edit_url */
-			KUrl urlEtag(gcal_contact_get_url(contact));
-			urlEtag.addQueryItem("etag",
-					     gcal_contact_get_etag(contact));
-
-			newItem.setPayload<KABC::Addressee>(addressee);
-			newItem.setRemoteId(urlEtag.url());
-                        itemRetrieved(newItem);
-			return true;
-		}
-
-	}
-
-	return false;
+	Q_UNUSED( item );
+	return true;
 }
 
 void GoogleDataResource::aboutToQuit()
@@ -647,6 +585,8 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	QByteArray t_byte;
 	int result;
 
+	kError() << "Deleting one item...";
+
 	if (!authenticated) {
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
@@ -689,6 +629,7 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	gcal_contact_delete(contact);
 
 	changeProcessed();
+	kError() << "done deleting!!";
 }
 
 AKONADI_RESOURCE_MAIN( GoogleDataResource )
