@@ -210,8 +210,6 @@ int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
 		if (!wallet->hasFolder(folder))
 			wallet->createFolder(folder);
 		wallet->setFolder(folder);
-		/* TODO: could I store proxy settings here too? */
-
 		QMap<QString, QString> data;
 		data["login"] = user;
 		data["password"] = pass;
@@ -544,7 +542,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
-	/* TODO: Support contact's photo */
+
 
 	KUrl url(item.remoteId());
 	temp = url.queryItem("etag");
