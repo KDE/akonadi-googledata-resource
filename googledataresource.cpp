@@ -319,26 +319,83 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	int result = 0;
 	gcal_contact_t contact;
 	QString newerTimestamp;
+	QString temp;
+	Akonadi::Item::List pending;
+	Akonadi::Item::List deleted;
 
 	kError() << "Timestamp of last updated contact is: " << timestamp;
 	gcal_cleanup_contacts(&all_contacts);
 	if ((result = gcal_get_updated_contacts(gcal, &all_contacts, timestamp)))
 		return result;
-	kError() << "Updated contacts are: " << all_contacts.length;
+	kError() << "Updated contacts are: " << all_contacts.length - 1;
 
 
 	/* Query is inclusive regarding timestamp */
-	if (all_contacts.length == 1)
+	if (all_contacts.length == 1) {
+		kError() << "no updates, done!";
 		return result;
+	}
 
+	/* First element was already included in last retrieval, because
+	 * query-by-updated is inclusive.
+	 */
+	for (size_t i = 1; i < all_contacts.length; ++i) {
+		contact = gcal_contact_element(&all_contacts, i);
+		Item item(QLatin1String("text/directory"));
 
-	//TODO: use this to report updated items
-	//void itemsRetrievedIncremental(const Item::List &changedItems,
-	//              const Item::List &removedItems)
+		if (!gcal_contact_is_deleted(contact)) {
+			KABC::Addressee addressee;
+			KABC::PhoneNumber number;
+			KABC::Address address;
+			/* name */
+			temp = gcal_contact_get_title(contact);
+			addressee.setNameFromString(temp);
+			kError() << "updated: " << temp;
+			/* email */
+			temp = gcal_contact_get_email(contact);
+			addressee.insertEmail(temp, true);
+			/* address */
+			temp = gcal_contact_get_address(contact);
+			address.setExtended(temp);
+			addressee.insertAddress(address);
+			/* telephone */
+			temp = gcal_contact_get_phone(contact);
+			number.setNumber(temp);
+			addressee.insertPhoneNumber(number);
+			/* profission */
+			temp = gcal_contact_get_profission(contact);
+			addressee.setTitle(temp);
+			/* company */
+			temp = gcal_contact_get_organization(contact);
+			addressee.setOrganization(temp);
+			/* description */
+			temp = gcal_contact_get_content(contact);
+			addressee.setNote(temp);
+			item.setPayload<KABC::Addressee>(addressee);
 
+			/* remoteID: etag+edit_url */
+			KUrl urlEtag(gcal_contact_get_url(contact));
+			urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
+			item.setRemoteId(urlEtag.url());
+			pending << item;
 
+		} else {
+			/* remoteID: etag+edit_url */
+			KUrl urlEtag(gcal_contact_get_url(contact));
+			urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
+			item.setRemoteId(urlEtag.url());
+			kError() << "deleted: " << gcal_contact_get_url(contact);
+			deleted << item;
+		}
+
+	}
+
+	itemsRetrievedIncremental(pending, deleted);
+	synchronize();
+	pending.clear();
+	deleted.clear();
 
 	/* Contacts return last updated entry as last element */
 	contact = gcal_contact_element(&all_contacts,
