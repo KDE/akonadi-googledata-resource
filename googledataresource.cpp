@@ -288,6 +288,7 @@ void GoogleDataResource::doSetOnline(bool online)
 
 				retrieveTimestamp(timestamp);
 				t_byte = timestamp.toLocal8Bit();
+				/* TODO: treat error */
 				result = getUpdated(t_byte.data());
 			}
 
@@ -316,20 +317,47 @@ void GoogleDataResource::saveTimestamp(QString &timestamp)
 int GoogleDataResource::getUpdated(char *timestamp)
 {
 	int result = 0;
-	kError() << "Timestamp of last updated contact is: " << timestamp;
+	gcal_contact_t contact;
+	QString newerTimestamp;
 
+	kError() << "Timestamp of last updated contact is: " << timestamp;
 	gcal_cleanup_contacts(&all_contacts);
 	if ((result = gcal_get_updated_contacts(gcal, &all_contacts, timestamp)))
 		return result;
+	kError() << "Updated contacts are: " << all_contacts.length;
+
 
 	/* Query is inclusive regarding timestamp */
-	if (all_contacts.length > 1) {
-		//TODO: use this to report updated items
-		//void itemsRetrievedIncremental(const Item::List &changedItems,
-		//              const Item::List &removedItems)
+	if (all_contacts.length == 1)
+		return result;
 
+
+	//TODO: use this to report updated items
+	//void itemsRetrievedIncremental(const Item::List &changedItems,
+	//              const Item::List &removedItems)
+
+
+
+
+
+	/* Contacts return last updated entry as last element */
+	contact = gcal_contact_element(&all_contacts,
+				       all_contacts.length - 1);
+	if (!contact) {
+		kError() << "Failed to retrieve last updated contact.";
+		const QString message = i18nc("@info:status",
+					      "Failed getting last"
+					      " updated"
+					      " contact");
+		emit error(message);
+		emit status(Broken, message);
+		result = -1;
+		return result;
 
 	}
+
+	newerTimestamp = gcal_contact_get_updated(contact);
+	saveTimestamp(newerTimestamp);
 
 	return result;
 }
