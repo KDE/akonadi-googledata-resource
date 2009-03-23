@@ -81,6 +81,9 @@ GoogleDataResource::~GoogleDataResource()
 	gcal_cleanup_contacts(&all_contacts);
 	if (dlgConf)
 		delete dlgConf;
+
+	pending.clear();
+	deleted.clear();
 }
 
 void GoogleDataResource::retrieveCollections()
@@ -320,8 +323,15 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
-	Akonadi::Item::List pending;
-	Akonadi::Item::List deleted;
+
+
+	/* Test for minimal timestamp lenght */
+	if ((strlen(timestamp) < TIMESTAMP_SIZE))
+		return result;
+
+	/* Just in case, I'm not sure when this member function is called */
+	pending.clear();
+	deleted.clear();
 
 	kError() << "Timestamp of last updated contact is: " << timestamp;
 	gcal_cleanup_contacts(&all_contacts);
@@ -394,8 +404,6 @@ int GoogleDataResource::getUpdated(char *timestamp)
 
 	itemsRetrievedIncremental(pending, deleted);
 	synchronize();
-	pending.clear();
-	deleted.clear();
 
 	/* Contacts return last updated entry as last element */
 	contact = gcal_contact_element(&all_contacts,

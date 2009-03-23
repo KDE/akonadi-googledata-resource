@@ -84,6 +84,10 @@ protected:
 	struct gcal_contact_array all_contacts;
 	/* KWallet object pointer */
 	KWallet::Wallet *wallet;
+	/* Contact itens upddate lists */
+	Akonadi::Item::List pending;
+	Akonadi::Item::List deleted;
+
 };
 
 #endif
