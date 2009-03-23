@@ -72,7 +72,7 @@ protected:
 	void saveTimestamp(QString &timestamp);
 
 	/* TODO: implement call for gcal_get_updated_contacts */
-	int getUpdated(const char *timestamp);
+	int getUpdated(char *timestamp);
 
 	/* Config dialog */
 	dlgGoogleDataConf *dlgConf;

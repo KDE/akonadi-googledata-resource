@@ -313,14 +313,24 @@ void GoogleDataResource::saveTimestamp(QString &timestamp)
  	Settings::self()->writeConfig();
 }
 
-int GoogleDataResource::getUpdated(const char *timestamp)
+int GoogleDataResource::getUpdated(char *timestamp)
 {
 	int result = 0;
-	//TODO: use this to report updated items
-	//	void itemsRetrievedIncremental(const Item::List &changedItems,
-	//				       const Item::List &removedItems)
-	//TODO: call gcal_get_updated_contacts and report items
 	kError() << "Timestamp of last updated contact is: " << timestamp;
+
+	gcal_cleanup_contacts(&all_contacts);
+	if ((result = gcal_get_updated_contacts(gcal, &all_contacts, timestamp)))
+		return result;
+
+	/* Query is inclusive regarding timestamp */
+	if (all_contacts.length > 1) {
+		//TODO: use this to report updated items
+		//void itemsRetrievedIncremental(const Item::List &changedItems,
+		//              const Item::List &removedItems)
+
+
+	}
+
 	return result;
 }
 
