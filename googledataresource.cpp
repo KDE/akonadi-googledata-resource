@@ -122,7 +122,9 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	int result;
 	gcal_contact_t contact;
 	QString timestamp;
+	QByteArray t_byte;
 
+	kError() << "\n............. retrieveItems ...........\n";
 	if (!authenticated) {
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
@@ -132,6 +134,15 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		emit status(Broken, message);
 		return;
 	}
+
+	/* Query by updated */
+	retrieveTimestamp(timestamp);
+	t_byte = timestamp.toLocal8Bit();
+	if (t_byte.length() > TIMESTAMP_SIZE) {
+		result = getUpdated(t_byte.data());
+		return;
+	}
+	kError() << "First retrieve";
 
 	/* Downloading the contacts can be slow and it is blocking. Will
 	 * it mess up with akonadi?
@@ -278,8 +289,6 @@ void GoogleDataResource::doSetOnline(bool online)
 	kDebug() << "online" << online;
 	QString user;
 	QString password;
-	QString timestamp;
-	QByteArray t_byte;
 	int result = 0;
 	WId window = winIdForDialogs();
 
@@ -288,11 +297,7 @@ void GoogleDataResource::doSetOnline(bool online)
 			if (!(authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
-
-				retrieveTimestamp(timestamp);
-				t_byte = timestamp.toLocal8Bit();
-				/* TODO: treat error */
-				result = getUpdated(t_byte.data());
+				synchronize();
 			}
 
 	if (result) {
@@ -323,11 +328,6 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
-
-
-	/* Test for minimal timestamp lenght */
-	if ((strlen(timestamp) < TIMESTAMP_SIZE))
-		return result;
 
 	/* Just in case, I'm not sure when this member function is called */
 	pending.clear();
@@ -403,7 +403,6 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	}
 
 	itemsRetrievedIncremental(pending, deleted);
-	synchronize();
 
 	/* Contacts return last updated entry as last element */
 	contact = gcal_contact_element(&all_contacts,
