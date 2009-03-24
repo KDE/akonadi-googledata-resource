@@ -17,8 +17,6 @@
  */
 
 /* TODO:
- * - fix: etag *does* change when the contact was deleted. This makes reporting
- * deleted contacts fail (since the ID is the combo of contact id + etag)
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
@@ -202,7 +200,7 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 		addressee.setNote(temp);
 		item.setPayload<KABC::Addressee>(addressee);
 
-		/* remoteID: etag+edit_url */
+		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_contact_get_url(contact));
 		item.setRemoteId(urlEtag.url());
 
@@ -389,16 +387,13 @@ int GoogleDataResource::getUpdated(char *timestamp)
 			addressee.setNote(temp);
 			item.setPayload<KABC::Addressee>(addressee);
 
-			/* remoteID: etag+edit_url */
+			/* remoteID: edit_url */
 			KUrl urlEtag(gcal_contact_get_url(contact));
 			item.setRemoteId(urlEtag.url());
 			pending << item;
 
 		} else {
-			/* remoteID: etag+edit_url */
-			/* FIXME: not sure if deleted contact has etag...
-			 * or even if it has, probably changed.
-			 */
+
 			KUrl urlEtag(gcal_contact_get_url(contact));
 			item.setRemoteId(urlEtag.url());
 			kError() << "index: " << i
@@ -583,7 +578,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 	}
 
-	/* remoteID: etag+edit_url */
+	/* remoteID: edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
 
 	Item newItem(item);
@@ -711,7 +706,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 	}
 
-	/* remoteID: etag+edit_url */
+	/* remoteID: edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
 
 	Item newItem(item);
