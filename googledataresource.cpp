@@ -21,8 +21,6 @@
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
  * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
- * - fast-sync: get changes/updates from server (libgcal currently supports
- * query by updates)
  * - test with special characters (unicode > 256)
  * - support google calendar (libgcal already has code for that)
  * - code cleanup
@@ -324,7 +322,7 @@ void GoogleDataResource::saveTimestamp(QString &timestamp)
 
 int GoogleDataResource::getUpdated(char *timestamp)
 {
-	int result = 0;
+	int result = 1;
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
@@ -335,8 +333,11 @@ int GoogleDataResource::getUpdated(char *timestamp)
 
 	kError() << "Timestamp of last updated contact is: " << timestamp;
 	gcal_cleanup_contacts(&all_contacts);
-	if ((result = gcal_get_updated_contacts(gcal, &all_contacts, timestamp)))
+	gcal_deleted(gcal, SHOW);
+	if ((result = gcal_get_updated_contacts(gcal, &all_contacts, timestamp))) {
+		kError() << "Failed querying by updated";
 		return result;
+	}
 	kError() << "Updated contacts are: " << all_contacts.length - 1;
 
 
@@ -392,11 +393,14 @@ int GoogleDataResource::getUpdated(char *timestamp)
 
 		} else {
 			/* remoteID: etag+edit_url */
+			/* FIXME: not sure if deleted contact has etag...
+			 * or even if it has, probably changed.
+			 */
 			KUrl urlEtag(gcal_contact_get_url(contact));
 			urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
 			item.setRemoteId(urlEtag.url());
-			kError() << "deleted: " << gcal_contact_get_url(contact);
+			kError() << "deleted: " << urlEtag.url();
 			deleted << item;
 		}
 
