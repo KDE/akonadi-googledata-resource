@@ -17,6 +17,8 @@
  */
 
 /* TODO:
+ * - fix: etag *does* change when the contact was deleted. This makes reporting
+ * deleted contacts fail (since the ID is the combo of contact id + etag)
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
