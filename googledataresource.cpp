@@ -339,7 +339,7 @@ int GoogleDataResource::getUpdated(char *timestamp)
 		kError() << "Failed querying by updated";
 		return result;
 	}
-	kError() << "Updated contacts are: " << all_contacts.length - 1;
+	kError() << "Updated contacts are: " << all_contacts.length;
 
 
 	/* Query is inclusive regarding timestamp */
@@ -351,9 +351,13 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	/* First element was already included in last retrieval, because
 	 * query-by-updated is inclusive.
 	 */
-	for (size_t i = 1; i < all_contacts.length; ++i) {
+	for (size_t i = 0; i < all_contacts.length; ++i) {
 		contact = gcal_contact_element(&all_contacts, i);
 		Item item(QLatin1String("text/directory"));
+		if (!strcmp(timestamp, gcal_contact_get_updated(contact))) {
+			kError() << "This is an old contact... continue.";
+			continue;
+		}
 
 		if (!gcal_contact_is_deleted(contact)) {
 			KABC::Addressee addressee;
@@ -362,7 +366,7 @@ int GoogleDataResource::getUpdated(char *timestamp)
 			/* name */
 			temp = gcal_contact_get_title(contact);
 			addressee.setNameFromString(temp);
-			kError() << "updated: " << temp;
+			kError() << "index: " << i <<"updated: " << temp;
 			/* email */
 			temp = gcal_contact_get_email(contact);
 			addressee.insertEmail(temp, true);
@@ -397,7 +401,8 @@ int GoogleDataResource::getUpdated(char *timestamp)
 			 */
 			KUrl urlEtag(gcal_contact_get_url(contact));
 			item.setRemoteId(urlEtag.url());
-			kError() << "deleted: " << urlEtag.url();
+			kError() << "index: " << i
+				 << "deleted: " << urlEtag.url();
 			deleted << item;
 		}
 
