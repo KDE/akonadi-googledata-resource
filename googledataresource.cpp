@@ -204,9 +204,8 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 
 		/* remoteID: etag+edit_url */
 		KUrl urlEtag(gcal_contact_get_url(contact));
-		urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
-
 		item.setRemoteId(urlEtag.url());
+
 		items << item;
 	}
 
@@ -388,8 +387,6 @@ int GoogleDataResource::getUpdated(char *timestamp)
 
 			/* remoteID: etag+edit_url */
 			KUrl urlEtag(gcal_contact_get_url(contact));
-			urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
-
 			item.setRemoteId(urlEtag.url());
 			pending << item;
 
@@ -399,8 +396,6 @@ int GoogleDataResource::getUpdated(char *timestamp)
 			 * or even if it has, probably changed.
 			 */
 			KUrl urlEtag(gcal_contact_get_url(contact));
-			urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
-
 			item.setRemoteId(urlEtag.url());
 			kError() << "deleted: " << urlEtag.url();
 			deleted << item;
@@ -585,7 +580,6 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 	/* remoteID: etag+edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
-	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
 	Item newItem(item);
 	newItem.setPayload<KABC::Addressee>(addressee);
@@ -699,11 +693,6 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 
 	KUrl url(item.remoteId());
-	temp = url.queryItem("etag");
-	t_byte = temp.toAscii();
-	gcal_contact_set_etag(contact, t_byte.data());
-
-	url.removeQueryItem("etag");
 	temp = url.url();
 	t_byte = temp.toAscii();
 	gcal_contact_set_url(contact, t_byte.data());
@@ -719,7 +708,6 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 
 	/* remoteID: etag+edit_url */
 	KUrl urlEtag(gcal_contact_get_url(contact));
-	urlEtag.addQueryItem("etag", gcal_contact_get_etag(contact));
 
 	Item newItem(item);
 	newItem.setPayload<KABC::Addressee>(addressee);
@@ -760,11 +748,6 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 
 
 	KUrl url(item.remoteId());
-	temp = url.queryItem("etag");
-	t_byte = temp.toAscii();
-	gcal_contact_set_etag(contact, t_byte.data());
-
-	url.removeQueryItem("etag");
 	temp = url.url();
 	t_byte = temp.toAscii();
 	gcal_contact_set_url(contact, t_byte.data());
