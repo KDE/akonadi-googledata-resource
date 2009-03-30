@@ -291,17 +291,16 @@ void GoogleDataResource::doSetOnline(bool online)
 
 	if (online)
 		if (!retrieveFromWallet(user, password, window))
-			if (!(authenticate(user, password))) {
+			if (!(result = authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
 				synchronize();
 			}
 
 	if (result) {
-		kError() << "Failed retrieving updated contacts.";
+		kError() << "Failed setting online.";
 		const QString message = i18nc("@info:status",
-					      "Failed retrieving updated"
-					      " contacts");
+					      "Invalid password.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -464,13 +463,24 @@ void GoogleDataResource::configure( WId windowId )
 	/* TODO: in case of authentication error, display an error
 	 * message.
 	 */
-	if (!(authenticate(dlgConf->eAccount->text(),
-			     dlgConf->ePass->text())))
+	if (!(result = authenticate(dlgConf->eAccount->text(),
+				    dlgConf->ePass->text()))) {
 		result = saveToWallet(dlgConf->eAccount->text(),
 				      dlgConf->ePass->text(),
 				      windowId);
 
-	synchronize();
+		synchronize();
+	}
+
+	if (result) {
+		kError() << "Failed configuring resource.";
+		const QString message = i18nc("@info:status",
+					      "Invalid password.");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
+
 }
 
 void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
