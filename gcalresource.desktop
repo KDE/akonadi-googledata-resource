@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Akonadi Google Calendar Resource
+Type=AkonadiResource
+Exec=akonadi_gcal_resource
+Icon=text-directory
+
+X-Akonadi-MimeTypes=text/calendar
+X-Akonadi-Capabilities=Resource
+X-Akonadi-Identifier=akonadi_gcal_resource
