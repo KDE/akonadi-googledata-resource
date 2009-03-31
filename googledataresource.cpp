@@ -373,9 +373,6 @@ void GoogleContactsResource::configure( WId windowId )
 		KWindowSystem::setMainWindow(dlgConf, windowId);
 
 	dlgConf->exec();
-	/* TODO: in case of authentication error, display an error
-	 * message.
-	 */
 	if (!(result = authenticate(dlgConf->eAccount->text(),
 				    dlgConf->ePass->text()))) {
 		result = saveToWallet(dlgConf->eAccount->text(),
