@@ -54,7 +54,7 @@ using KWallet::Wallet;
 
 using namespace Akonadi;
 
-GoogleDataResource::GoogleDataResource( const QString &id )
+GoogleContactsResource::GoogleContactsResource( const QString &id )
 	: ResourceBase(id), dlgConf(0), authenticated(false)
 {
 	new SettingsAdaptor( Settings::self() );
@@ -73,7 +73,7 @@ GoogleDataResource::GoogleDataResource( const QString &id )
 	wallet = 0;
 }
 
-GoogleDataResource::~GoogleDataResource()
+GoogleContactsResource::~GoogleContactsResource()
 {
 	gcal_delete(gcal);
 	gcal_cleanup_contacts(&all_contacts);
@@ -84,7 +84,7 @@ GoogleDataResource::~GoogleDataResource()
 	deleted.clear();
 }
 
-void GoogleDataResource::retrieveCollections()
+void GoogleContactsResource::retrieveCollections()
 {
 	if (!authenticated) {
 		kError() << "No authentication for Google Contacts available";
@@ -112,7 +112,7 @@ void GoogleDataResource::retrieveCollections()
 
 }
 
-void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
+void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
 
@@ -210,20 +210,20 @@ void GoogleDataResource::retrieveItems( const Akonadi::Collection &collection )
 	itemsRetrieved(items);
 }
 
-bool GoogleDataResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
+bool GoogleContactsResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED( parts );
 	Q_UNUSED( item );
 	return true;
 }
 
-void GoogleDataResource::aboutToQuit()
+void GoogleContactsResource::aboutToQuit()
 {
 	// TODO: any cleanup you need to do while there is still an active
 	// event loop. The resource will terminate after this method returns
 }
 
-int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
+int GoogleContactsResource::saveToWallet(const QString &user, const QString &pass,
 				     const WId &window, const QString &folder,
 				     const QString &awallet)
 {
@@ -250,7 +250,7 @@ int GoogleDataResource::saveToWallet(const QString &user, const QString &pass,
 	return result;
 }
 
-int GoogleDataResource::retrieveFromWallet(QString &user,
+int GoogleContactsResource::retrieveFromWallet(QString &user,
 					   QString &pass,
 					   const WId &window,
 					   const QString &folder,
@@ -280,7 +280,7 @@ int GoogleDataResource::retrieveFromWallet(QString &user,
 
 }
 
-void GoogleDataResource::doSetOnline(bool online)
+void GoogleContactsResource::doSetOnline(bool online)
 {
 	/* Approach based on kabcresource.cpp */
 	kDebug() << "online" << online;
@@ -307,18 +307,18 @@ void GoogleDataResource::doSetOnline(bool online)
 	}
 }
 
-void GoogleDataResource::retrieveTimestamp(QString &timestamp)
+void GoogleContactsResource::retrieveTimestamp(QString &timestamp)
 {
 	timestamp = Settings::self()->timestamp();
 }
 
-void GoogleDataResource::saveTimestamp(QString &timestamp)
+void GoogleContactsResource::saveTimestamp(QString &timestamp)
 {
  	Settings::self()->setTimestamp(timestamp);
  	Settings::self()->writeConfig();
 }
 
-int GoogleDataResource::getUpdated(char *timestamp)
+int GoogleContactsResource::getUpdated(char *timestamp)
 {
 	int result = 1;
 	gcal_contact_t contact;
@@ -426,7 +426,7 @@ int GoogleDataResource::getUpdated(char *timestamp)
 	return result;
 }
 
-int GoogleDataResource::authenticate(const QString &user,
+int GoogleContactsResource::authenticate(const QString &user,
 				     const QString &password)
 {
 
@@ -448,7 +448,7 @@ int GoogleDataResource::authenticate(const QString &user,
 
 }
 
-void GoogleDataResource::configure( WId windowId )
+void GoogleContactsResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
 	int result = -1;
@@ -483,7 +483,7 @@ void GoogleDataResource::configure( WId windowId )
 
 }
 
-void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
+void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 
 	Q_UNUSED(collection);
@@ -602,7 +602,7 @@ void GoogleDataResource::itemAdded( const Akonadi::Item &item, const Akonadi::Co
 
 }
 
-void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
+void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED(parts);
 
@@ -727,7 +727,7 @@ void GoogleDataResource::itemChanged( const Akonadi::Item &item, const QSet<QByt
 	gcal_contact_delete(contact);
 }
 
-void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
+void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 {
 	KABC::Addressee addressee;
 	gcal_contact_t contact;
@@ -777,6 +777,6 @@ void GoogleDataResource::itemRemoved( const Akonadi::Item &item )
 	kError() << "done deleting!!";
 }
 
-AKONADI_RESOURCE_MAIN( GoogleDataResource )
+AKONADI_RESOURCE_MAIN( GoogleContactsResource )
 
 #include "googledataresource.moc"
