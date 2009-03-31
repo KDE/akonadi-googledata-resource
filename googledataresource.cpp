@@ -29,7 +29,6 @@
  * - nice to have: a libqcal (using Qt for both networking and XML/XPath parsing)
  */
 #include "googledataresource.h"
-
 #include "settings.h"
 #include "settingsadaptor.h"
 
@@ -50,12 +49,11 @@ extern "C" {
 #include <gcal_status.h>
 }
 
-using KWallet::Wallet;
 
 using namespace Akonadi;
 
 GoogleContactsResource::GoogleContactsResource( const QString &id )
-	: ResourceBase(id), dlgConf(0), authenticated(false)
+	: ResourceBase(id)
 {
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject(
@@ -70,19 +68,27 @@ GoogleContactsResource::GoogleContactsResource( const QString &id )
 	all_contacts.length = 0;
 	all_contacts.entries = NULL;
 
-	wallet = 0;
 }
 
 GoogleContactsResource::~GoogleContactsResource()
 {
-	gcal_delete(gcal);
-	gcal_cleanup_contacts(&all_contacts);
-	if (dlgConf)
-		delete dlgConf;
 
+	gcal_cleanup_contacts(&all_contacts);
 	pending.clear();
 	deleted.clear();
 }
+
+void GoogleContactsResource::retrieveTimestamp(QString &timestamp)
+{
+	timestamp = Settings::self()->timestamp();
+}
+
+void GoogleContactsResource::saveTimestamp(QString &timestamp)
+{
+ 	Settings::self()->setTimestamp(timestamp);
+ 	Settings::self()->writeConfig();
+}
+
 
 void GoogleContactsResource::retrieveCollections()
 {
@@ -223,63 +229,6 @@ void GoogleContactsResource::aboutToQuit()
 	// event loop. The resource will terminate after this method returns
 }
 
-int GoogleContactsResource::saveToWallet(const QString &user, const QString &pass,
-				     const WId &window, const QString &folder,
-				     const QString &awallet)
-{
-	int result = -1;
-	QString gaccount("googleAccount");
-	if (wallet == 0)
-		wallet = Wallet::openWallet(awallet, window);
-
-	if (wallet == 0)
-		return result;
-
-	if (wallet->isOpen()) {
-		if (!wallet->hasFolder(folder))
-			wallet->createFolder(folder);
-		wallet->setFolder(folder);
-		QMap<QString, QString> data;
-		data["login"] = user;
-		data["password"] = pass;
-		wallet->writeMap(gaccount, data);
-		wallet->sync();
-		result = 0;
-	}
-
-	return result;
-}
-
-int GoogleContactsResource::retrieveFromWallet(QString &user,
-					   QString &pass,
-					   const WId &window,
-					   const QString &folder,
-					   const QString &awallet)
-{
-	int result = -1;
-	QString gaccount("googleAccount");
-	if (wallet == 0)
-		wallet = Wallet::openWallet(awallet, window);
-
-	if (wallet == 0)
-		return result;
-
-	if (wallet->isOpen()) {
-		if (!wallet->hasFolder(folder))
-			return result;
-		wallet->setFolder(folder);
-		QMap<QString, QString> data;
-		if (!wallet->readMap(gaccount, data)) {
-			user = data["login"];
-			pass = data["password"];
-			result = 0;
-		}
-	}
-
-	return result;
-
-}
-
 void GoogleContactsResource::doSetOnline(bool online)
 {
 	/* Approach based on kabcresource.cpp */
@@ -305,17 +254,6 @@ void GoogleContactsResource::doSetOnline(bool online)
 		emit status(Broken, message);
 		return;
 	}
-}
-
-void GoogleContactsResource::retrieveTimestamp(QString &timestamp)
-{
-	timestamp = Settings::self()->timestamp();
-}
-
-void GoogleContactsResource::saveTimestamp(QString &timestamp)
-{
- 	Settings::self()->setTimestamp(timestamp);
- 	Settings::self()->writeConfig();
 }
 
 int GoogleContactsResource::getUpdated(char *timestamp)
@@ -426,35 +364,10 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 	return result;
 }
 
-int GoogleContactsResource::authenticate(const QString &user,
-				     const QString &password)
-{
-
-	QByteArray byteUser, bytePass;
-	char *l_user, *l_pass;
-	int result = -1;
-
-	byteUser = user.toLocal8Bit();
-	bytePass = password.toLocal8Bit();
-
-	l_user = const_cast<char *>(byteUser.constData());
-	l_pass = const_cast<char *>(bytePass.constData());
-
-	if (l_user && l_pass)
-		if (!(result = gcal_get_authentication(gcal, l_user, l_pass)))
-			authenticated = true;
-
-	return result;
-
-}
-
 void GoogleContactsResource::configure( WId windowId )
 {
 	Q_UNUSED( windowId );
 	int result = -1;
-
-	if (!dlgConf)
-		dlgConf = new dlgGoogleDataConf;
 
 	if (windowId && dlgConf)
 		KWindowSystem::setMainWindow(dlgConf, windowId);

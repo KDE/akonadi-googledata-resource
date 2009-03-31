@@ -19,16 +19,11 @@
 #define GOOGLEDATARESOURCE_H
 
 #include <akonadi/resourcebase.h>
-#include "dlgGoogleDataConf.h"
-#include <kwallet.h>
-
-extern "C" {
-#include <gcalendar.h>
-#include <gcontact.h>
-}
+#include "googledata.h"
 
 class GoogleContactsResource : public Akonadi::ResourceBase,
-                           public Akonadi::AgentBase::Observer
+			       public Akonadi::AgentBase::Observer,
+			       public GoogleData
 {
 Q_OBJECT
 public:
@@ -45,46 +40,18 @@ protected Q_SLOTS:
 
 protected:
 	virtual void aboutToQuit();
-
 	virtual void itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection );
 	virtual void itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts );
 	virtual void itemRemoved( const Akonadi::Item &item );
-
-	int saveToWallet(const QString &user, const QString &pass,
-			 const WId &window,
-			 const QString &folder = "akonadigoogle",
-			 const QString &awallet = "kdewallet");
-
-
-	int retrieveFromWallet(QString &user, QString &pass,
-			       const WId &window,
-			       const QString &folder = "akonadigoogle",
-			       const QString &awallet = "kdewallet");
-
-	int authenticate(const QString &user, const QString &password);
-
-
 	virtual void doSetOnline(bool online);
 
-	/* Implement timestamp handling */
 	void retrieveTimestamp(QString &timestamp);
-
 	void saveTimestamp(QString &timestamp);
 
-	/* TODO: implement call for gcal_get_updated_contacts */
 	int getUpdated(char *timestamp);
-
-	/* Config dialog */
-	dlgGoogleDataConf *dlgConf;
-	/* Flag with authentication */
-	bool authenticated;
-	/* Google data context: holds user account name/password */
-	gcal_t gcal;
 	/* Contact array */
 	struct gcal_contact_array all_contacts;
-	/* KWallet object pointer */
-	KWallet::Wallet *wallet;
-	/* Contact itens upddate lists */
+	/* Contact itens update lists */
 	Akonadi::Item::List pending;
 	Akonadi::Item::List deleted;
 
