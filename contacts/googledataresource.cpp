@@ -20,7 +20,6 @@
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
- * - retrieve KDE proxy and use it (KProtocolManager::proxyFor can help)
  * - test with special characters (unicode > 256)
  * - support google calendar (libgcal already has code for that)
  * - code cleanup

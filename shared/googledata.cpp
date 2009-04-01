@@ -19,6 +19,7 @@
 #include "googledata.h"
 #include <qstring.h>
 #include <qmap.h>
+#include <kprotocolmanager.h>
 
 using KWallet::Wallet;
 
@@ -109,8 +110,9 @@ int GoogleData::authenticate(const QString &user,
 			     const QString &password)
 {
 
-	QByteArray byteUser, bytePass;
-	char *l_user, *l_pass;
+	QByteArray byteUser, bytePass, proxyUrl;
+	QString proxy;
+	char *l_user, *l_pass, *l_proxy;
 	int result = -1;
 
 	byteUser = user.toLocal8Bit();
@@ -118,6 +120,16 @@ int GoogleData::authenticate(const QString &user,
 
 	l_user = const_cast<char *>(byteUser.constData());
 	l_pass = const_cast<char *>(bytePass.constData());
+
+	if (KProtocolManager::useProxy()) {
+		proxy = "http";
+		proxy = KProtocolManager::proxyFor(proxy);
+		if (proxy.length()) {
+			proxyUrl = proxy.toLocal8Bit();
+			l_proxy = const_cast<char *>(proxyUrl.constData());
+			gcal_set_proxy(gcal, l_proxy);
+		}
+	}
 
 	if (l_user && l_pass)
 		if (!(result = gcal_get_authentication(gcal, l_user, l_pass)))
