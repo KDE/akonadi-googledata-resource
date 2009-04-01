@@ -55,6 +55,7 @@ include_directories(
 
 set( RESOURCE_AKONADI_SHARED_SOURCES
      ${CMAKE_CURRENT_SOURCE_DIR}/shared/googledata.cpp
+     ${CMAKE_CURRENT_SOURCE_DIR}/shared/dlgGoogleDataConf.cpp
 )
 
 add_subdirectory(contacts)

@@ -1,7 +1,6 @@
 
 set( googlecontactresource_SRCS
   googledataresource.cpp
-  dlgGoogleDataConf.cpp
   ${RESOURCE_AKONADI_SHARED_SOURCES}
 )
 

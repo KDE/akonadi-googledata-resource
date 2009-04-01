@@ -21,7 +21,7 @@
 #include <akonadi/resourcebase.h>
 #include "googledata.h"
 
-class GCalResource : public Akonadi::ResourceBase
+class GCalResource : public Akonadi::ResourceBase,
 		     public Akonadi::AgentBase::Observer,
 		     public GoogleData
 {
