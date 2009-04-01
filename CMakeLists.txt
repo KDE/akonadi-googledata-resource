@@ -48,4 +48,14 @@ include_directories(
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
 
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/shared
+  ${CMAKE_CURRENT_BINARY_DIR}/shared
+)
+
+set( RESOURCE_AKONADI_SHARED_SOURCES
+     ${CMAKE_CURRENT_SOURCE_DIR}/shared/googledata.cpp
+)
+
 add_subdirectory(contacts)
+add_subdirectory(calendar)

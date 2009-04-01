@@ -1,8 +1,8 @@
 
 set( googlecontactresource_SRCS
-  googledata.cpp
   googledataresource.cpp
   dlgGoogleDataConf.cpp
+  ${RESOURCE_AKONADI_SHARED_SOURCES}
 )
 
 kde4_add_ui_files( googlecontactresource_SRCS GoogleData.ui )
