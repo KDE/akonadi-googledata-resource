@@ -1,5 +1,9 @@
 [Desktop Entry]
 Name=Akonadi Google Calendar Resource
+Name[ga]=Acmhainn Féilire Google le haghaidh Akonadi
+Name[pt]=Recurso de Calendário do Google para o Akonadi
+Name[pt_BR]=Recurso de Calendário do Google para o Akonadi
+Name[uk]=Ресурс Календаря Google для Akonadi
 Type=AkonadiResource
 Exec=akonadi_gcal_resource
 Icon=text-directory
