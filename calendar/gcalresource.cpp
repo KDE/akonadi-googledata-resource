@@ -25,6 +25,7 @@
 #include <kabc/phonenumber.h>
 #include <kabc/key.h>
 #include <kabc/errorhandler.h>
+#include <kcal/event.h>
 #include <qstring.h>
 #include <KWindowSystem>
 #include <akonadi/changerecorder.h>
@@ -104,14 +105,90 @@ void GCalResource::retrieveCollections()
 
 void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 {
-	Q_UNUSED( collection );
+	Q_UNUSED(collection);
+	Item::List items;
+	int result;
+	gcal_event_t event;
+	QString timestamp;
+	QByteArray t_byte;
 
+	kError() << "\n............. retrieveItems ...........\n";
+	if (!authenticated) {
+		kError() << "No authentication for Google calendar available";
+		const QString message = i18nc("@info:status",
+					      "Not yet authenticated for"
+					      " use of Google calendar");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
+
+	/* Query by updated */
+	retrieveTimestamp(timestamp);
+	t_byte = timestamp.toLocal8Bit();
+	if (t_byte.length() > TIMESTAMP_SIZE) {
+		//TODO: implement getUpdated
+		//result = getUpdated(t_byte.data());
+		return;
+	}
+	kError() << "First retrieve";
+
+	if ((result = gcal_get_events(gcal, &all_events)))
+		exit(1);
+
+	/* GCalendar returns last updated entry as first element */
+	event = gcal_event_element(&all_events, 0);
+	if (!event) {
+		kError() << "Failed to retrieve last updated event.";
+		const QString message = i18nc("@info:status",
+					      "Failed getting last updated"
+					      " event");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+
+	}
+
+	timestamp = gcal_event_get_updated(event);
+	saveTimestamp(timestamp);
+
+	/* Each google entry has a unique ID and edit_url */
+	for (size_t i = 0; i < all_events.length; ++i) {
+		Item item(QLatin1String("text/calendar"));
+		KCal::Event kevent;
+		QString temp;
+		event = gcal_event_element(&all_events, i);
+
+		temp = gcal_event_get_title(event);
+		kevent.setSummary(temp);
+
+		temp = gcal_event_get_where(event);
+		kevent.setLocation(temp);
+
+		temp = gcal_event_get_status(event);
+		KCal::Incidence::Status status;
+		if (gcal_event_is_deleted(event))
+			status = KCal::Incidence::StatusCanceled;
+		else
+			status = KCal::Incidence::StatusConfirmed;
+		kevent.setStatus(status);
+
+		temp = gcal_event_get_content(event);
+		kevent.setDescription(temp);
+
+		temp = gcal_event_get_start(event);
+		temp = gcal_event_get_end(event);
+		//TODO: create a KDateTime
+		//kevent.set
+
+
+	}
 }
 
 bool GCalResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
-	Q_UNUSED( parts );
-	Q_UNUSED( item );
+	Q_UNUSED(parts);
+	Q_UNUSED(item);
 	return true;
 }
 
@@ -123,33 +200,37 @@ void GCalResource::aboutToQuit()
 
 void GCalResource::doSetOnline(bool online)
 {
-
+	Q_UNUSED(online);
 }
 
 int GCalResource::getUpdated(char *timestamp)
 {
+	Q_UNUSED(timestamp);
 
+	return -1;
 }
 
 void GCalResource::configure( WId windowId )
 {
-	Q_UNUSED( windowId );
+	Q_UNUSED(windowId);
 
 }
 
 void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 	Q_UNUSED(collection);
+	Q_UNUSED(item);
 }
 
 void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED(parts);
+	Q_UNUSED(item);
 }
 
 void GCalResource::itemRemoved( const Akonadi::Item &item )
 {
-
+	Q_UNUSED(item);
 }
 
 AKONADI_RESOURCE_MAIN( GCalResource )
