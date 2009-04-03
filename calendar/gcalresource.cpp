@@ -167,7 +167,6 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		temp = gcal_event_get_where(event);
 		kevent.setLocation(temp);
 
-		temp = gcal_event_get_status(event);
 		KCal::Incidence::Status status;
 		if (gcal_event_is_deleted(event))
 			status = KCal::Incidence::StatusCanceled;
