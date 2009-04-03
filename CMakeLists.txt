@@ -9,10 +9,9 @@ include(MacroLibrary)
 include(MacroOptionalAddSubdirectory)
 include(CheckIncludeFiles)
 
-find_package (KdepimLibs REQUIRED)
-
+find_package(KdepimLibs REQUIRED)
 #libgcal implements google data protocols 2.0
-FIND_PACKAGE( LibGCal REQUIRED )
+FIND_PACKAGE(LibGCal REQUIRED)
 
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
