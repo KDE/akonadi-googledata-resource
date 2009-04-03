@@ -50,18 +50,18 @@ GCalResource::GCalResource( const QString &id )
 
 	changeRecorder()->itemFetchScope().fetchFullPayload();
 
-    if (!(gcal = gcal_new(GCALENDAR)))
+	if (!(gcal = gcal_new(GCALENDAR)))
 		exit(1);
-    gcal_set_store_xml(gcal, 1);
-    all_events.length = 0;
-    all_events.entries = NULL;
+	gcal_set_store_xml(gcal, 1);
+	all_events.length = 0;
+	all_events.entries = NULL;
 }
 
 GCalResource::~GCalResource()
 {
-    gcal_cleanup_events(&all_events);
-    pending.clear();
-    deleted.clear();
+	gcal_cleanup_events(&all_events);
+	pending.clear();
+	deleted.clear();
 }
 
 void GCalResource::retrieveTimestamp(QString &timestamp)
@@ -71,23 +71,23 @@ void GCalResource::retrieveTimestamp(QString &timestamp)
 
 void GCalResource::saveTimestamp(QString &timestamp)
 {
-    Settings::self()->setTimestamp(timestamp);
-    Settings::self()->writeConfig();
+	Settings::self()->setTimestamp(timestamp);
+	Settings::self()->writeConfig();
 }
 
 
 void GCalResource::retrieveCollections()
 {
-    if(!authenticated) {
-		kError() << "No authentication for Google Calendar available";
-                const QString message = i18nc("@info: status",
-					      "Not yet authenticated for "
-					      "use of Google Calendar");
+    if (!authenticated) {
+	    kError() << "No authentication for Google Calendar available";
+	    const QString message = i18nc("@info: status",
+					  "Not yet authenticated for "
+					  "use of Google Calendar");
 
-        emit error(message);
+	    emit error(message);
 
-        emit status(Broken, message);
-        return;
+	    emit status(Broken, message);
+	    return;
     }
 
     Collection c;
@@ -125,13 +125,13 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	}
 
 	/* Query by updated */
-	retrieveTimestamp(timestamp);
-	t_byte = timestamp.toLocal8Bit();
-	if (t_byte.length() > TIMESTAMP_SIZE) {
-		//TODO: implement getUpdated
-		//result = getUpdated(t_byte.data());
-		return;
-	}
+// 	retrieveTimestamp(timestamp);
+// 	t_byte = timestamp.toLocal8Bit();
+// 	if (t_byte.length() > TIMESTAMP_SIZE) {
+// 		//TODO: implement getUpdated
+// 		//result = getUpdated(t_byte.data());
+// 		return;
+// 	}
 	kError() << "First retrieve";
 
 	if ((result = gcal_get_events(gcal, &all_events)))
