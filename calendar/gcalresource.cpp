@@ -31,6 +31,13 @@
 #include <akonadi/itemfetchscope.h>
 #include <KUrl>
 
+extern "C" {
+#include <gcalendar.h>
+#include <gcal_status.h>
+}
+
+using namespace Akonadi;
+
 GCalResource::GCalResource( const QString &id )
 	: ResourceBase(id)
 {
@@ -41,11 +48,18 @@ GCalResource::GCalResource( const QString &id )
 
 	changeRecorder()->itemFetchScope().fetchFullPayload();
 
+	if (!(gcal = gcal_new(GCALENDAR))) 
+		exit(1);
+	gcal_set_store_xml(gcal, 1);
+	all_events.length = 0;
+	all_events.entries = NULL;
 }
 
 GCalResource::~GCalResource()
 {
-
+	gcal_cleanup_events(&all_events);
+	pending.clear();
+	deleted.clear();
 }
 
 void GCalResource::retrieveTimestamp(QString &timestamp)
@@ -62,7 +76,30 @@ void GCalResource::saveTimestamp(QString &timestamp)
 
 void GCalResource::retrieveCollections()
 {
+	if(!authenticated) {
+		kError() << "No authentication for Google Calendar available";
+                const QString message = i18nc("@info: status",
+					      "Not yet authenticated for "	
+					      "use of Google Calendar");
 
+		emit error(message);
+		
+                emit status(Broken, message);
+		return;
+	}
+
+	Collection c;
+        c.setParent(Collection::root());
+        c.setRemoteId("google-calendar");
+	c.setName(name());
+
+	QStringList mimeTypes;
+	mimeTypes << "text/calendar";
+	c.setContentMimeTypes(mimeTypes);
+	
+	Collection::List list;
+	list << c;
+	collectionsRetrieved(list);
 }
 
 void GCalResource::retrieveItems( const Akonadi::Collection &collection )

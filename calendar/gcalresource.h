@@ -49,9 +49,9 @@ protected:
 	void saveTimestamp(QString &timestamp);
 
 	int getUpdated(char *timestamp);
-	/* Contact array */
-	struct gcal_contact_array all_contacts;
-	/* Contact itens update lists */
+	/* Event array */
+	struct gcal_event_array all_events;
+	/* Event itens update lists */
 	Akonadi::Item::List pending;
 	Akonadi::Item::List deleted;
 
