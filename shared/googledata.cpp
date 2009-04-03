@@ -28,7 +28,7 @@ GoogleData::GoogleData(): wallet(0), dlgConf(0), authenticated(false),
 {
 	if (!dlgConf)
 		dlgConf = new dlgGoogleDataConf;
-};
+}
 
 GoogleData::~GoogleData()
 {
