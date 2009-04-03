@@ -21,7 +21,6 @@
 #include "settingsadaptor.h"
 
 #include <QtDBus/QDBusConnection>
-#include <QDate>
 #include <kabc/addressee.h>
 #include <kabc/phonenumber.h>
 #include <kabc/key.h>
@@ -178,14 +177,13 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		kevent.setDescription(temp);
 
 		/* TODO: there must exit an easier way */
-		QDate start, end;
+		KDateTime start, end;
 		temp = gcal_event_get_start(event);
-		start.fromString(temp, Qt::ISODate);
+		start.fromString(temp);
 		temp = gcal_event_get_end(event);
-		end.fromString(temp, Qt::ISODate);
-		KDateTime time_start(start), time_end(end);
-		kevent.setDtStart(time_start);
-		kevent.setDtEnd(time_end);
+		end.fromString(temp);
+		kevent.setDtStart(start);
+		kevent.setDtEnd(end);
 
 		items << item;
 	}
