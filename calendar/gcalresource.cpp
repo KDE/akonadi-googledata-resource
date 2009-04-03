@@ -106,9 +106,9 @@ void GCalResource::retrieveCollections()
 
 void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 {
-    Q_UNUSED(collection);
-    Item::List items;
-    int result;
+	Q_UNUSED(collection);
+	Item::List items;
+	int result;
 	gcal_event_t event;
 	QString timestamp;
 	QByteArray t_byte;
