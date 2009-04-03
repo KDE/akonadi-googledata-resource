@@ -283,7 +283,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
         t_byte = temp.toLocal8Bit();
         gcal_event_set_content(event, t_byte);
     }
-    //TODO: event start, event end, status, url, id and etags
+    //TODO: event start, event end, status
 
     temp = kevent.location();
     if(!temp.length()) {
@@ -318,6 +318,47 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 void GCalResource::itemRemoved( const Akonadi::Item &item )
 {
 	Q_UNUSED(item);
+
+    gcal_event_t event;
+    QString temp;
+    QByteArray t_byte;
+
+    kDebug() << "Deleting one item ... ";
+
+    if(!authenticated) {
+        kError() << "No authentication for Google calendar";
+        const QString message = i18nc("@info:status",
+                                "Not yet authenticated for "
+                                "use of Google calendar");
+        emit error(message);
+        emit status(Broken, message);
+    }
+
+    if (!(event = gcal_event_new(NULL))) {
+        kError() << "Memory allocation error!";
+        const QString message = i18nc("@info:status",
+                                "Failed to create gcal_event");
+        emit error(message);
+        emit status(Broken, message);
+    }
+
+    KUrl url(item.remoteId());
+    temp = url.url();
+    t_byte = temp.toAscii();
+    gcal_event_set_url(event, t_byte.data());
+
+    if (gcal_erase_event(gcal, event)) {
+        kError() << "Failed deleting calendar";
+        const QString message = i18nc("@info:status",
+                                "Failed deleting new calendar");
+        emit error(message);
+        emit status(Broken, message);
+    }
+
+    gcal_event_delete(event);
+
+    changeProcessed();
+    kDebug() << "done deleting!!";
 }
 
 AKONADI_RESOURCE_MAIN( GCalResource )
