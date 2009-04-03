@@ -217,8 +217,28 @@ int GCalResource::getUpdated(char *timestamp)
 
 void GCalResource::configure( WId windowId )
 {
-	Q_UNUSED(windowId);
+	int result = 0;
+	if (windowId && dlgConf)
+		KWindowSystem::setMainWindow(dlgConf, windowId);
 
+	dlgConf->exec();
+	if (!(result = authenticate(dlgConf->eAccount->text(),
+				    dlgConf->ePass->text()))) {
+		result = saveToWallet(dlgConf->eAccount->text(),
+				      dlgConf->ePass->text(),
+				      windowId);
+
+		synchronize();
+	}
+
+	if (result) {
+		kError() << "Failed configuring resource.";
+		const QString message = i18nc("@info:status",
+					      "Invalid password.");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 }
 
 void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
