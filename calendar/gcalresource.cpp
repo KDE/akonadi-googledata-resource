@@ -176,7 +176,6 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		temp = gcal_event_get_content(event);
 		kevent.setDescription(temp);
 
-		/* TODO: there must exit an easier way */
 		KDateTime start, end;
 		temp = gcal_event_get_start(event);
 		start.fromString(temp);
