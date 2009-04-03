@@ -187,7 +187,10 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		kevent.setDtStart(time_start);
 		kevent.setDtEnd(time_end);
 
+		items << item;
 	}
+
+	itemsRetrieved(items);
 }
 
 bool GCalResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
