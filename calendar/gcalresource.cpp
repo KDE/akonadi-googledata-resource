@@ -244,7 +244,52 @@ void GCalResource::configure( WId windowId )
 void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 	Q_UNUSED(collection);
-	Q_UNUSED(item);
+
+    gcal_event_t event;
+    KCal::Event kevent;
+    QByteArray t_byte;
+    QString temp;
+
+    if (!authenticated) {
+        kError() << "No authentication for Google calendar available";
+        const QString message = i18nc("@info:status",
+                          "Not yet authenticated for"
+                          " use of Google calendar");
+        emit error(message);
+        emit status(Broken, message);
+        return;
+    }
+
+    if(item.hasPayload<KCal::Event>())
+        kevent = item.payload<KCal::Event>();
+
+    if (!(event = gcal_event_new(NULL))) {
+        kError() << "Memory allocation error!";
+        const QString message = i18nc("@info:status",
+                      "Failed to create gcal_event");
+        emit error(message);
+        emit status(Broken, message);
+        return;
+    }
+
+    temp = kevent.summary();
+    if(!temp.length()) {
+        t_byte = temp.toLocal8Bit();
+        gcal_event_set_title(event, t_byte);
+    }
+
+    temp = kevent.description();
+    if(!temp.length()) {
+        t_byte = temp.toLocal8Bit();
+        gcal_event_set_content(event, t_byte);
+    }
+    //TODO: event start, event end, status, url, id and etags
+
+    temp = kevent.location();
+    if(!temp.length()) {
+        t_byte = temp.toLocal8Bit();
+        gcal_event_set_where(event, t_byte);
+    }
 }
 
 void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
