@@ -365,8 +365,6 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 
 void GoogleContactsResource::configure( WId windowId )
 {
-	Q_UNUSED( windowId );
-	int result = -1;
 
 	if (windowId && dlgConf)
 		KWindowSystem::setMainWindow(dlgConf, windowId);
