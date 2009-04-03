@@ -49,18 +49,18 @@ GCalResource::GCalResource( const QString &id )
 
 	changeRecorder()->itemFetchScope().fetchFullPayload();
 
-	if (!(gcal = gcal_new(GCALENDAR))) 
+    if (!(gcal = gcal_new(GCALENDAR)))
 		exit(1);
-	gcal_set_store_xml(gcal, 1);
-	all_events.length = 0;
-	all_events.entries = NULL;
+    gcal_set_store_xml(gcal, 1);
+    all_events.length = 0;
+    all_events.entries = NULL;
 }
 
 GCalResource::~GCalResource()
 {
-	gcal_cleanup_events(&all_events);
-	pending.clear();
-	deleted.clear();
+    gcal_cleanup_events(&all_events);
+    pending.clear();
+    deleted.clear();
 }
 
 void GCalResource::retrieveTimestamp(QString &timestamp)
@@ -70,44 +70,44 @@ void GCalResource::retrieveTimestamp(QString &timestamp)
 
 void GCalResource::saveTimestamp(QString &timestamp)
 {
- 	Settings::self()->setTimestamp(timestamp);
- 	Settings::self()->writeConfig();
+    Settings::self()->setTimestamp(timestamp);
+    Settings::self()->writeConfig();
 }
 
 
 void GCalResource::retrieveCollections()
 {
-	if(!authenticated) {
+    if(!authenticated) {
 		kError() << "No authentication for Google Calendar available";
                 const QString message = i18nc("@info: status",
-					      "Not yet authenticated for "	
+					      "Not yet authenticated for "
 					      "use of Google Calendar");
 
-		emit error(message);
-		
-                emit status(Broken, message);
-		return;
-	}
+        emit error(message);
 
-	Collection c;
-        c.setParent(Collection::root());
-        c.setRemoteId("google-calendar");
-	c.setName(name());
+        emit status(Broken, message);
+        return;
+    }
 
-	QStringList mimeTypes;
-	mimeTypes << "text/calendar";
-	c.setContentMimeTypes(mimeTypes);
-	
-	Collection::List list;
-	list << c;
-	collectionsRetrieved(list);
+    Collection c;
+    c.setParent(Collection::root());
+    c.setRemoteId("google-calendar");
+    c.setName(name());
+
+    QStringList mimeTypes;
+    mimeTypes << "text/calendar";
+    c.setContentMimeTypes(mimeTypes);
+
+    Collection::List list;
+    list << c;
+    collectionsRetrieved(list);
 }
 
 void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 {
-	Q_UNUSED(collection);
-	Item::List items;
-	int result;
+    Q_UNUSED(collection);
+    Item::List items;
+    int result;
 	gcal_event_t event;
 	QString timestamp;
 	QByteArray t_byte;
