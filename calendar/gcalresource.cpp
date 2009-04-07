@@ -16,6 +16,12 @@
  *
  */
 
+/* TODO:
+ * - test add new event
+ * - implement and test edit event
+ * - support for recurrent events (it will require changes on libgcal)
+ */
+
 #include "gcalresource.h"
 #include "settings.h"
 #include "settingsadaptor.h"

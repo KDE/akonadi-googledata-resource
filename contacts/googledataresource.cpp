@@ -21,7 +21,6 @@
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
  * - test with special characters (unicode > 256)
- * - support google calendar (libgcal already has code for that)
  * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
  * of tests
