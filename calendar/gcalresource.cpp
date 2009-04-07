@@ -32,6 +32,7 @@
 #include <akonadi/changerecorder.h>
 #include <akonadi/itemfetchscope.h>
 #include <KUrl>
+#include <kdatetime.h>
 #include <boost/shared_ptr.hpp>
 typedef boost::shared_ptr<KCal::Incidence> IncidencePtr;
 
@@ -181,11 +182,16 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 
 		KDateTime start, end;
 		temp = gcal_event_get_start(event);
-		start.fromString(temp);
+		qDebug() << "start: " << temp;
+		start.fromString(temp, KDateTime::ISODate);
 		temp = gcal_event_get_end(event);
-		end.fromString(temp);
+		qDebug() << "end: " << temp;
+		end.fromString(temp, KDateTime::ISODate);
 		kevent->setDtStart(start);
 		kevent->setDtEnd(end);
+
+		qDebug() << "start: " << start.dateTime()
+			 << "\tend: " << end.dateTime();
 
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_event_get_url(event));
