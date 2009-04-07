@@ -10,6 +10,12 @@ include(MacroOptionalAddSubdirectory)
 include(CheckIncludeFiles)
 
 find_package(KdepimLibs REQUIRED)
+macro_optional_find_package(Boost)
+macro_log_feature(Boost_FOUND "boost" "Boost C++ Libraries" "http://www.boost.org" TRUE "1.33.1" "Required by Akonadi.")
+if(NOT Boost_FOUND)
+  macro_display_feature_log()
+endif(NOT Boost_FOUND)
+
 #libgcal implements google data protocols 2.0
 FIND_PACKAGE(LibGCal REQUIRED)
 
@@ -43,6 +49,7 @@ set(KDE4_ICON_DIR ${KDE4_INSTALL_DIR}/share/icons)
 
 include_directories(
     ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
