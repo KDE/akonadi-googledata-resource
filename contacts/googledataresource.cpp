@@ -499,6 +499,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	KUrl urlEtag(gcal_contact_get_url(contact));
 
 	Item newItem(item);
+	/* TODO: what about new updated field? */
 	newItem.setPayload<KABC::Addressee>(addressee);
 	newItem.setRemoteId(urlEtag.url());
 	changeCommitted(newItem);
