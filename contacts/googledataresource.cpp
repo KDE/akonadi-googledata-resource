@@ -213,6 +213,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	}
 
 	itemsRetrieved(items);
+	kError() << "\n............. done retrieveItems! ...........\n";
 }
 
 bool GoogleContactsResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
