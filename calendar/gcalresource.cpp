@@ -184,6 +184,10 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		kevent.setDtStart(start);
 		kevent.setDtEnd(end);
 
+		/* remoteID: edit_url */
+		KUrl urlEtag(gcal_event_get_url(event));
+		item.setRemoteId(urlEtag.url());
+
 		items << item;
 	}
 
