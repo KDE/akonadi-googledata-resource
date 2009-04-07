@@ -32,6 +32,8 @@
 #include <akonadi/changerecorder.h>
 #include <akonadi/itemfetchscope.h>
 #include <KUrl>
+#include <boost/shared_ptr.hpp>
+typedef boost::shared_ptr<KCal::Incidence> IncidencePtr;
 
 extern "C" {
 #include <gcalendar.h>
@@ -156,42 +158,45 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	/* Each google entry has a unique ID and edit_url */
 	for (size_t i = 0; i < all_events.length; ++i) {
 		Item item(QLatin1String("text/calendar"));
-		KCal::Event kevent;
+		KCal::Event *kevent;
+		kevent = new KCal::Event;
 		QString temp;
 		event = gcal_event_element(&all_events, i);
 
 		temp = gcal_event_get_title(event);
-		kevent.setSummary(temp);
+		kevent->setSummary(temp);
 
 		temp = gcal_event_get_where(event);
-		kevent.setLocation(temp);
+		kevent->setLocation(temp);
 
 		KCal::Incidence::Status status;
 		if (gcal_event_is_deleted(event))
 			status = KCal::Incidence::StatusCanceled;
 		else
 			status = KCal::Incidence::StatusConfirmed;
-		kevent.setStatus(status);
+		kevent->setStatus(status);
 
 		temp = gcal_event_get_content(event);
-		kevent.setDescription(temp);
+		kevent->setDescription(temp);
 
 		KDateTime start, end;
 		temp = gcal_event_get_start(event);
 		start.fromString(temp);
 		temp = gcal_event_get_end(event);
 		end.fromString(temp);
-		kevent.setDtStart(start);
-		kevent.setDtEnd(end);
+		kevent->setDtStart(start);
+		kevent->setDtEnd(end);
 
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_event_get_url(event));
 		item.setRemoteId(urlEtag.url());
+		item.setPayload(IncidencePtr(kevent));
 
 		items << item;
 	}
 
 	itemsRetrieved(items);
+	kError() << "\n............. done retrieveItems! ...........\n";
 }
 
 bool GCalResource::retrieveItem( const Akonadi::Item &item, const QSet<QByteArray> &parts )
