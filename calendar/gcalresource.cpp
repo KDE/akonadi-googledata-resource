@@ -348,7 +348,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
     KUrl url(gcal_event_get_url(event));
     Item newItem(item);
     /* Either 'new' or crash... */
-    newItem.setPayload(IncidencePtr(new KCal::Event(*kevent)));
+    newItem.setPayload(IncidencePtr(kevent->clone()));
     newItem.setRemoteId(url.url());
     changeCommitted(newItem);
 
