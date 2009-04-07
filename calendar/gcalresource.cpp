@@ -308,19 +308,19 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
      * summary, description, location.
      */
     temp = kevent->summary();
-    if(!temp.length()) {
+    if (!temp.isEmpty()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_title(event, t_byte);
     }
 
     temp = kevent->description();
-    if(!temp.length()) {
+    if (!temp.isEmpty()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_content(event, t_byte);
     }
 
     temp = kevent->location();
-    if(!temp.length()) {
+    if (!temp.isEmpty()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_where(event, t_byte);
     }
