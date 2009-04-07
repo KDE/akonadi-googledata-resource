@@ -17,8 +17,8 @@
  */
 
 /* TODO:
- * - fix missing fields on 'add' event
  * - implement and test edit event
+ * - query-by-update implement and test
  * - support for recurrent events (it will require changes on libgcal)
  */
 
@@ -304,9 +304,6 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
         return;
     }
 
-    /* FIXME: for some reason the event is missing these fields:
-     * summary, description, location.
-     */
     temp = kevent->summary();
     if (!temp.isEmpty()) {
         t_byte = temp.toLocal8Bit();
