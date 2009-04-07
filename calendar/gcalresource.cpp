@@ -17,7 +17,7 @@
  */
 
 /* TODO:
- * - test add new event
+ * - fix missing fields on 'add' event
  * - implement and test edit event
  * - support for recurrent events (it will require changes on libgcal)
  */
@@ -266,9 +266,12 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	Q_UNUSED(collection);
 
     gcal_event_t event;
-    KCal::Event kevent;
+    KCal::Event *kevent;
+    IncidencePtr ptrEvent;
     QByteArray t_byte;
     QString temp;
+    KDateTime time;
+    //TODO: test for recurrence (and ignore creation for while)
 
     if (!authenticated) {
         kError() << "No authentication for Google calendar available";
@@ -280,8 +283,17 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
         return;
     }
 
-    if(item.hasPayload<KCal::Event>())
-        kevent = item.payload<KCal::Event>();
+    if (item.hasPayload<IncidencePtr>()) {
+	    ptrEvent = item.payload<IncidencePtr>();
+	    kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
+    } else {
+        kError() << "Add without payload!";
+        const QString message = i18nc("@info:status",
+                          "No payload to add event");
+        emit error(message);
+        emit status(Broken, message);
+        return;
+    }
 
     if (!(event = gcal_event_new(NULL))) {
         kError() << "Memory allocation error!";
@@ -292,28 +304,41 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
         return;
     }
 
-    temp = kevent.summary();
+    /* FIXME: for some reason the event is missing these fields:
+     * summary, description, location.
+     */
+    temp = kevent->summary();
     if(!temp.length()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_title(event, t_byte);
     }
 
-    temp = kevent.description();
+    temp = kevent->description();
     if(!temp.length()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_content(event, t_byte);
     }
-    //TODO: event start, event end, status
 
-    temp = kevent.location();
+    temp = kevent->location();
     if(!temp.length()) {
         t_byte = temp.toLocal8Bit();
         gcal_event_set_where(event, t_byte);
     }
 
+    /* Only this fields are being successfuly extracted */
+    time = kevent->dtStart();
+    temp = time.toString(KDateTime::ISODate);
+    t_byte = temp.toLocal8Bit();
+    gcal_event_set_start(event, t_byte.data());
+
+    time = kevent->dtEnd();
+    temp = time.toString(KDateTime::ISODate);
+    t_byte = temp.toLocal8Bit();
+    gcal_event_set_end(event, t_byte.data());
+
     if ((gcal_add_event(gcal, event))) {
         kError() << "Failed adding new calendar"
-                << "title:" << kevent.summary();
+                << "title:" << kevent->summary();
         const QString message = i18nc("@info:status",
                             "failed adding new calendar");
         emit error(message);
@@ -322,7 +347,8 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 
     KUrl url(gcal_event_get_url(event));
     Item newItem(item);
-    newItem.setPayload<KCal::Event>(kevent);
+    /* Either 'new' or crash... */
+    newItem.setPayload(IncidencePtr(new KCal::Event(*kevent)));
     newItem.setRemoteId(url.url());
     changeCommitted(newItem);
 
