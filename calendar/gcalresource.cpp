@@ -182,16 +182,15 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 
 		KDateTime start, end;
 		temp = gcal_event_get_start(event);
-		qDebug() << "start: " << temp;
-		start.fromString(temp, KDateTime::ISODate);
+		start = start.fromString(temp, KDateTime::ISODate);
 		temp = gcal_event_get_end(event);
-		qDebug() << "end: " << temp;
-		end.fromString(temp, KDateTime::ISODate);
+		end = end.fromString(temp, KDateTime::ISODate);
 		kevent->setDtStart(start);
 		kevent->setDtEnd(end);
 
 		qDebug() << "start: " << start.dateTime()
 			 << "\tend: " << end.dateTime();
+
 
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_event_get_url(event));
