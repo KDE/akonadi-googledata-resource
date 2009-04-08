@@ -480,7 +480,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		buffer.open(QIODevice::WriteOnly);
 		raw.save(&buffer, "PNG");
 		gcal_contact_set_photo(contact,
-				       reinterpret_cast<unsigned char*>(ba.data()),
+				       ba.data(),
 				       ba.size());
 	}
 
@@ -605,7 +605,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		buffer.open(QIODevice::WriteOnly);
 		raw.save(&buffer, "PNG");
 		gcal_contact_set_photo(contact,
-				       reinterpret_cast<unsigned char*>(ba.data()),
+				       ba.data(),
 				       ba.size());
 	}
 
