@@ -1,0 +1,9 @@
+== Google contacts and calendar akonadi resource ==
+
+What works:
+
+- contacts: retrieve/add/edit/delete/query-by-updates
+- calendar: retrieve/add/delete
+
+Dependency: libgcal from git repository (git://repo.or.cz/libgcal.git)
+
