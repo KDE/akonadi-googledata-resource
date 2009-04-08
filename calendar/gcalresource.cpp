@@ -17,7 +17,6 @@
  */
 
 /* TODO:
- * - test edit event
  * - query-by-update implement and test
  * - support for recurrent events (it will require changes on libgcal)
  * - Some duplicated code must be moved to a common function (setting
@@ -324,7 +323,6 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
         gcal_event_set_where(event, t_byte);
     }
 
-    /* Only this fields are being successfuly extracted */
     time = kevent->dtStart();
     temp = time.toString(KDateTime::ISODate);
     t_byte = temp.toLocal8Bit();
