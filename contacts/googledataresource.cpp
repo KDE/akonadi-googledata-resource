@@ -625,11 +625,12 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	}
 
 	/* remoteID: edit_url */
-	KUrl urlEtag(gcal_contact_get_url(contact));
+	temp = gcal_contact_get_url(contact);
+	url = temp;
 
 	Item newItem(item);
 	newItem.setPayload<KABC::Addressee>(addressee);
-	newItem.setRemoteId(urlEtag.url());
+	newItem.setRemoteId(url.url());
 	changeCommitted(newItem);
 
 	gcal_contact_delete(contact);
