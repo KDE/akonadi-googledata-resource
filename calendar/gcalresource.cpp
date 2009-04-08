@@ -424,6 +424,11 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
     t_byte = temp.toLocal8Bit();
     gcal_event_set_end(event, t_byte.data());
 
+    KUrl url(item.remoteId());
+    temp = url.url();
+    t_byte = temp.toAscii();
+    gcal_event_set_url(event, t_byte.data());
+
     if ((gcal_update_event(gcal, event))) {
         kError() << "Failed adding new calendar"
                 << "title:" << kevent->summary();
@@ -433,7 +438,8 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
         emit status(Broken, message);
     }
 
-    KUrl url(gcal_event_get_url(event));
+    temp = gcal_event_get_url(event);
+    url = temp;
     Item newItem(item);
     newItem.setPayload(IncidencePtr(kevent->clone()));
     newItem.setRemoteId(url.url());
