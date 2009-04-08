@@ -21,6 +21,8 @@
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
  * - test with special characters (unicode > 256)
+ * - Some duplicated code must be moved to a common function (setting
+ * KABC::Addressee data in gcal_contact_t).
  * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
  * of tests
