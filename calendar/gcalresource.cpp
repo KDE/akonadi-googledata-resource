@@ -135,13 +135,13 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	}
 
 	/* Query by updated */
-// 	retrieveTimestamp(timestamp);
-// 	t_byte = timestamp.toLocal8Bit();
-// 	if (t_byte.length() > TIMESTAMP_SIZE) {
-// 		//TODO: implement getUpdated
-// 		//result = getUpdated(t_byte.data());
-// 		return;
-// 	}
+	retrieveTimestamp(timestamp);
+	t_byte = timestamp.toLocal8Bit();
+	if (t_byte.length() > TIMESTAMP_SIZE) {
+		//TODO: implement getUpdated
+		result = getUpdated(t_byte.data());
+		return;
+	}
 	kError() << "First retrieve";
 
 	if ((result = gcal_get_events(gcal, &all_events)))
@@ -226,7 +226,29 @@ void GCalResource::aboutToQuit()
 
 void GCalResource::doSetOnline(bool online)
 {
-	Q_UNUSED(online);
+	/* Approach based on kabcresource.cpp */
+	kDebug() << "online" << online;
+	QString user;
+	QString password;
+	int result = 0;
+	WId window = winIdForDialogs();
+
+	if (online)
+		if (!retrieveFromWallet(user, password, window))
+			if (!(result = authenticate(user, password))) {
+				authenticated = true;
+				ResourceBase::doSetOnline(online);
+				synchronize();
+			}
+
+	if (result) {
+		kError() << "Failed setting online.";
+		const QString message = i18nc("@info:status",
+					      "Invalid password.");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 }
 
 int GCalResource::getUpdated(char *timestamp)
