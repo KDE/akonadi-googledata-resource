@@ -17,7 +17,7 @@
  */
 
 /* TODO:
- * - query-by-update implement and test
+ * - test query-by-update
  * - support for recurrent events (it will require changes on libgcal)
  * - Some duplicated code must be moved to a common function (setting
  * KCal::Event data in gcal_event_t).
@@ -235,7 +235,12 @@ int GCalResource::getUpdated(char *timestamp)
 	gcal_event_t event;
 	QString newerTimestamp;
 	QString temp;
-
+	KCal::Incidence::Status status = KCal::Incidence::StatusConfirmed;
+	KDateTime start, end;
+	QByteArray t_byte;
+	KCal::Event *kevent;
+	IncidencePtr ptrEvent;
+	KUrl url;
 	/* Just in case, I'm not sure when this member function is called */
 	pending.clear();
 	deleted.clear();
@@ -261,17 +266,45 @@ int GCalResource::getUpdated(char *timestamp)
 	 */
 	for (size_t i = 0; i < all_events.length; ++i) {
 		event = gcal_event_element(&all_events, i);
+		Item item(QLatin1String("text/calendar"));
+		if (!strcmp(timestamp, gcal_event_get_updated(event))) {
+			kError() << "This is an old event... continue.";
+			continue;
+		}
+
 		if (!gcal_event_is_deleted(event)) {
 
-			/* TODO: set event fields and add item to 'add'
-			 * list
-			 */
+			kevent = new KCal::Event;
+			kevent->setStatus(status);
 
-		} else
-		{
-			/* TODO: set remoteId and add item to 'deleted'
-			 * list.
-			 */
+			temp = gcal_event_get_title(event);
+			kevent->setSummary(temp);
+
+			temp = gcal_event_get_where(event);
+			kevent->setLocation(temp);
+
+			temp = gcal_event_get_content(event);
+			kevent->setDescription(temp);
+
+			temp = gcal_event_get_start(event);
+			start = start.fromString(temp, KDateTime::ISODate);
+			temp = gcal_event_get_end(event);
+			end = end.fromString(temp, KDateTime::ISODate);
+			kevent->setDtStart(start);
+			kevent->setDtEnd(end);
+
+			url = gcal_event_get_url(event);
+			item.setRemoteId(url.url());
+			item.setPayload(IncidencePtr(kevent));
+
+			pending << item;
+
+		} else {
+			url = gcal_event_get_url(event);
+			item.setRemoteId(url.url());
+			kError() << "index: " << i
+				 << "deleted: " << url.url();
+			deleted << item;
 		}
 	}
 
@@ -286,7 +319,7 @@ int GCalResource::getUpdated(char *timestamp)
 					      " updated"
 					      " event");
 		emit error(message);
-		emit status(Broken, message);
+		//emit status(Broken, message);
 		result = -1;
 		return result;
 
