@@ -231,9 +231,71 @@ void GCalResource::doSetOnline(bool online)
 
 int GCalResource::getUpdated(char *timestamp)
 {
-	Q_UNUSED(timestamp);
+	int result = 0;
+	gcal_event_t event;
+	QString newerTimestamp;
+	QString temp;
 
-	return -1;
+	/* Just in case, I'm not sure when this member function is called */
+	pending.clear();
+	deleted.clear();
+
+	kError() << "Timestamp of last updated event is: " << timestamp;
+	gcal_cleanup_events(&all_events);
+	gcal_deleted(gcal, SHOW);
+	if ((result = gcal_get_updated_events(gcal, &all_events, timestamp))) {
+		kError() << "Failed querying by updated";
+		return result;
+	}
+	kError() << "Updated events are: " << all_events.length;
+
+
+	/* Query is inclusive regarding timestamp */
+	if (all_events.length == 1) {
+		kError() << "no updates, done!";
+		return result;
+	}
+
+	/* First element was already included in last retrieval, because
+	 * query-by-updated is inclusive.
+	 */
+	for (size_t i = 0; i < all_events.length; ++i) {
+		event = gcal_event_element(&all_events, i);
+		if (!gcal_event_is_deleted(event)) {
+
+			/* TODO: set event fields and add item to 'add'
+			 * list
+			 */
+
+		} else
+		{
+			/* TODO: set remoteId and add item to 'deleted'
+			 * list.
+			 */
+		}
+	}
+
+	itemsRetrievedIncremental(pending, deleted);
+
+	/* Events return last updated entry as first element */
+	event = gcal_event_element(&all_events, 0);
+	if (!event) {
+		kError() << "Failed to retrieve last updated event.";
+		const QString message = i18nc("@info:status",
+					      "Failed getting last"
+					      " updated"
+					      " event");
+		emit error(message);
+		emit status(Broken, message);
+		result = -1;
+		return result;
+
+	}
+
+	newerTimestamp = gcal_event_get_updated(event);
+	saveTimestamp(newerTimestamp);
+
+	return result;
 }
 
 void GCalResource::configure( WId windowId )
