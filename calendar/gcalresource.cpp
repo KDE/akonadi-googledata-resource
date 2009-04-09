@@ -87,30 +87,30 @@ void GCalResource::saveTimestamp(QString &timestamp)
 
 void GCalResource::retrieveCollections()
 {
-    if (!authenticated) {
-	    kError() << "No authentication for Google Calendar available";
-	    const QString message = i18nc("@info: status",
-					  "Not yet authenticated for "
-					  "use of Google Calendar");
+	if (!authenticated) {
+		kError() << "No authentication for Google Calendar available";
+		const QString message = i18nc("@info: status",
+					      "Not yet authenticated for "
+					      "use of Google Calendar");
 
-	    emit error(message);
+		emit error(message);
 
-	    emit status(Broken, message);
-	    return;
-    }
+		emit status(Broken, message);
+		return;
+	}
 
-    Collection c;
-    c.setParent(Collection::root());
-    c.setRemoteId("google-calendar");
-    c.setName(name());
+	Collection c;
+	c.setParent(Collection::root());
+	c.setRemoteId("google-calendar");
+	c.setName(name());
 
-    QStringList mimeTypes;
-    mimeTypes << "text/calendar";
-    c.setContentMimeTypes(mimeTypes);
+	QStringList mimeTypes;
+	mimeTypes << "text/calendar";
+	c.setContentMimeTypes(mimeTypes);
 
-    Collection::List list;
-    list << c;
-    collectionsRetrieved(list);
+	Collection::List list;
+	list << c;
+	collectionsRetrieved(list);
 }
 
 void GCalResource::retrieveItems( const Akonadi::Collection &collection )
@@ -382,184 +382,184 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 {
 	Q_UNUSED(collection);
 
-    gcal_event_t event;
-    KCal::Event *kevent;
-    IncidencePtr ptrEvent;
-    QByteArray t_byte;
-    QString temp;
-    KDateTime time;
-    //TODO: test for recurrence (and ignore creation for while)
+	gcal_event_t event;
+	KCal::Event *kevent;
+	IncidencePtr ptrEvent;
+	QByteArray t_byte;
+	QString temp;
+	KDateTime time;
+	//TODO: test for recurrence (and ignore creation for while)
 
-    if (!authenticated) {
-        kError() << "No authentication for Google calendar available";
-        const QString message = i18nc("@info:status",
-                          "Not yet authenticated for"
-                          " use of Google calendar");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (!authenticated) {
+		kError() << "No authentication for Google calendar available";
+		const QString message = i18nc("@info:status",
+					      "Not yet authenticated for"
+					      " use of Google calendar");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    if (item.hasPayload<IncidencePtr>()) {
-	    ptrEvent = item.payload<IncidencePtr>();
-	    kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
-    } else {
-        kError() << "Add without payload!";
-        const QString message = i18nc("@info:status",
-                          "No payload to add event");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (item.hasPayload<IncidencePtr>()) {
+		ptrEvent = item.payload<IncidencePtr>();
+		kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
+	} else {
+		kError() << "Add without payload!";
+		const QString message = i18nc("@info:status",
+					      "No payload to add event");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    if (!(event = gcal_event_new(NULL))) {
-        kError() << "Memory allocation error!";
-        const QString message = i18nc("@info:status",
-                      "Failed to create gcal_event");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (!(event = gcal_event_new(NULL))) {
+		kError() << "Memory allocation error!";
+		const QString message = i18nc("@info:status",
+					      "Failed to create gcal_event");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    temp = kevent->summary();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_title(event, t_byte);
-    }
+	temp = kevent->summary();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_title(event, t_byte);
+	}
 
-    temp = kevent->description();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_content(event, t_byte);
-    }
+	temp = kevent->description();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_content(event, t_byte);
+	}
 
-    temp = kevent->location();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_where(event, t_byte);
-    }
+	temp = kevent->location();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_where(event, t_byte);
+	}
 
-    time = kevent->dtStart();
-    temp = time.toString(KDateTime::ISODate);
-    t_byte = temp.toLocal8Bit();
-    gcal_event_set_start(event, t_byte.data());
+	time = kevent->dtStart();
+	temp = time.toString(KDateTime::ISODate);
+	t_byte = temp.toLocal8Bit();
+	gcal_event_set_start(event, t_byte.data());
 
-    time = kevent->dtEnd();
-    temp = time.toString(KDateTime::ISODate);
-    t_byte = temp.toLocal8Bit();
-    gcal_event_set_end(event, t_byte.data());
+	time = kevent->dtEnd();
+	temp = time.toString(KDateTime::ISODate);
+	t_byte = temp.toLocal8Bit();
+	gcal_event_set_end(event, t_byte.data());
 
-    if ((gcal_add_event(gcal, event))) {
-        kError() << "Failed adding new calendar"
-                << "title:" << kevent->summary();
-        const QString message = i18nc("@info:status",
-                            "failed adding new calendar");
-        emit error(message);
-        emit status(Broken, message);
-    }
+	if ((gcal_add_event(gcal, event))) {
+		kError() << "Failed adding new calendar"
+			 << "title:" << kevent->summary();
+		const QString message = i18nc("@info:status",
+					      "failed adding new calendar");
+		emit error(message);
+		emit status(Broken, message);
+	}
 
-    KUrl url(gcal_event_get_url(event));
-    Item newItem(item);
-    newItem.setPayload(IncidencePtr(kevent->clone()));
-    newItem.setRemoteId(url.url());
-    changeCommitted(newItem);
+	KUrl url(gcal_event_get_url(event));
+	Item newItem(item);
+	newItem.setPayload(IncidencePtr(kevent->clone()));
+	newItem.setRemoteId(url.url());
+	changeCommitted(newItem);
 
-    gcal_event_delete(event);
+	gcal_event_delete(event);
 }
 
 void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray> &parts )
 {
 	Q_UNUSED(parts);
-    gcal_event_t event;
-    KCal::Event *kevent;
-    IncidencePtr ptrEvent;
-    QByteArray t_byte;
-    QString temp;
-    KDateTime time;
-    //TODO: test for recurrence (and ignore creation for while)
+	gcal_event_t event;
+	KCal::Event *kevent;
+	IncidencePtr ptrEvent;
+	QByteArray t_byte;
+	QString temp;
+	KDateTime time;
+	//TODO: test for recurrence (and ignore creation for while)
 
-    if (!authenticated) {
-        kError() << "No authentication for Google calendar available";
-        const QString message = i18nc("@info:status",
-                          "Not yet authenticated for"
-                          " use of Google calendar");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (!authenticated) {
+		kError() << "No authentication for Google calendar available";
+		const QString message = i18nc("@info:status",
+					      "Not yet authenticated for"
+					      " use of Google calendar");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    if (item.hasPayload<IncidencePtr>()) {
-	    ptrEvent = item.payload<IncidencePtr>();
-	    kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
-    } else {
-        kError() << "Add without payload!";
-        const QString message = i18nc("@info:status",
-                          "No payload to add event");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (item.hasPayload<IncidencePtr>()) {
+		ptrEvent = item.payload<IncidencePtr>();
+		kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
+	} else {
+		kError() << "Add without payload!";
+		const QString message = i18nc("@info:status",
+					      "No payload to add event");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    if (!(event = gcal_event_new(NULL))) {
-        kError() << "Memory allocation error!";
-        const QString message = i18nc("@info:status",
-                      "Failed to create gcal_event");
-        emit error(message);
-        emit status(Broken, message);
-        return;
-    }
+	if (!(event = gcal_event_new(NULL))) {
+		kError() << "Memory allocation error!";
+		const QString message = i18nc("@info:status",
+					      "Failed to create gcal_event");
+		emit error(message);
+		emit status(Broken, message);
+		return;
+	}
 
-    temp = kevent->summary();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_title(event, t_byte);
-    }
+	temp = kevent->summary();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_title(event, t_byte);
+	}
 
-    temp = kevent->description();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_content(event, t_byte);
-    }
+	temp = kevent->description();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_content(event, t_byte);
+	}
 
-    temp = kevent->location();
-    if (!temp.isEmpty()) {
-        t_byte = temp.toLocal8Bit();
-        gcal_event_set_where(event, t_byte);
-    }
+	temp = kevent->location();
+	if (!temp.isEmpty()) {
+		t_byte = temp.toLocal8Bit();
+		gcal_event_set_where(event, t_byte);
+	}
 
-    /* Only this fields are being successfuly extracted */
-    time = kevent->dtStart();
-    temp = time.toString(KDateTime::ISODate);
-    t_byte = temp.toLocal8Bit();
-    gcal_event_set_start(event, t_byte.data());
+	/* Only this fields are being successfuly extracted */
+	time = kevent->dtStart();
+	temp = time.toString(KDateTime::ISODate);
+	t_byte = temp.toLocal8Bit();
+	gcal_event_set_start(event, t_byte.data());
 
-    time = kevent->dtEnd();
-    temp = time.toString(KDateTime::ISODate);
-    t_byte = temp.toLocal8Bit();
-    gcal_event_set_end(event, t_byte.data());
+	time = kevent->dtEnd();
+	temp = time.toString(KDateTime::ISODate);
+	t_byte = temp.toLocal8Bit();
+	gcal_event_set_end(event, t_byte.data());
 
-    KUrl url(item.remoteId());
-    temp = url.url();
-    t_byte = temp.toAscii();
-    gcal_event_set_url(event, t_byte.data());
+	KUrl url(item.remoteId());
+	temp = url.url();
+	t_byte = temp.toAscii();
+	gcal_event_set_url(event, t_byte.data());
 
-    if ((gcal_update_event(gcal, event))) {
-        kError() << "Failed adding new calendar"
-                << "title:" << kevent->summary();
-        const QString message = i18nc("@info:status",
-                            "failed adding new calendar");
-        emit error(message);
-        emit status(Broken, message);
-    }
+	if ((gcal_update_event(gcal, event))) {
+		kError() << "Failed adding new calendar"
+			 << "title:" << kevent->summary();
+		const QString message = i18nc("@info:status",
+					      "failed adding new calendar");
+		emit error(message);
+		emit status(Broken, message);
+	}
 
-    temp = gcal_event_get_url(event);
-    url = temp;
-    Item newItem(item);
-    newItem.setPayload(IncidencePtr(kevent->clone()));
-    newItem.setRemoteId(url.url());
-    changeCommitted(newItem);
+	temp = gcal_event_get_url(event);
+	url = temp;
+	Item newItem(item);
+	newItem.setPayload(IncidencePtr(kevent->clone()));
+	newItem.setRemoteId(url.url());
+	changeCommitted(newItem);
 
-    gcal_event_delete(event);
+	gcal_event_delete(event);
 
 }
 
@@ -567,46 +567,46 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 {
 	Q_UNUSED(item);
 
-    gcal_event_t event;
-    QString temp;
-    QByteArray t_byte;
+	gcal_event_t event;
+	QString temp;
+	QByteArray t_byte;
 
-    kDebug() << "Deleting one item ... ";
+	kDebug() << "Deleting one item ... ";
 
-    if(!authenticated) {
-        kError() << "No authentication for Google calendar";
-        const QString message = i18nc("@info:status",
-                                "Not yet authenticated for "
-                                "use of Google calendar");
-        emit error(message);
-        emit status(Broken, message);
-    }
+	if(!authenticated) {
+		kError() << "No authentication for Google calendar";
+		const QString message = i18nc("@info:status",
+					      "Not yet authenticated for "
+					      "use of Google calendar");
+		emit error(message);
+		emit status(Broken, message);
+	}
 
-    if (!(event = gcal_event_new(NULL))) {
-        kError() << "Memory allocation error!";
-        const QString message = i18nc("@info:status",
-                                "Failed to create gcal_event");
-        emit error(message);
-        emit status(Broken, message);
-    }
+	if (!(event = gcal_event_new(NULL))) {
+		kError() << "Memory allocation error!";
+		const QString message = i18nc("@info:status",
+					      "Failed to create gcal_event");
+		emit error(message);
+		emit status(Broken, message);
+	}
 
-    KUrl url(item.remoteId());
-    temp = url.url();
-    t_byte = temp.toAscii();
-    gcal_event_set_url(event, t_byte.data());
+	KUrl url(item.remoteId());
+	temp = url.url();
+	t_byte = temp.toAscii();
+	gcal_event_set_url(event, t_byte.data());
 
-    if (gcal_erase_event(gcal, event)) {
-        kError() << "Failed deleting calendar";
-        const QString message = i18nc("@info:status",
-                                "Failed deleting new calendar");
-        emit error(message);
-        emit status(Broken, message);
-    }
+	if (gcal_erase_event(gcal, event)) {
+		kError() << "Failed deleting calendar";
+		const QString message = i18nc("@info:status",
+					      "Failed deleting new calendar");
+		emit error(message);
+		emit status(Broken, message);
+	}
 
-    gcal_event_delete(event);
+	gcal_event_delete(event);
 
-    changeProcessed();
-    kDebug() << "done deleting!!";
+	changeProcessed();
+	kDebug() << "done deleting!!";
 }
 
 AKONADI_RESOURCE_MAIN( GCalResource )
