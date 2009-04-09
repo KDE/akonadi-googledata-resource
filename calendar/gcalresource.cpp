@@ -17,7 +17,6 @@
  */
 
 /* TODO:
- * - test query-by-update
  * - support for recurrent events (it will require changes on libgcal)
  * - Some duplicated code must be moved to a common function (setting
  * KCal::Event data in gcal_event_t).
