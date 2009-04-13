@@ -209,8 +209,9 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		item.setPayload<KABC::Addressee>(addressee);
 		/* photo */
 		if (gcal_contact_get_photolength(contact)) {
-			image.loadFromData(gcal_contact_get_photo(contact),
-					   gcal_contact_get_photolength(contact));
+			QByteArray ba(gcal_contact_get_photo(contact),
+				      (int)gcal_contact_get_photolength(contact));
+			image.loadFromData(ba);
 			photo.setData(image);
 			addressee.setPhoto(photo);
 
@@ -338,8 +339,9 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			item.setPayload<KABC::Addressee>(addressee);
 			/* photo */
 			if (gcal_contact_get_photolength(contact)) {
-				image.loadFromData(gcal_contact_get_photo(contact),
-						   gcal_contact_get_photolength(contact));
+				QByteArray ba(gcal_contact_get_photo(contact),
+					      (int)gcal_contact_get_photolength(contact));
+				image.loadFromData(ba);
 				photo.setData(image);
 				addressee.setPhoto(photo);
 
