@@ -179,6 +179,8 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		KABC::Addressee addressee;
 		KABC::PhoneNumber number;
 		KABC::Address address;
+		KABC::Picture photo;
+		QImage image;
 		QString temp;
 
 		/* name */
@@ -205,6 +207,14 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		temp = gcal_contact_get_content(contact);
 		addressee.setNote(temp);
 		item.setPayload<KABC::Addressee>(addressee);
+		/* photo */
+		if (gcal_contact_get_photolength(contact)) {
+			image.loadFromData(gcal_contact_get_photo(contact),
+					   gcal_contact_get_photolength(contact));
+			photo.setData(image);
+			addressee.setPhoto(photo);
+
+		}
 
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_contact_get_url(contact));
@@ -263,6 +273,8 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
+	KABC::Picture photo;
+	QImage image;
 
 	/* Just in case, I'm not sure when this member function is called */
 	pending.clear();
@@ -324,6 +336,14 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			temp = gcal_contact_get_content(contact);
 			addressee.setNote(temp);
 			item.setPayload<KABC::Addressee>(addressee);
+			/* photo */
+			if (gcal_contact_get_photolength(contact)) {
+				image.loadFromData(gcal_contact_get_photo(contact),
+						   gcal_contact_get_photolength(contact));
+				photo.setData(image);
+				addressee.setPhoto(photo);
+
+			}
 
 			/* remoteID: edit_url */
 			KUrl urlEtag(gcal_contact_get_url(contact));
