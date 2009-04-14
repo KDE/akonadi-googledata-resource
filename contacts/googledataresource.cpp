@@ -206,7 +206,6 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		/* description */
 		temp = gcal_contact_get_content(contact);
 		addressee.setNote(temp);
-		item.setPayload<KABC::Addressee>(addressee);
 		/* photo */
 		if (gcal_contact_get_photolength(contact)) {
 			QByteArray ba(gcal_contact_get_photo(contact),
@@ -216,6 +215,8 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 			addressee.setPhoto(photo);
 
 		}
+
+		item.setPayload<KABC::Addressee>(addressee);
 
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_contact_get_url(contact));
@@ -336,7 +337,6 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			/* description */
 			temp = gcal_contact_get_content(contact);
 			addressee.setNote(temp);
-			item.setPayload<KABC::Addressee>(addressee);
 			/* photo */
 			if (gcal_contact_get_photolength(contact)) {
 				QByteArray ba(gcal_contact_get_photo(contact),
@@ -346,6 +346,8 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 				addressee.setPhoto(photo);
 
 			}
+
+			item.setPayload<KABC::Addressee>(addressee);
 
 			/* remoteID: edit_url */
 			KUrl urlEtag(gcal_contact_get_url(contact));
