@@ -6,7 +6,7 @@
       http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
   <group name="General">
     <entry name="timestamp" type="Path">
-      <label>A timestamp in RFC 3339 format (e.g. 2008-09-10T21:00:00Z)</label>
+      <label>A timestamp in RFC 3339 format (e.g. 2008-09-10T21:00:00Z.)</label>
       <default></default>
     </entry>
     <entry name="ReadOnly" type="Bool">

@@ -91,7 +91,7 @@ void GCalResource::retrieveCollections()
 		kError() << "No authentication for Google Calendar available";
 		const QString message = i18nc("@info: status",
 					      "Not yet authenticated for "
-					      "use of Google Calendar");
+					      "use of Google Calendar.");
 
 		emit error(message);
 
@@ -127,7 +127,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		kError() << "No authentication for Google calendar available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google calendar");
+					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -152,7 +152,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		kError() << "Failed to retrieve last updated event.";
 		const QString message = i18nc("@info:status",
 					      "Failed getting last updated"
-					      " event");
+					      " event.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -338,7 +338,7 @@ int GCalResource::getUpdated(char *timestamp)
 		const QString message = i18nc("@info:status",
 					      "Failed getting last"
 					      " updated"
-					      " event");
+					      " event.");
 		emit error(message);
 		//emit status(Broken, message);
 		result = -1;
@@ -394,7 +394,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 		kError() << "No authentication for Google calendar available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google calendar");
+					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -406,7 +406,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	} else {
 		kError() << "Add without payload!";
 		const QString message = i18nc("@info:status",
-					      "No payload to add event");
+					      "No payload to add event.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -415,7 +415,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	if (!(event = gcal_event_new(NULL))) {
 		kError() << "Memory allocation error!";
 		const QString message = i18nc("@info:status",
-					      "Failed to create gcal_event");
+					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -453,7 +453,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 		kError() << "Failed adding new calendar"
 			 << "title:" << kevent->summary();
 		const QString message = i18nc("@info:status",
-					      "failed adding new calendar");
+					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
 	}
@@ -482,7 +482,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 		kError() << "No authentication for Google calendar available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google calendar");
+					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -494,7 +494,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	} else {
 		kError() << "Add without payload!";
 		const QString message = i18nc("@info:status",
-					      "No payload to add event");
+					      "No payload to add event.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -503,7 +503,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	if (!(event = gcal_event_new(NULL))) {
 		kError() << "Memory allocation error!";
 		const QString message = i18nc("@info:status",
-					      "Failed to create gcal_event");
+					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -547,7 +547,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 		kError() << "Failed adding new calendar"
 			 << "title:" << kevent->summary();
 		const QString message = i18nc("@info:status",
-					      "failed adding new calendar");
+					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
 	}
@@ -577,7 +577,7 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 		kError() << "No authentication for Google calendar";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for "
-					      "use of Google calendar");
+					      "use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
 	}
@@ -585,7 +585,7 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 	if (!(event = gcal_event_new(NULL))) {
 		kError() << "Memory allocation error!";
 		const QString message = i18nc("@info:status",
-					      "Failed to create gcal_event");
+					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
 	}
@@ -598,7 +598,7 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 	if (gcal_erase_event(gcal, event)) {
 		kError() << "Failed deleting calendar";
 		const QString message = i18nc("@info:status",
-					      "Failed deleting new calendar");
+					      "Failed deleting new calendar.");
 		emit error(message);
 		emit status(Broken, message);
 	}

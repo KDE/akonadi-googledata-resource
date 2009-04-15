@@ -96,7 +96,7 @@ void GoogleContactsResource::retrieveCollections()
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google Contacts");
+					      " use of Google Contacts.");
 		emit error(message);
 
 		emit status(Broken, message);
@@ -133,7 +133,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google Contacts");
+					      " use of Google Contacts.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -160,7 +160,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		kError() << "Failed to retrieve last updated contact.";
 		const QString message = i18nc("@info:status",
 					      "Failed getting last updated"
-					      " contact");
+					      " contact.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -375,7 +375,7 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 		const QString message = i18nc("@info:status",
 					      "Failed getting last"
 					      " updated"
-					      " contact");
+					      " contact.");
 		emit error(message);
 		emit status(Broken, message);
 		result = -1;
@@ -436,7 +436,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google Contacts");
+					      " use of Google Contacts.");
 		emit error(message);
 
 		emit status(Broken, message);
@@ -515,7 +515,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 			 << "name: " << addressee.realName()
 			 << "email: " << addressee.preferredEmail();
 		const QString message = i18nc("@info:status",
-					      "Failed adding new contact");
+					      "Failed adding new contact.");
 		emit error(message);
 		emit status(Broken, message);
 
@@ -555,7 +555,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google Contacts");
+					      " use of Google Contacts.");
 		emit error(message);
 
 		emit status(Broken, message);
@@ -568,7 +568,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	if (!(contact = gcal_contact_new(NULL))) {
 		kError() << "Memory allocation error!";
 		const QString message = i18nc("@info:status",
-					      "Failed to create gcal_contact");
+					      "Failed to create gcal_contact.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -644,7 +644,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	if ((result = gcal_update_contact(gcal, contact))) {
 		kError() << "Failed editing contact";
 		const QString message = i18nc("@info:status",
-					      "Failed editing new contact");
+					      "Failed editing new contact.");
 		emit error(message);
 		emit status(Broken, message);
 
@@ -676,7 +676,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 		kError() << "No authentication for Google Contacts available";
 		const QString message = i18nc("@info:status",
 					      "Not yet authenticated for"
-					      " use of Google Contacts");
+					      " use of Google Contacts.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -685,7 +685,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 	if (!(contact = gcal_contact_new(NULL))) {
 		kError() << "Memory allocation error!";
 		const QString message = i18nc("@info:status",
-					      "Failed to create gcal_contact");
+					      "Failed to create gcal_contact.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
@@ -700,7 +700,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 	if ((result = gcal_erase_contact(gcal, contact))) {
 		kError() << "Failed deleting contact";
 		const QString message = i18nc("@info:status",
-					      "Failed deleting new contact");
+					      "Failed deleting new contact.");
 		emit error(message);
 		emit status(Broken, message);
 
