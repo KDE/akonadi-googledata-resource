@@ -1,26 +1,6 @@
 [Desktop Entry]
 Name=Akonadi Google Contacts Resource
-Name[et]=Akonadi Google'i kontaktide ressurss
-Name[ga]=Acmhainn Teagmhálacha Google le haghaidh Akonadi
-Name[gl]=Recurso de contactos de Google para Akonadi
-Name[ja]=Akonadi Google コンタクト用リソース
-Name[nds]=Akonadi-Ressource för Google-Kontakten
-Name[pt]=Recurso de Contactos do Google para o Akonadi
-Name[pt_BR]=Recurso de Contactos do Google para o Akonadi
-Name[sv]=Akonadi Google-kontaktresurs
-Name[uk]=Ресурс Контактів Google для Akonadi
-Name[x-test]=xxAkonadi Google Contacts Resourcexx
 Comment=Resource for a google account
-Comment[et]=Google'i konto ressurss
-Comment[ga]=Acmhainn do chuntas Google
-Comment[gl]=Recurso para unha conta en google
-Comment[ja]=Google アカウント用のリソース
-Comment[nds]=Ressource för en Google-Togang
-Comment[pt]=Recurso para uma conta no Google
-Comment[pt_BR]=Recurso para uma conta no Google
-Comment[sv]=Resurs för ett Google-konto
-Comment[uk]=Ресурс для облікового запису google
-Comment[x-test]=xxResource for a google accountxx
 Type=AkonadiResource
 Exec=akonadi_googledata_resource
 Icon=text-directory
