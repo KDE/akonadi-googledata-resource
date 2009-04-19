@@ -3,6 +3,7 @@ Name=Akonadi Google Calendar Resource
 Name[pt]=Recurso do Google Calendar para o Akonadi
 Name[pt_BR]=Recurso do Google Calendar para o Akonadi
 Name[sv]=Akonadi Google-kalenderresurs
+Name[tr]=Akonadi Google Takvimi Kaynağı
 Name[uk]=Ресурс Календаря Google для Akonadi
 Type=AkonadiResource
 Exec=akonadi_gcal_resource
