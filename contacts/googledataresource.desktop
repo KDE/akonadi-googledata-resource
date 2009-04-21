@@ -1,11 +1,13 @@
 [Desktop Entry]
 Name=Akonadi Google Contacts Resource
+Name[et]=Akonadi Google'i kontaktide ressurss
 Name[pt]=Recurso do Google Contacts para o Akonadi
 Name[pt_BR]=Recurso do Google Contacts para o Akonadi
 Name[sv]=Akonadi Google-kontaktresurs
 Name[tr]=Akonadi Google Kişiler Kaynağı
 Name[uk]=Ресурс Контактів Google для Akonadi
 Comment=Resource for a google account
+Comment[et]=Google'i konto ressurss
 Comment[pt]=Recurso para uma conta do Google
 Comment[pt_BR]=Recurso para uma conta do Google
 Comment[sv]=Resurs för ett Google-konto
