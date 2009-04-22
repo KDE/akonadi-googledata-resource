@@ -5,5 +5,5 @@ What works:
 - contacts: retrieve/add/edit/delete/query-by-updates
 - calendar: retrieve/add/delete/query-by-updates
 
-Dependency: libgcal from git repository (git://repo.or.cz/libgcal.git)
+Dependency: at least libgcal 0.9.0 or better (git://repo.or.cz/libgcal.git)
 
