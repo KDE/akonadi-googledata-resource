@@ -1,6 +1,6 @@
 project(googledata)
 
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules" )
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # search packages used by KDE
 find_package (KDE4 REQUIRED)
@@ -10,15 +10,16 @@ include(MacroOptionalAddSubdirectory)
 include(CheckIncludeFiles)
 
 find_package(KdepimLibs REQUIRED)
-macro_optional_find_package(Boost)
-macro_log_feature(Boost_FOUND "boost" "Boost C++ Libraries" "http://www.boost.org" TRUE "1.33.1" "Required by Akonadi.")
-if(NOT Boost_FOUND)
-  macro_display_feature_log()
-endif(NOT Boost_FOUND)
+
+find_package(Boost)
+macro_log_feature(Boost_FOUND "Boost" "Boost C++ Libraries" "http://www.boost.org" TRUE "1.33.1" "Required by Akonadi.")
 
 #libgcal implements google data protocols 2.0
-FIND_PACKAGE(LibGCal REQUIRED)
+find_package(LibGCal)
+macro_log_feature(LIBGCAL_FOUND "LibGCal" "LibGcal Library" "http://libgcal.googlecode.com" TRUE "0.9.0" "LibGcal is required to build this Akonadi resource.")
 
+
+include_directories( ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} )
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
 macro_log_feature(XSLTPROC_EXECUTABLE "xsltproc" "The command line XSLT processor from libxslt" "http://xmlsoft.org/XSLT/" FALSE "" "Needed for building Akonadi resources. Recommended.")
@@ -47,11 +48,6 @@ endif(WIN32)
 
 set(KDE4_ICON_DIR ${KDE4_INSTALL_DIR}/share/icons)
 
-include_directories(
-    ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIR}
-)
-
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
 
 include_directories(
@@ -66,3 +62,6 @@ set( RESOURCE_AKONADI_SHARED_SOURCES
 
 add_subdirectory(contacts)
 add_subdirectory(calendar)
+
+macro_display_feature_log()
+
