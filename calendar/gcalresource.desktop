@@ -1,12 +1,5 @@
 [Desktop Entry]
 Name=Akonadi Google Calendar Resource
-Name[et]=Akonadi Google'i kalendri ressurss
-Name[pt]=Recurso do Google Calendar para o Akonadi
-Name[pt_BR]=Recurso do Google Calendar para o Akonadi
-Name[sv]=Akonadi Google-kalenderresurs
-Name[tr]=Akonadi Google Takvimi Kaynağı
-Name[uk]=Ресурс Календаря Google для Akonadi
-Name[zh_TW]=Akonadi Google 行事曆資源
 Type=AkonadiResource
 Exec=akonadi_gcal_resource
 Icon=text-directory
