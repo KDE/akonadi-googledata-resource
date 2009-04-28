@@ -20,7 +20,7 @@
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
- * - test with special characters (unicode > 256)
+ * - use QString::fromUtf8 for other fields
  * - Some duplicated code must be moved to a common function (setting
  * KABC::Addressee data in gcal_contact_t).
  * - code cleanup
@@ -184,7 +184,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		QString temp;
 
 		/* name */
-		temp = gcal_contact_get_title(contact);
+		temp = QString::fromUtf8(gcal_contact_get_title(contact));
 		addressee.setNameFromString(temp);
 		/* email */
 		temp = gcal_contact_get_email(contact);
@@ -314,7 +314,7 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			KABC::PhoneNumber number;
 			KABC::Address address;
 			/* name */
-			temp = gcal_contact_get_title(contact);
+			temp = QString::fromUtf8(gcal_contact_get_title(contact));
 			addressee.setNameFromString(temp);
 			kError() << "index: " << i <<"updated: " << temp;
 			/* email */
