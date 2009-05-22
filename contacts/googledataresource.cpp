@@ -409,24 +409,14 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 
 void GoogleContactsResource::configure( WId windowId )
 {
-	int result = 0;
 	if (windowId && dlgConf)
 		KWindowSystem::setMainWindow(dlgConf, windowId);
 
 	dlgConf->exec();
-	if (!(result = authenticate(dlgConf->eAccount->text(),
-				    dlgConf->ePass->text()))) {
-		result = saveToWallet(dlgConf->eAccount->text(),
-				      dlgConf->ePass->text(),
-				      windowId,
-				      dlgConf->reverseName->isChecked());
-		reverseName = dlgConf->reverseName->isChecked();
-
-		synchronize();
-	}
-
-	if (result) {
-		kError() << "Failed configuring resource.";
+	int authRes = authenticate(dlgConf->eAccount->text(),
+				   dlgConf->ePass->text());
+	if (authRes) {
+		kError() << "Failed configuring resource: Invalid password.";
 		const QString message = i18nc("@info:status",
 					      "Invalid password.");
 		emit error(message);
@@ -434,6 +424,16 @@ void GoogleContactsResource::configure( WId windowId )
 		return;
 	}
 
+	int walletRes = saveToWallet(dlgConf->eAccount->text(),
+				     dlgConf->ePass->text(),
+				     windowId,
+				     dlgConf->reverseName->isChecked());
+	if (walletRes)
+		kError() << "Cannot save user info: is user using kwallet?.";
+
+
+	reverseName = dlgConf->reverseName->isChecked();
+	synchronize();
 }
 
 void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
