@@ -55,7 +55,6 @@ using namespace Akonadi;
 GoogleContactsResource::GoogleContactsResource( const QString &id )
 	: ResourceBase(id)
 {
-	reverseName = false;
 	new SettingsAdaptor( Settings::self() );
 	QDBusConnection::sessionBus().registerObject(
 		QLatin1String( "/Settings" ), Settings::self(),
@@ -186,16 +185,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 
 		/* name */
 		temp = QString::fromUtf8(gcal_contact_get_title(contact));
-		addressee.setFormattedName(temp);
-		if ( reverseName ) {
-			QStringList temp1 = temp.split(" ");
-			QStringList temp2;
-			for ( int i=temp1.size()-1; i>=0; --i )
-				temp2.append(temp1.at(i));
-			addressee.setNameFromString(temp2.join(" "));
-			addressee.setFormattedName(temp);
-		} else
-			addressee.setNameFromString(temp);
+		addressee.setNameFromString(temp);
 		/* email */
 		temp = gcal_contact_get_email(contact);
 		addressee.insertEmail(temp, true);
@@ -262,7 +252,7 @@ void GoogleContactsResource::doSetOnline(bool online)
 	WId window = winIdForDialogs();
 
 	if (online)
-		if (!retrieveFromWallet(user, password, window, reverseName))
+		if (!retrieveFromWallet(user, password, window))
 			if (!(result = authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
@@ -325,15 +315,7 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			KABC::Address address;
 			/* name */
 			temp = QString::fromUtf8(gcal_contact_get_title(contact));
-			if ( reverseName ) {
-				QStringList temp1 = temp.split(" ");
-				QStringList temp2;
-				for ( int i=temp1.size()-1; i>=0; --i )
-					temp2.append(temp1.at(i));
-				addressee.setNameFromString(temp2.join(" "));
-				addressee.setFormattedName(temp);
-			} else
-				addressee.setNameFromString(temp);
+			addressee.setNameFromString(temp);
 			kError() << "index: " << i <<"updated: " << temp;
 			/* email */
 			temp = gcal_contact_get_email(contact);
@@ -426,13 +408,11 @@ void GoogleContactsResource::configure( WId windowId )
 
 	int walletRes = saveToWallet(dlgConf->eAccount->text(),
 				     dlgConf->ePass->text(),
-				     windowId,
-				     dlgConf->reverseName->isChecked());
+				     windowId);
 	if (walletRes)
 		kError() << "Cannot save user info: is user using kwallet?.";
 
 
-	reverseName = dlgConf->reverseName->isChecked();
 	synchronize();
 }
 

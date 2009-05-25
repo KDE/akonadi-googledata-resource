@@ -2,10 +2,18 @@
 <ui version="4.0">
  <class>dlgGoogleDataConf</class>
  <widget class="QDialog" name="dlgGoogleDataConf">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>161</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -39,17 +47,6 @@
       <widget class="QLineEdit" name="ePass">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <widget class="QCheckBox" name="reverseName">
-       <property name="text">
-        <string>Reverse Name Format</string>
        </property>
       </widget>
      </item>

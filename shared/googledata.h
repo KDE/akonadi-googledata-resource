@@ -39,21 +39,16 @@ protected:
 
 	int saveToWallet(const QString &user, const QString &pass,
 			 const WId &window,
-			 bool reverseName = false,
 			 const QString &folder = "akonadigoogle",
 			 const QString &awallet = "kdewallet");
 
 
 	int retrieveFromWallet(QString &user, QString &pass,
 			       const WId &window,
-			       bool reverseName = false,
 			       const QString &folder = "akonadigoogle",
 			       const QString &awallet = "kdewallet");
 
 	int authenticate(const QString &user, const QString &password);
-
-// 	void retrieveTimestamp(QString &timestamp);
-// 	void saveTimestamp(QString &timestamp);
 
 	/* KWallet object pointer */
 	KWallet::Wallet *wallet;

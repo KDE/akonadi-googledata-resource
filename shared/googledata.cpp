@@ -16,6 +16,10 @@
  *
  */
 
+/* REMARK: if you change this check the effects on both calendar and
+ * contacts resource files.
+ */
+
 #include "googledata.h"
 #include <qstring.h>
 #include <qmap.h>
@@ -39,7 +43,7 @@ GoogleData::~GoogleData()
 }
 
 int GoogleData::saveToWallet(const QString &user, const QString &pass,
-			     const WId &window, bool reverseName, const QString &folder,
+			     const WId &window, const QString &folder,
 			     const QString &awallet)
 {
 	int result = -1;
@@ -57,7 +61,6 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 		QMap<QString, QString> data;
 		data["login"] = user;
 		data["password"] = pass;
-		data["reverseName"] = reverseName == true ? "true" : "false";
 		wallet->writeMap(gaccount, data);
 		wallet->sync();
 		result = 0;
@@ -69,7 +72,6 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 int GoogleData::retrieveFromWallet(QString &user,
 				   QString &pass,
 				   const WId &window,
-				   bool reverseName,
 				   const QString &folder,
 				   const QString &awallet)
 {
@@ -89,7 +91,6 @@ int GoogleData::retrieveFromWallet(QString &user,
 		if (!wallet->readMap(gaccount, data)) {
 			user = data["login"];
 			pass = data["password"];
-			reverseName = data["reverseName"] == "true" ? true : false;
 			result = 0;
 		}
 	}

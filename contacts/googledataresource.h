@@ -55,9 +55,6 @@ protected:
 	Akonadi::Item::List pending;
 	Akonadi::Item::List deleted;
 
-private:
-	bool reverseName;
-
 };
 
 #endif
