@@ -49,6 +49,9 @@ protected:
 	void saveTimestamp(QString &timestamp);
 
 	int getUpdated(char *timestamp);
+
+	int authenticationError(const char *msgError, int signal);
+
 	/* Contact array */
 	struct gcal_contact_array all_contacts;
 	/* Contact itens update lists */

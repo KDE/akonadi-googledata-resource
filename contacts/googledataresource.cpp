@@ -92,16 +92,9 @@ void GoogleContactsResource::saveTimestamp(QString &timestamp)
 
 void GoogleContactsResource::retrieveCollections()
 {
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts.");
-		emit error(message);
-
-		emit status(Broken, message);
+	if (authenticationError("retrieveCollections: not authenticated!",
+				Broken))
 		return;
-	}
 
 	Collection c;
 	c.setParent(Collection::root());
@@ -118,6 +111,20 @@ void GoogleContactsResource::retrieveCollections()
 
 }
 
+int GoogleContactsResource::authenticationError(const char *msgError, int signal)
+{
+	int result = 0;
+	QString qmsg(msgError);
+	if (!authenticated) {
+		kError() << qmsg;
+		emit error(qmsg);
+		emit status(signal, qmsg);
+		result = -1;
+	}
+
+	return result;
+}
+
 void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
@@ -128,16 +135,8 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	QString timestamp;
 	QByteArray t_byte;
 
-	kError() << "\n............. retrieveItems ...........\n";
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts.");
-		emit error(message);
-		emit status(Broken, message);
+	if (authenticationError("retrieveItems: not authenticated!", Broken))
 		return;
-	}
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
@@ -432,16 +431,8 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	KABC::Picture photo;
 	int result;
 
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts.");
-		emit error(message);
-
-		emit status(Broken, message);
+	if (authenticationError("itemAdded: not authenticated!", Broken))
 		return;
-	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -551,16 +542,8 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	KABC::Picture photo;
 	int result;
 
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts.");
-		emit error(message);
-
-		emit status(Broken, message);
+	if (authenticationError("itemChanged: not authenticated!", Broken))
 		return;
-	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -672,15 +655,9 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 
 	kError() << "Deleting one item...";
 
-	if (!authenticated) {
-		kError() << "No authentication for Google Contacts available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google Contacts.");
-		emit error(message);
-		emit status(Broken, message);
+	if (authenticationError("itemRemoved: not authenticated!",
+				Broken))
 		return;
-	}
 
 	if (!(contact = gcal_contact_new(NULL))) {
 		kError() << "Memory allocation error!";
