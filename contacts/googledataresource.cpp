@@ -253,7 +253,6 @@ void GoogleContactsResource::doSetOnline(bool online)
 	if (online)
 		if (!retrieveFromWallet(user, password, window))
 			if (!(result = authenticate(user, password))) {
-				authenticated = true;
 				ResourceBase::doSetOnline(online);
 				synchronize();
 			}
