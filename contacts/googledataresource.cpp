@@ -92,9 +92,13 @@ void GoogleContactsResource::saveTimestamp(QString &timestamp)
 
 void GoogleContactsResource::retrieveCollections()
 {
-	if (authenticationError("retrieveCollections: not authenticated!",
-				Broken))
+	if (!authenticated)
+		configure(NULL);
+	else {
+		authenticationError("retrieveCollections: not authenticated!",
+				    Broken);
 		return;
+	}
 
 	Collection c;
 	c.setParent(Collection::root());
@@ -135,8 +139,14 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	QString timestamp;
 	QByteArray t_byte;
 
-	if (authenticationError("retrieveItems: not authenticated!", Broken))
+	if (!authenticated)
+		configure(NULL);
+	else {
+
+		authenticationError("retrieveItems: not authenticated!",
+				    Broken);
 		return;
+	}
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
@@ -430,8 +440,12 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	KABC::Picture photo;
 	int result;
 
-	if (authenticationError("itemAdded: not authenticated!", Broken))
+	if (!authenticated)
+		configure(NULL);
+	else {
+		authenticationError("itemAdded: not authenticated!", Broken);
 		return;
+	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -541,8 +555,13 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	KABC::Picture photo;
 	int result;
 
-	if (authenticationError("itemChanged: not authenticated!", Broken))
+	if (!authenticated)
+		configure(NULL);
+	else {
+		authenticationError("itemChanged: not authenticated!",
+				    Broken);
 		return;
+	}
 
 	if (item.hasPayload<KABC::Addressee>())
 		addressee = item.payload<KABC::Addressee>();
@@ -654,9 +673,13 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 
 	kError() << "Deleting one item...";
 
-	if (authenticationError("itemRemoved: not authenticated!",
-				Broken))
+	if (!authenticated)
+		configure(NULL);
+	else {
+		authenticationError("itemRemoved: not authenticated!",
+				    Broken);
 		return;
+	}
 
 	if (!(contact = gcal_contact_new(NULL))) {
 		kError() << "Memory allocation error!";
