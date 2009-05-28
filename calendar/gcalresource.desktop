@@ -9,6 +9,7 @@ Name[pt_BR]=Recurso do Google Agenda do Akonadi
 Name[sv]=Akonadi Google-kalenderresurs
 Name[tr]=Akonadi Google Takvimi Kaynağı
 Name[uk]=Ресурс Календаря Google для Akonadi
+Name[zh_CN]=Akonadi Google 日历资源
 Type=AkonadiResource
 Exec=akonadi_gcal_resource
 Icon=text-directory
