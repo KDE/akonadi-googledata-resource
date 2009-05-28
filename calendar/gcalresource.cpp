@@ -226,7 +226,7 @@ void GCalResource::aboutToQuit()
 void GCalResource::doSetOnline(bool online)
 {
 	/* Approach based on kabcresource.cpp */
-	kDebug() << "online" << online;
+	kDebug() << "online: " << online;
 	QString user;
 	QString password;
 	int result = 0;
