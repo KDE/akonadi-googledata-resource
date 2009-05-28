@@ -241,7 +241,7 @@ void GoogleContactsResource::aboutToQuit()
 void GoogleContactsResource::doSetOnline(bool online)
 {
 	/* Approach based on kabcresource.cpp */
-	kDebug() << "online" << online;
+	kDebug() << "online: " << online;
 	QString user;
 	QString password;
 	int result = 0;
@@ -429,7 +429,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 
 	if (!authenticated)
 		configure(NULL);
-	else {
+	if (!authenticated) {
 		authenticationError("itemAdded: not authenticated!", Broken);
 		return;
 	}
@@ -544,7 +544,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 
 	if (!authenticated)
 		configure(NULL);
-	else {
+	if (!authenticated) {
 		authenticationError("itemChanged: not authenticated!",
 				    Broken);
 		return;
@@ -662,7 +662,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 
 	if (!authenticated)
 		configure(NULL);
-	else {
+	if (!authenticated) {
 		authenticationError("itemRemoved: not authenticated!",
 				    Broken);
 		return;
