@@ -92,13 +92,6 @@ void GoogleContactsResource::saveTimestamp(QString &timestamp)
 
 void GoogleContactsResource::retrieveCollections()
 {
-	if (!authenticated)
-		configure(NULL);
-	else {
-		authenticationError("retrieveCollections: not authenticated!",
-				    Broken);
-		return;
-	}
 
 	Collection c;
 	c.setParent(Collection::root());
@@ -141,12 +134,6 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 
 	if (!authenticated)
 		configure(NULL);
-	else {
-
-		authenticationError("retrieveItems: not authenticated!",
-				    Broken);
-		return;
-	}
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
