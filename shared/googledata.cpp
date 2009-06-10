@@ -30,14 +30,12 @@ using KWallet::Wallet;
 GoogleData::GoogleData(): wallet(0), dlgConf(0), authenticated(false),
 			  gcal(NULL)
 {
-	if (!dlgConf)
-		dlgConf = new dlgGoogleDataConf;
+	dlgConf = new dlgGoogleDataConf;
 }
 
 GoogleData::~GoogleData()
 {
-	if (dlgConf)
-		delete dlgConf;
+	delete dlgConf;
 	if (gcal)
 		gcal_delete(gcal);
 }
@@ -47,7 +45,7 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 			     const QString &awallet)
 {
 	int result = -1;
-	QString gaccount("googleAccount");
+	const QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(awallet, window);
 
@@ -76,7 +74,7 @@ int GoogleData::retrieveFromWallet(QString &user,
 				   const QString &awallet)
 {
 	int result = -1;
-	QString gaccount("googleAccount");
+	const QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(awallet, window);
 
