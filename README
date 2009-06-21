@@ -5,5 +5,47 @@ What works:
 - contacts: retrieve/add/edit/delete/query-by-updates
 - calendar: retrieve/add/delete/query-by-updates
 
-Dependency: at least libgcal 0.9.0 or better (git://repo.or.cz/libgcal.git)
+Network proxy can be defined in KDE System Settings and the resource
+will use it.
 
+Passwords will be stored in KWallet, for while only 1 account is allowed.
+
+Requires at least libgcal 0.9.0. Support for hosted accounts
+(e.g. joe@foo.bar.com) requires libgcal from git repository i.e. soon to
+be released libgcal 0.9.1.
+
+Some distributions already include 0.9.0, I'm planning to release 0.9.1 in
+this week.
+
+== libgcal ==
+
+You will need to have libxml-dev and libcurl-dev with openssl (plus
+ca-certificates to do authentication with google) to compile libgcal.
+
+In ubuntu, the packages are: libcurl4-openssl-dev, libxml2-dev, ca-certificates.
+
+ - checkout the code:
+ $git clone git://repo.or.cz/libgcal.git
+
+ - configure and compile, you can use either autotools or cmake based
+ buildsystem (but *not both*).
+
+ For autotools:
+ $autoreconf -i -f; mkdir build; cd build; ../configure; make; sudo make install
+
+ For cmake:
+ $mkdir build; cd build; cmake ..; make; sudo make install
+
+- set environment variable to the path of installation (you can add this to
+your ~/.bashrc file): export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+After this, you are set to compile the google contacts and calendar resources,
+as long you have akonadi and KDE development packages. You will need to
+restart akonadi server *after* installing the resources
+(i.e. akonadictl restart).
+
+
+== Getting help ==
+
+You can write to kde-pim list or send an email directly to me:
+cavalcantii-at-gmail.com
