@@ -12,7 +12,7 @@ public:
 	dlgGoogleDataConf(QWidget *parent = 0);
 
 private slots:
-
+        void accountChanged(const QString& text);
 	/* add some slots here */
 
 };
