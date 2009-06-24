@@ -270,8 +270,43 @@ int GCalResource::getUpdated(char *timestamp)
 	gcal_cleanup_events(&all_events);
 	gcal_deleted(gcal, SHOW);
 	if ((result = gcal_get_updated_events(gcal, &all_events, timestamp))) {
-		kError() << "Failed querying by updated";
-		return result;
+
+	  /** XXX: google server has a bug where a 2.0 protocol request
+	   * is being met with a 2.1 protocol behaviour
+	   * (if updated-min > 30 days, return a HTTP 410 error).
+	   * Further details:
+	   * http://code.google.com/p/gdata-issues/issues/detail?id=1036
+	   */
+		int gBug = gcal_status_httpcode(gcal);
+		if (gBug != 410) {
+			qDebug() << "Failed querying by updated";
+			return result;
+		} else {
+			qDebug() << "Workarounding bug: HTTP 410 Gone...";
+
+			/* Calculate a date up to 30 days ago */
+			KDateTime original, now, newtime;
+			original = original.fromString(timestamp,
+						       KDateTime::ISODate);
+			now = now.currentDateTime(KDateTime::Spec::ClockTime());
+
+			int delta = original.daysTo(now);
+			newtime = original.addDays(delta);
+			newtime = newtime.addDays(-10);
+			qDebug() << "delta: " << delta << "\ttimestamp: "
+				 << newtime.toString(KDateTime::ISODate);
+
+			temp = newtime.toString(KDateTime::ISODate);
+			t_byte = temp.toLocal8Bit();
+			if ((result = gcal_get_updated_events(gcal,
+							      &all_events,
+							      t_byte.data()))) {
+				qDebug() << "Failed querying by updated";
+				return result;
+			}
+
+		}
+
 	}
 	kError() << "Updated events are: " << all_events.length;
 
