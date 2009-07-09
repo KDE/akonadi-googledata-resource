@@ -17,7 +17,7 @@ Name[zh_CN]=Akonadi Google 日历资源
 Name[zh_TW]=Akonadi Google 行事曆資源
 Type=AkonadiResource
 Exec=akonadi_gcal_resource
-Icon=text-directory
+Icon=text-calendar
 
 X-Akonadi-MimeTypes=text/calendar
 X-Akonadi-Capabilities=Resource
