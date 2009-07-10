@@ -276,6 +276,12 @@ int GCalResource::getUpdated(char *timestamp)
 	   * (if updated-min > 30 days, return a HTTP 410 error).
 	   * Further details:
 	   * http://code.google.com/p/gdata-issues/issues/detail?id=1036
+	   *
+	   * The workaround is:
+	   * - add a new dummy entry
+	   * - save the dummy timestamp
+	   * - delete the dummy
+	   * - force a slow sync
 	   */
 		int gBug = gcal_status_httpcode(gcal);
 		if (gBug != 410) {
@@ -283,28 +289,36 @@ int GCalResource::getUpdated(char *timestamp)
 			return result;
 		} else {
 			qDebug() << "Workarounding bug: HTTP 410 Gone...";
-
-			/* Calculate a date up to 30 days ago */
-			KDateTime original, now, newtime;
-			original = original.fromString(timestamp,
-						       KDateTime::ISODate);
-			now = now.currentDateTime(KDateTime::Spec::ClockTime());
-
-			int delta = original.daysTo(now);
-			newtime = original.addDays(delta);
-			newtime = newtime.addDays(-10);
-			qDebug() << "delta: " << delta << "\ttimestamp: "
-				 << newtime.toString(KDateTime::ISODate);
-
-			temp = newtime.toString(KDateTime::ISODate);
-			t_byte = temp.toLocal8Bit();
-			if ((result = gcal_get_updated_events(gcal,
-							      &all_events,
-							      t_byte.data()))) {
-				qDebug() << "Failed querying by updated";
+			gcal_event_t event;
+			if (!(event = gcal_event_new(NULL))) {
+				qDebug() << "Failed allocating HTTP 410 event";
 				return result;
 			}
 
+			gcal_event_set_title(event, "HTTP 410 workaround");
+			gcal_event_set_start(event, "2009-06-30T21:00:00Z");
+			gcal_event_set_end(event, "2009-06-30T22:00:00Z");
+			if ((result = gcal_add_event(gcal, event))) {
+				qDebug() << "Failed adding HTTP 410 event";
+				return result;
+			}
+
+			newerTimestamp = gcal_event_get_updated(event);
+			saveTimestamp(newerTimestamp);
+
+			if ((result = gcal_erase_event(gcal, event))) {
+				qDebug() << "Failed deleting HTTP 410 event";
+				return result;
+			}
+
+			gcal_event_delete(event);
+
+			if ((result = gcal_get_events(gcal, &all_events))) {
+				qDebug() << "Failed slowsync...";
+				return result;
+			}
+
+			qDebug() << "Forcing slow sync: HTTP 410";
 		}
 
 	}
@@ -366,23 +380,28 @@ int GCalResource::getUpdated(char *timestamp)
 
 	itemsRetrievedIncremental(pending, deleted);
 
-	/* Events return last updated entry as first element */
-	event = gcal_event_element(&all_events, 0);
-	if (!event) {
-		kError() << "Failed to retrieve last updated event.";
-		const QString message = i18nc("@info:status",
-					      "Failed getting last"
-					      " updated"
-					      " event.");
-		emit error(message);
-		//emit status(Broken, message);
-		result = -1;
-		return result;
+	/* Only save timestamp if it was not initialized (i.e. normal
+	 * behavior).
+	 */
+	if (newerTimestamp.isEmpty()) {
+		/* Events return last updated entry as first element */
+		event = gcal_event_element(&all_events, 0);
+		if (!event) {
+			kError() << "Failed to retrieve last updated event.";
+			const QString message = i18nc("@info:status",
+						      "Failed getting last"
+						      " updated"
+						      " event.");
+			emit error(message);
+			//emit status(Broken, message);
+			result = -1;
+			return result;
 
+		}
+
+		newerTimestamp = gcal_event_get_updated(event);
+		saveTimestamp(newerTimestamp);
 	}
-
-	newerTimestamp = gcal_event_get_updated(event);
-	saveTimestamp(newerTimestamp);
 
 	return result;
 }
