@@ -170,10 +170,10 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		QString temp;
 		event = gcal_event_element(&all_events, i);
 
-		temp = gcal_event_get_title(event);
+		temp = QString::fromUtf8(gcal_event_get_title(event));
 		kevent->setSummary(temp);
 
-		temp = gcal_event_get_where(event);
+		temp = QString::fromUtf8(gcal_event_get_where(event));
 		kevent->setLocation(temp);
 
 		KCal::Incidence::Status status;
@@ -183,7 +183,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 			status = KCal::Incidence::StatusConfirmed;
 		kevent->setStatus(status);
 
-		temp = gcal_event_get_content(event);
+		temp = QString::fromUtf8(gcal_event_get_content(event));
 		kevent->setDescription(temp);
 
 		KDateTime start, end;
@@ -347,13 +347,13 @@ int GCalResource::getUpdated(char *timestamp)
 			kevent = new KCal::Event;
 			kevent->setStatus(status);
 
-			temp = gcal_event_get_title(event);
+			temp = QString::fromUtf8(gcal_event_get_title(event));
 			kevent->setSummary(temp);
 
-			temp = gcal_event_get_where(event);
+			temp = QString::fromUtf8(gcal_event_get_where(event));
 			kevent->setLocation(temp);
 
-			temp = gcal_event_get_content(event);
+			temp = QString::fromUtf8(gcal_event_get_content(event));
 			kevent->setDescription(temp);
 
 			temp = gcal_event_get_start(event);
