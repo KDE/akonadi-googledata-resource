@@ -8,14 +8,15 @@ What works:
 Network proxy can be defined in KDE System Settings and the resource
 will use it.
 
-Passwords will be stored in KWallet, for while only 1 account is allowed.
+Passwords will be stored in KWallet, for while only 1 account is allowed
+(I highly recommend to use it together with KWallet, because it makes
+possible to query by updates automatically whenever akonadi/kde is
+restarted *without* re-entering the account details).
 
-Requires at least libgcal 0.9.0. Support for hosted accounts
-(e.g. joe@foo.bar.com) requires libgcal from git repository i.e. soon to
-be released libgcal 0.9.1.
+Requires at least libgcal 0.9.0, support for hosted accounts
+(e.g. joe@foo.bar.com) requires libgcal 0.9.1. Some linux distributions
+already include the newer version of libgcal.
 
-Some distributions already include 0.9.0, I'm planning to release 0.9.1 in
-this week.
 
 == libgcal ==
 
