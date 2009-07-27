@@ -328,6 +328,7 @@ int GCalResource::getUpdated(char *timestamp)
 	/* Query is inclusive regarding timestamp */
 	if (all_events.length == 1) {
 		kError() << "no updates, done!";
+		itemsRetrievedIncremental(pending, deleted);
 		return result;
 	}
 
