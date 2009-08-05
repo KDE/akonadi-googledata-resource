@@ -70,13 +70,12 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 int GoogleData::retrieveFromWallet(QString &user,
 				   QString &pass,
 				   const WId &window,
-				   const QString &folder,
-				   const QString &awallet)
+				   const QString &folder)
 {
 	int result = -1;
 	const QString gaccount("googleAccount");
 	if (wallet == 0)
-		wallet = Wallet::openWallet(awallet, window);
+		wallet = Wallet::openWallet(Wallet::NetworkWallet(), window);
 
 	if (wallet == 0)
 		return result;

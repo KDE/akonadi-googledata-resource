@@ -45,8 +45,7 @@ protected:
 
 	int retrieveFromWallet(QString &user, QString &pass,
 			       const WId &window,
-			       const QString &folder = "akonadigoogle",
-			       const QString &awallet = "kdewallet");
+			       const QString &folder = "akonadigoogle");
 
 	int authenticate(const QString &user, const QString &password);
 
