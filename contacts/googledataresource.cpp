@@ -443,7 +443,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 
 	/* This 2 fields are required! */
 	temp = addressee.realName();
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.preferredEmail();
@@ -565,7 +565,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 
 	/* This 2 fields are required! */
 	temp = addressee.realName();
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.preferredEmail();
