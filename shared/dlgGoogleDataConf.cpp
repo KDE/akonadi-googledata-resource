@@ -1,6 +1,5 @@
 #include "dlgGoogleDataConf.h"
 #include <QPushButton>
-#include <QLineEdit>
 
 dlgGoogleDataConf::dlgGoogleDataConf(QWidget *parent): QDialog(parent)
 {
