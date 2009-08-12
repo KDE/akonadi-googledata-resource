@@ -133,7 +133,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	QByteArray t_byte;
 
 	if (!authenticated)
-		configure(NULL);
+		configure(0);
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
@@ -429,7 +429,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	int result;
 
 	if (!authenticated)
-		configure(NULL);
+		configure(0);
 	if (!authenticated) {
 		authenticationError("itemAdded: not authenticated!", Broken);
 		return;
@@ -544,7 +544,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	int result;
 
 	if (!authenticated)
-		configure(NULL);
+		configure(0);
 	if (!authenticated) {
 		authenticationError("itemChanged: not authenticated!",
 				    Broken);
@@ -662,7 +662,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 	kError() << "Deleting one item...";
 
 	if (!authenticated)
-		configure(NULL);
+		configure(0);
 	if (!authenticated) {
 		authenticationError("itemRemoved: not authenticated!",
 				    Broken);
