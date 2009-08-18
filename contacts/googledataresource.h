@@ -1,5 +1,5 @@
 /***********************************************************************/
-/* googledataresource.h 					       */
+/* googledata.h 						       */
 /* 								       */
 /* Copyright (C) 2009  Adenilson Cavalcanti <savagobr@yahoo.com>       */
 /* 								       */
