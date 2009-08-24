@@ -23,7 +23,6 @@
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
- * - use QString::fromUtf8 for other fields
  * - Some duplicated code must be moved to a common function (setting
  * KABC::Addressee data in gcal_contact_t).
  * - code cleanup
@@ -140,7 +139,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
-	t_byte = timestamp.toLocal8Bit();
+	t_byte = timestamp.toUtf8();
 	if (t_byte.length() > TIMESTAMP_SIZE) {
 		result = getUpdated(t_byte.data());
 		return;
@@ -186,24 +185,24 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		temp = QString::fromUtf8(gcal_contact_get_title(contact));
 		addressee.setNameFromString(temp);
 		/* email */
-		temp = gcal_contact_get_email(contact);
+		temp = QString::fromUtf8(gcal_contact_get_email(contact));
 		addressee.insertEmail(temp, true);
 		/* address */
-		temp = gcal_contact_get_address(contact);
+		temp = QString::fromUtf8(gcal_contact_get_address(contact));
 		address.setExtended(temp);
 		addressee.insertAddress(address);
 		/* telephone */
-		temp = gcal_contact_get_phone(contact);
+		temp = QString::fromUtf8(gcal_contact_get_phone(contact));
 		number.setNumber(temp);
 		addressee.insertPhoneNumber(number);
 		/* profission */
-		temp = gcal_contact_get_profission(contact);
+		temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 		addressee.setTitle(temp);
 		/* company */
-		temp = gcal_contact_get_organization(contact);
+		temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 		addressee.setOrganization(temp);
 		/* description */
-		temp = gcal_contact_get_content(contact);
+		temp = QString::fromUtf8(gcal_contact_get_content(contact));
 		addressee.setNote(temp);
 		/* photo */
 		if (gcal_contact_get_photolength(contact)) {
@@ -317,24 +316,24 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			addressee.setNameFromString(temp);
 			kError() << "index: " << i <<"updated: " << temp;
 			/* email */
-			temp = gcal_contact_get_email(contact);
+			temp = QString::fromUtf8(gcal_contact_get_email(contact));
 			addressee.insertEmail(temp, true);
 			/* address */
-			temp = gcal_contact_get_address(contact);
+			temp = QString::fromUtf8(gcal_contact_get_address(contact));
 			address.setExtended(temp);
 			addressee.insertAddress(address);
 			/* telephone */
-			temp = gcal_contact_get_phone(contact);
+			temp = QString::fromUtf8(gcal_contact_get_phone(contact));
 			number.setNumber(temp);
 			addressee.insertPhoneNumber(number);
 			/* profission */
-			temp = gcal_contact_get_profission(contact);
+			temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 			addressee.setTitle(temp);
 			/* company */
-			temp = gcal_contact_get_organization(contact);
+			temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 			addressee.setOrganization(temp);
 			/* description */
-			temp = gcal_contact_get_content(contact);
+			temp = QString::fromUtf8(gcal_contact_get_content(contact));
 			addressee.setNote(temp);
 			/* photo */
 			if (gcal_contact_get_photolength(contact)) {
@@ -450,7 +449,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.preferredEmail();
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_contact_set_email(contact, t_byte.data());
 
 	/* Bellow are optional */
@@ -459,7 +458,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		address = listAddress.first();
 		temp = address.extended();
 		if (temp.length()) {
-			t_byte = temp.toLocal8Bit();
+			t_byte = temp.toUtf8();
 			gcal_contact_set_address(contact, t_byte.data());
 		}
 
@@ -470,26 +469,26 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		number = listNumber.first();
 		temp = number.number();
 		if (temp.length()) {
-			t_byte = temp.toLocal8Bit();
+			t_byte = temp.toUtf8();
 			gcal_contact_set_phone(contact, t_byte.data());
 		}
 	}
 
 	temp = addressee.title();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_profission(contact, t_byte.data());
 	}
 
 	temp = addressee.organization();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
 	}
 
 	temp = addressee.note();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
@@ -572,7 +571,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	gcal_contact_set_title(contact, t_byte.data());
 
 	temp = addressee.preferredEmail();
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_contact_set_email(contact, t_byte.data());
 
 	/* Bellow are optional */
@@ -581,7 +580,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		address = listAddress.first();
 		temp = address.extended();
 		if (temp.length()) {
-			t_byte = temp.toLocal8Bit();
+			t_byte = temp.toUtf8();
 			gcal_contact_set_address(contact, t_byte.data());
 		}
 	}
@@ -591,7 +590,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		number = listNumber.first();
 		temp = number.number();
 		if (temp.length()) {
-			t_byte = temp.toLocal8Bit();
+			t_byte = temp.toUtf8();
 			gcal_contact_set_phone(contact, t_byte.data());
 		}
 
@@ -599,19 +598,19 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 
 	temp = addressee.title();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_profission(contact, t_byte.data());
 	}
 
 	temp = addressee.organization();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
 	}
 
 	temp = addressee.note();
 	if (temp.length()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 

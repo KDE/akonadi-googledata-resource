@@ -138,7 +138,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
-	t_byte = timestamp.toLocal8Bit();
+	t_byte = timestamp.toUtf8();
 	if (t_byte.length() > TIMESTAMP_SIZE) {
 		//TODO: implement getUpdated
 		result = getUpdated(t_byte.data());
@@ -481,30 +481,30 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 
 	temp = kevent->summary();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_title(event, t_byte);
 	}
 
 	temp = kevent->description();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_content(event, t_byte);
 	}
 
 	temp = kevent->location();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_where(event, t_byte);
 	}
 
 	time = kevent->dtStart();
 	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_event_set_start(event, t_byte.data());
 
 	time = kevent->dtEnd();
 	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_event_set_end(event, t_byte.data());
 
 	if ((gcal_add_event(gcal, event))) {
@@ -569,31 +569,31 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 
 	temp = kevent->summary();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_title(event, t_byte);
 	}
 
 	temp = kevent->description();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_content(event, t_byte);
 	}
 
 	temp = kevent->location();
 	if (!temp.isEmpty()) {
-		t_byte = temp.toLocal8Bit();
+		t_byte = temp.toUtf8();
 		gcal_event_set_where(event, t_byte);
 	}
 
 	/* Only this fields are being successfuly extracted */
 	time = kevent->dtStart();
 	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_event_set_start(event, t_byte.data());
 
 	time = kevent->dtEnd();
 	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toLocal8Bit();
+	t_byte = temp.toUtf8();
 	gcal_event_set_end(event, t_byte.data());
 
 	KUrl url(item.remoteId());
