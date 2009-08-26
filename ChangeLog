@@ -1,17 +1,73 @@
-2009-08-05 18:56  adasilva
+2009-08-25  fabo
+
+	* COPYING: Replace LGPL3 license by LGPL2.1
+	  the COPYING file is synced with the headers now.
+	  
+	  CCMAIL: cvalcantii@gmail.com
+
+2009-08-24  adasilva
+
+	* calendar/gcalresource.cpp, contacts/googledataresource.cpp:
+	  Getting the remaining fields to use UTF-8 (should fix
+	  accented characters).
+
+2009-08-18  adasilva
+
+	* calendar/gcalresource.cpp, contacts/googledataresource.cpp,
+	  contacts/googledataresource.h, shared/dlgGoogleDataConf.cpp,
+	  shared/googledata.cpp: Updating remaining source code files to
+	  match LGPL license.
+	  
+	  I was going to license it using GPLv2, but later I discovered
+	  that
+	  akonadi itself uses LGPL, so the change in licensing.
+	  
+	  I hope with this commit to solve any licensing issue stopping
+	  packagers to do their job.
+	  
+	  ps: thanks dyndns and DD-WRT for making this commit possible.
+
+2009-08-12  adasilva
+
+	* contacts/googledataresource.cpp: Cleaning up compiler warnings.
+
+2009-08-12  cgiboudeaux
+
+	* CMakeLists.txt: Fix include
+
+2009-08-11  mikearthur
+
+	* cmake/modules/COPYING-CMAKE-SCRIPTS: Add CMake modules copyright
+	  information.
+
+2009-08-09  mlaurent
+
+	* shared/dlgGoogleDataConf.cpp: fix includes
+
+2009-08-08  cfeck
+
+	* CMakeLists.txt: Cleanup libgcal detection
+
+2009-08-06  adasilva
+
+	* README: Updating README file with further information about the
+	  resource.
+	* COPYING, ChangeLog, calendar/gcalresource.h,
+	  contacts/googledataresource.h, shared/dlgGoogleDataConf.h,
+	  shared/googledata.h: Adding license note in source plus license
+	  (LGPL).
+
+2009-08-05  adasilva
 
 	* shared/googledata.cpp, shared/googledata.h: Using the standard
 	  wallet to store user account details.
 	  
 	  Patch by Johannes Wolter.
-
-2009-08-05 15:35  adasilva
-
 	* contacts/googledataresource.cpp: Using UTF-8 for contact's names
 	  (should fix any encoding
 	  issue).
 
-2009-07-27 20:14  adasilva
+2009-07-27  adasilva
 
 	* calendar/gcalresource.cpp, contacts/googledataresource.cpp: When
 	  there are no items, still got to notify akonadi server that the
@@ -21,23 +77,23 @@
 	  resources were
 	  stuck syncing.
 
-2009-07-25 17:35  adasilva
+2009-07-25  adasilva
 
 	* README: Updating README.
 
-2009-07-13 17:45  adasilva
+2009-07-13  adasilva
 
 	* calendar/gcalresource.cpp: Making umlauts (and other characters)
 	  work with calendar.
 	  Thanks Marvin for testing the fix.
 
-2009-07-11 17:01  scripty
+2009-07-11  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-07-10 20:27  adasilva
+2009-07-10  adasilva
 
 	* calendar/gcalresource.cpp: A better workaround for gcalendar bug:
 	  it will add a new dummy
@@ -46,18 +102,18 @@
 	  This way the code makes sure that the next fast sync will
 	  succeed.
 
-2009-07-09 10:01  krake
+2009-07-09  krake
 
 	* calendar/gcalresource.desktop: The calendar resource should be
 	  using the respective icon, not the one for contacts
 
-2009-07-06 14:48  scripty
+2009-07-06  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-06-24 05:15  adasilva
+2009-06-24  adasilva
 
 	* calendar/gcalresource.cpp: Workaround for gcalendar bug "HTTP 410
 	  Gone" bug (not sure if bigger than
@@ -68,73 +124,64 @@
 	  handles
 	  remoteID items... still to confirm with the big guys.
 
-2009-06-21 19:17  adasilva
+2009-06-21  adasilva
 
 	* README: Updating the README to include instructions how to
 	  checkout and
 	  compile libgcal from git repository.
 
-2009-06-21 16:27  mlaurent
+2009-06-21  mlaurent
 
 	* shared/dlgGoogleDataConf.cpp, shared/dlgGoogleDataConf.h: We must
 	  add a login
 
-2009-06-14 14:16  scripty
+2009-06-14  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-06-12 14:31  scripty
+2009-06-12  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-06-10 11:58  mlaurent
+2009-06-10  mlaurent
 
 	* shared/googledata.cpp: Minor fix
-
-2009-06-10 11:55  mlaurent
-
 	* CMakeLists.txt: Remove not necessary variable
 
-2009-06-09 14:51  scripty
+2009-06-09  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-06-04 13:55  scripty
+2009-06-04  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-05-28 20:30  adasilva
+2009-05-28  adasilva
 
 	* calendar/gcalresource.cpp: Better formated output message.
-
-2009-05-28 20:29  adasilva
-
 	* contacts/googledataresource.cpp: And the same for other
 	  operations.
-
-2009-05-28 18:39  adasilva
-
 	* contacts/googledataresource.cpp: I introduced a bug where
 	  checking for authentication in first retrieve
 	  was returning without getting the contacts from google server.
 	  
 	  Should work fine now.
 
-2009-05-28 13:50  scripty
+2009-05-28  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-05-27 02:09  adasilva
+2009-05-27  adasilva
 
 	* contacts/googledataresource.cpp: Fix for the following scenario:
 	  if user did any operation (add/edit/delete)
@@ -151,26 +198,23 @@
 	  to authenticate with google server.
 	  
 	  I must do the same for gcalendar.
-
-2009-05-27 01:52  adasilva
-
 	* contacts/googledataresource.cpp: Base class member function
 	  already sets authenticated to proper
 	  state.
 
-2009-05-26 22:50  adasilva
+2009-05-26  adasilva
 
 	* contacts/googledataresource.cpp, contacts/googledataresource.h:
 	  Moving check for authentication (and error signal emit) to
 	  a commmon function.
 
-2009-05-26 14:23  scripty
+2009-05-26  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-05-25 13:16  adasilva
+2009-05-25  adasilva
 
 	* contacts/GoogleData.ui, contacts/googledataresource.cpp,
 	  contacts/googledataresource.h, shared/googledata.cpp,
@@ -186,25 +230,22 @@
 	  network
 	  proxy, which calendar to use, etc).
 
-2009-05-24 13:46  scripty
+2009-05-24  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-05-22 18:52  adasilva
+2009-05-22  adasilva
 
 	* calendar/gcalresource.cpp: Doing the same for gcalendar resource.
-
-2009-05-22 18:00  adasilva
-
 	* contacts/googledataresource.cpp: Allowing resource to work even
 	  if the user is not using KWallet.
 	  
 	  Previously the code would fail (even if the user password was
 	  right).
 
-2009-05-18 07:37  pali
+2009-05-18  pali
 
 	* contacts/GoogleData.ui, contacts/googledataresource.cpp,
 	  contacts/googledataresource.h, shared/googledata.cpp,
@@ -212,127 +253,112 @@
 	  for user who have on gmail saved for all contacts family name
 	  before given name)
 
-2009-05-09 15:32  scripty
+2009-05-09  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-05-05 14:30  scripty
+2009-05-05  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-04-28 20:48  adasilva
+2009-04-28  adasilva
 
 	* contacts/googledataresource.cpp: Handling contact's names with
 	  non ASCII characters.
 	  
 	  Patch by Yury G. Kudryashov.
 
-2009-04-28 13:56  scripty
+2009-04-28  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-04-26 13:40  scripty
+2009-04-26  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-04-25 17:53  scripty
+2009-04-25  scripty
 
 	* calendar/gcalresource.desktop,
 	  contacts/googledataresource.desktop: SVN_SILENT made messages
 	  (.desktop file)
 
-2009-04-25 16:22  cgiboudeaux
+2009-04-25  cgiboudeaux
 
 	* cmake/modules/FindLibGCal.cmake: LIB_GCAL_INCLUDE_DIR doesn't
 	  exist.
-
-2009-04-25 16:20  cgiboudeaux
-
 	* CMakeLists.txt: Cleanup
 
-2009-04-24 18:03  adasilva
+2009-04-24  adasilva
 
 	* .: Moving code from kdereview.
 
-2009-04-22 15:17  scripty
+2009-04-22  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-22 13:13  adasilva
+2009-04-22  adasilva
 
 	* Updating README (since I have just released libgcal 0.9.0).
 
-2009-04-21 13:54  scripty
+2009-04-21  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-19 13:26  scripty
+2009-04-19  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-17 13:25  scripty
+2009-04-17  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-16 13:50  scripty
+2009-04-16  scripty
 
 	* SVN_SILENT made messages (.desktop file, second try)
 
-2009-04-16 07:34  mlaurent
+2009-04-16  mlaurent
 
 	* fix include
 
-2009-04-15 20:25  coles
+2009-04-15  coles
 
 	* Proof-reading, and added missing Messages.sh to extract strings
 	  for the calendar resource. Nice work!
 
-2009-04-15 14:12  adasilva
+2009-04-15  adasilva
 
 	* Moving googledata resources from playground to review.
 
-2009-04-14 18:25  adasilva
+2009-04-14  adasilva
 
 	* Thou shalt set payload only after setting contact picture.
 	  
 	  Now support for retrieving contact's photos is working.
 
-2009-04-13 22:47  adasilva
+2009-04-13  adasilva
 
 	* Trying to load photo data using QByteArray (still fails).
-
-2009-04-13 20:31  adasilva
-
 	* Starting to implement retrieval of contact's photos.
 	  
 	  It is not working at this moment, I'm not sure if the problem
 	  is with converting the image buffer to QImage or not.
 
-2009-04-09 20:05  adasilva
+2009-04-09  adasilva
 
 	* Aesthetics (I should check later if KDE has an emacs style
 	  ready...
 	  for while I'm using K&R c-style).
-
-2009-04-09 20:03  adasilva
-
 	* Updating documentation (yes, we should do that...).
 	  :-)
-
-2009-04-09 19:55  adasilva
-
 	* Updating todos.
-
-2009-04-09 19:54  adasilva
-
 	* Implemented query-by-updated in gcalendar resource. Now the
 	  resource will 'sync'
 	  with google server and retrieve *only* the changes like newly
@@ -341,85 +367,46 @@
 	  
 	  Now the following operations are supported:
 	  add/edit/delete/query-by-updates.
-
-2009-04-09 19:33  adasilva
-
 	* Filling Item::List with updated and deleted events.
 	  
 	  What is next: call this function when the resource is started.
-
-2009-04-09 19:10  adasilva
-
 	* Starting to implement query by updated events (this is a
 	  requirement to
 	  'sync' with changes on gcalendar server).
 
-2009-04-08 19:05  adasilva
+2009-04-08  adasilva
 
 	* Adding a todo note on contact resource.
-
-2009-04-08 19:03  adasilva
-
 	* Updating comments.
-
-2009-04-08 19:01  adasilva
-
 	* No need to use 2 KUrl objects in edit contact.
-
-2009-04-08 18:38  adasilva
-
 	* I forgot to set the edit_url in gcal_event_t.
 	  
 	  Now edit is working.
-
-2009-04-08 17:37  adasilva
-
 	* Adding code to edit an event (needs testing).
-
-2009-04-08 17:20  adasilva
-
 	* Information about the code and dependencies.
-
-2009-04-08 17:17  adasilva
-
 	* Casting are evil and not necessary (libgcal from git repository
 	  is using const char *
 	  already).
 	  
 	  Now the code compiles again.
 
-2009-04-08 15:05  scripty
+2009-04-08  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-08 13:00  dlonie
+2009-04-08  dlonie
 
 	* Fix c-style cast in last commit.
-
-2009-04-08 12:54  dlonie
-
 	* Added some type casts to fix compiler errors.
 
-2009-04-07 20:11  adasilva
+2009-04-07  adasilva
 
 	* Updating todos.
-
-2009-04-07 20:10  adasilva
-
 	* Today was a good day: retrieve/delete/add gcalendar events are
 	  working.
 	  :-)
-
-2009-04-07 19:57  adasilva
-
 	* Removing left over comment.
-
-2009-04-07 19:55  adasilva
-
 	* Using clone instead of new (less verbose).
-
-2009-04-07 19:43  adasilva
-
 	* Using the same technique with auto_ptr to retrieve event payload
 	  for adding event.
 	  
@@ -428,71 +415,41 @@
 	  (thanks for some missing fields like summary).
 	  
 	  I will debug this later.
-
-2009-04-07 19:41  adasilva
-
 	* Adding one more todo.
-
-2009-04-07 17:43  adasilva
-
 	* Updating todos.
-
-2009-04-07 14:21  adasilva
-
 	* Fixed event duration convertion.
-
-2009-04-07 13:48  adasilva
-
 	* Adding debug information, trying to force KDateTime convertion to
 	  work.
-
-2009-04-07 13:10  adasilva
-
 	* Solving the missing payload item bug on gcalendar.
-
-2009-04-07 12:58  adasilva
-
 	* Debugging info.
-
-2009-04-07 12:58  adasilva
-
 	* Adding boost package in buildsystem.
-
-2009-04-07 11:15  adasilva
-
 	* Setting remote ID as the edit URL (this is used later for
 	  edit/delete).
 
-2009-04-04 15:57  scripty
+2009-04-04  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-03 21:38  vkrause
+2009-04-03  vkrause
 
 	* build with -pedantic
 
-2009-04-03 20:06  igorto
+2009-04-03  igorto
 
 	* adding itemRemoved method, now needs test
-
-2009-04-03 18:29  igorto
-
 	* last itemAdded changes, now test it
 
-2009-04-03 16:30  adasilva
+2009-04-03  adasilva
 
 	* Formating and commenting soon-to-be-used-code.
 
-2009-04-03 16:06  igorto
+2009-04-03  igorto
 
 	* adding code to itemAdded
 
-2009-04-03 15:39  adasilva
+2009-04-03  adasilva
 
 	* Aesthetics.
-
-2009-04-03 15:32  adasilva
-
 	* Adding code to configure. For while it is the same for contacts
 	  and
 	  calendar, but in future it will change (i.e. gcalendar account
@@ -500,119 +457,71 @@
 	  more than 1 calendar, user should be capable of choosing which
 	  one to
 	  use).
-
-2009-04-03 15:31  adasilva
-
 	* Ouch! I was using the result variable (should be more careful).
-
-2009-04-03 15:29  adasilva
-
 	* Removing unused code.
-
-2009-04-03 15:23  adasilva
-
 	* Updating comment.
-
-2009-04-03 15:17  adasilva
-
 	* Converting from RFC3339 format to KDateTime in an easier way
 	  (thanks
 	  krake for this tip).
-
-2009-04-03 15:11  adasilva
-
 	* Sending item list to akonadi server (now is time to test).
-
-2009-04-03 15:09  adasilva
-
 	* Removing unused function call.
-
-2009-04-03 15:08  adasilva
-
 	* Setting event duration (not happy with current code).
 
-2009-04-03 14:55  igorto
+2009-04-03  igorto
 
 	* remove trailing empty spaces
 
-2009-04-03 14:45  adasilva
+2009-04-03  adasilva
 
 	* Starting to implement gcalendar events retrieve and report to
 	  akonadi,
 	  it required to link with KCal library.
 	  
 	  I also did some compiler warnings cleanup.
-
-2009-04-03 14:44  adasilva
-
 	* Aesthetics.
 
-2009-04-03 12:51  igorto
+2009-04-03  igorto
 
 	* implement retrieveCollections
 
-2009-04-02 14:40  scripty
+2009-04-02  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-04-01 20:28  adasilva
+2009-04-01  adasilva
 
 	* Completed buildsystem adjustments: now it will build and install
 	  2 resources (contacts and calendar).
-
-2009-04-01 14:58  adasilva
-
 	* Adding support for network proxy (I will test it next, if
 	  I don't do any more commits, it means that is done).
 
-2009-04-01 13:36  igorto
+2009-04-01  igorto
 
 	* create shared directory
-
-2009-04-01 13:20  igorto
-
 	* Oops .. fix build
-
-2009-04-01 02:31  igorto
-
 	* create a new directory to google data resource and do a
 	  cmakelistst more clean
 
-2009-03-31 19:05  adasilva
+2009-03-31  adasilva
 
 	* I'm assuming that each resource will need a configuration class,
 	  since each will need to store its own timestamp.
-
-2009-03-31 18:35  adasilva
-
 	* Adding skeleton for gcalendar resource.
 	  
 	  I'm planning to have both resources on this directory.
-
-2009-03-31 17:35  adasilva
-
 	* Updating todo.
-
-2009-03-31 17:19  adasilva
-
 	* Moving common code to a base class.
-
-2009-03-31 16:24  adasilva
-
 	* Renaming the class name (I'm going to write another resource for
 	  calendars).
 
-2009-03-30 20:27  adasilva
+2009-03-30  adasilva
 
 	* Better error handling in case of wrong password or failure to
 	  authenticate.
 
-2009-03-24 18:15  adasilva
+2009-03-24  adasilva
 
 	* Updating comments.
-
-2009-03-24 16:20  adasilva
-
 	* Adding some more debugging messages and treating the case of
 	  inclusive
 	  query-by-updated.
@@ -620,9 +529,6 @@
 	  New contacts are being correctly displayed by akonadi, but
 	  deleted contacts
 	  not.
-
-2009-03-24 15:24  adasilva
-
 	* Removing etag from item ID, because when a contact was deleted,
 	  its Etag changes on google server
 	  (and thus the informed remote ID to akonadi will change).
@@ -634,18 +540,12 @@
 	  The alternative of not being able to correctly inform deleted
 	  contacts are worst (I think).
 	  
-
-2009-03-24 03:59  adasilva
-
 	* Ouch! Etag change when contact was deleted. I will need to find
 	  another way to store contact's
 	  etag (instead of appending it with the remote ID) *or* ignore
 	  Etag and commit change no matter what.
 	  
 	  Tough call.
-
-2009-03-24 03:44  adasilva
-
 	* I just remember that is required to set libgcal to display
 	  deleted contacts (since by protocol
 	  definition they are not displayed by default).
@@ -654,16 +554,13 @@
 	  akonadi (problem being the etag,
 	  since I'm not sure what is its behavior for deleted entries).
 
-2009-03-23 19:20  adasilva
+2009-03-23  adasilva
 
 	* Moving call to getUpdate() to retrieveItems(), updated items are
 	  being
 	  reported (at least newly added items).
 	  
 	  TODO: test deleted items.
-
-2009-03-23 18:03  adasilva
-
 	* Testing for timestamp validity (handles the case where there is
 	  no
 	  timestamp stored in resource configuration).
@@ -675,20 +572,11 @@
 	  I made the item lists class members (instead of only on member
 	  function
 	  scope) but still doesn't work.
-
-2009-03-23 16:51  adasilva
-
 	* Informing akonadi of updated contacts (at least is not
 	  crashing...).
 	  
 	  Going to lunch now, testing later.
-
-2009-03-23 16:22  adasilva
-
 	* Adding code to save last updated contact timestamp.
-
-2009-03-23 16:09  adasilva
-
 	* Query google server by updated contacts.
 	  
 	  Query by updated is inclusive, so the last updated contact which
@@ -697,20 +585,14 @@
 	  Next: build items and report to akonadi.
 	  
 
-2009-03-19 18:41  adasilva
+2009-03-19  adasilva
 
 	* Aesthetics.
-
-2009-03-19 18:39  adasilva
-
 	* Retrieving from resource configuration the timestamp.
 	  
 	  What is next: use the timestamp to query by updated and report
 	  changes
 	  to akonadi.
-
-2009-03-19 18:18  adasilva
-
 	* Saving last updated contact timestamp in configuration file (is
 	  will
 	  save on kde/share/config/akonadi_googledata_resource_whatever).
@@ -718,52 +600,37 @@
 	  This is a requirement to do query by updated contacts later (and
 	  keep
 	  downloaded contacts in sync with google server).
-
-2009-03-19 15:56  adasilva
-
 	* Adding photo data when editing a contact (not tested, my system
 	  is
 	  borked).
-
-2009-03-19 15:48  adasilva
-
 	* Updating todos comments.
-
-2009-03-19 15:46  adasilva
-
 	* Cleaning up the code and adding some debugging msg (not a good
 	  commit to
 	  be honest).
-
-2009-03-19 14:33  adasilva
-
 	* Updating todo (photo is being displayed in webbrowser).
 
-2009-03-19 14:32  mikearthur
+2009-03-19  mikearthur
 
 	* Use new FindLibGCal module. Shouldn't be needed as it's already
 	  distributed but will leave it here for a while in case people are
 	  running old versions of LibGCal that don't have the module
 	  installed yet.
 
-2009-03-18 23:57  adasilva
+2009-03-18  adasilva
 
 	* No more casting.
 
-2009-03-18 12:55  mikearthur
+2009-03-18  mikearthur
 
 	* Add more helpful username dialog label and mask password field.
 
-2009-03-07 13:31  scripty
+2009-03-07  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-03-03 18:46  adasilva
+2009-03-03  adasilva
 
 	* Updating todo.
-
-2009-03-03 17:57  adasilva
-
 	* Using a lonnng way to retrieve the image raw file format so
 	  google will
 	  happily accept the contact foto.
@@ -773,42 +640,33 @@
 	  file image headers.
 	  
 	  Now the resource supports contacts with photos.
-
-2009-03-03 16:05  adasilva
-
 	* Trying to add a photo to contact.
 
-2009-02-26 16:13  scripty
+2009-02-26  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-02-21 14:12  scripty
+2009-02-21  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-02-19 20:35  adasilva
+2009-02-19  adasilva
 
 	* Implementing missing contact fields: telephone, address, company,
 	  etc.
 
-2009-02-18 23:49  adasilva
+2009-02-18  adasilva
 
 	* Using a more Qt-ish way to avoid compiling warnings (thanks krake
 	  for remark).
-
-2009-02-18 19:31  adasilva
-
 	* Fixing timestamp save/retrieve (special thanks for igorto for the
 	  tip).
 
-2009-02-17 19:20  adasilva
+2009-02-17  adasilva
 
 	* Getting config timestamp with Settings::whateverPath is not
 	  working
 	  (time to get another coffe).
-
-2009-02-17 18:34  adasilva
-
 	* Adding function stubs for 'fast-sync' (getting updated items from
 	  google
 	  server).
@@ -816,44 +674,29 @@
 	  The idea is to store in a configuration file the timestamp of
 	  last updated
 	  entry and use it to do queries to google server.
-
-2009-02-17 18:28  adasilva
-
 	* Adding a timestamp field in configuration file.
 
-2009-02-16 20:12  adasilva
+2009-02-16  adasilva
 
 	* Updating todos (recent commits on libgcal fixed edit/add and
 	  delete/add
 	  operations).
 
-2009-02-13 18:56  adasilva
+2009-02-13  adasilva
 
 	* fullEmail() includes the username (e.g. "John Doe
 	  <doe@nevermind.com>").
 	  
 	  I will try with prefereredEmail() and see what happens.
-
-2009-02-13 15:33  adasilva
-
 	* Updating todos.
-
-2009-02-13 15:29  adasilva
-
 	* Getting the windowId, should work better when showing dialogs (I
 	  think that
 	  right now is a bit confusing, since both the user account dialog
 	  and
 	  kwallet unlock dialog are show at the same time).
-
-2009-02-13 15:12  adasilva
-
 	* The idea is to get user account from kwallet when required (so
 	  the user
 	  will only to input the password once).
-
-2009-02-13 14:49  adasilva
-
 	* A pack of changes... here it goes:
 	  - add some extra error checking in retrieveFromWallet
 	  - moved google authentication libgcal call to a distinct class
@@ -862,49 +705,28 @@
 	  The idea is next to use retrieveFromWallet to recover the user
 	  account info
 	  from kwallet.
-
-2009-02-13 14:23  adasilva
-
 	* Adding code to retrieve the user account map from KWallet (still
 	  untested,
 	  I'm still think where could be the better place to call this
 	  function).
-
-2009-02-13 14:16  adasilva
-
 	* Writing a map in KWallet with a known entry name
 	  ("googleAccount").
 	  
 	  Special thanks to lemma for providing the code snippet for this.
 	  
 	  Next: retrieve the user data from kwallet.
-
-2009-02-13 13:35  adasilva
-
 	* Use changeCommitted instead of itemRetrieved (should work now).
 	  
 	  Thanks igorto by the tip.
 
-2009-02-12 22:31  adasilva
+2009-02-12  adasilva
 
 	* Updating todos.
-
-2009-02-12 21:02  adasilva
-
 	* Using const references to avoid unnecessary objects copies.
-
-2009-02-12 19:52  adasilva
-
 	* Adding code to retrieve the password from KWallet, currently not
 	  used.
-
-2009-02-12 19:40  adasilva
-
 	* Updating todos, as libgcal is using 'const char *' for its
 	  setters.
-
-2009-02-12 19:37  adasilva
-
 	* Starting to implement KWallet support for user account details.
 	  
 	  Both KWalletManager and akonadi's imap resource were useful to
@@ -915,20 +737,14 @@
 	  
 	  Next: retrieve the user account details from kwallet.
 
-2009-02-10 14:39  scripty
+2009-02-10  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-02-09 20:43  adasilva
+2009-02-09  adasilva
 
 	* Some more todos.
-
-2009-02-09 20:41  adasilva
-
 	* Updating todos.
-
-2009-02-09 20:32  adasilva
-
 	* Returning to akonadi a contact with the updated field (edit_url +
 	  Etag).
 	  
@@ -937,69 +753,27 @@
 	  add/edit/delete.
 	  
 	  TODO: testing.
-
-2009-02-09 20:18  adasilva
-
 	* Using a better convertion from QByteArray to char *.
-
-2009-02-09 18:21  adasilva
-
 	* Adding copyright notes and a long list of todos.
-
-2009-02-09 18:02  adasilva
-
 	* Better error handling.
-
-2009-02-09 17:51  adasilva
-
 	* Using QByteArray instead of qPrintable.
-
-2009-02-09 17:48  adasilva
-
 	* Retriving the etag/edit_url from KUrl in itemChanged function.
-
-2009-02-09 16:03  adasilva
-
 	* Better error messages.
-
-2009-02-09 15:38  adasilva
-
 	* Making sure that gcal_contact_array is correctly initialized.
-
-2009-02-09 14:56  adasilva
-
 	* Retriving the etag/edit_url from KUrl in itemRemoved function.
-
-2009-02-09 14:40  adasilva
-
 	* Using KUrl to store ETag + edit_url. Special thanks to krake by
 	  its
 	  suggestion.
-
-2009-02-09 13:56  adasilva
-
 	* Using remoteId to store etag+edit_url.
-
-2009-02-09 13:51  adasilva
-
 	* Deleted items will not have the payload available, I will need to
 	  change
 	  the code in resource to deal with that.
-
-2009-02-09 12:41  adasilva
-
 	* Commenting a little bit.
-
-2009-02-09 12:38  adasilva
-
 	* Adding email + contact name in gcontact object when deleting (not
 	  really
 	  required, but help when debugging).
 	  
 	  I tried to swap toLocal8Bit() for toAscii() to no avail.
-
-2009-02-09 12:03  adasilva
-
 	* Using QByteArray to access the ETag field from contact, plus
 	  accessing directly
 	  contact's fields when printing debugging information.
@@ -1010,19 +784,19 @@
 	  URL from
 	  akonadi classes.
 
-2009-02-08 14:16  scripty
+2009-02-08  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-02-06 21:34  aacid
+2009-02-06  aacid
 
 	* Typo found by Manfred Wiese
 
-2009-02-05 14:16  scripty
+2009-02-05  scripty
 
 	* SVN_SILENT made messages (.desktop file)
 
-2009-02-04 19:09  adasilva
+2009-02-04  adasilva
 
 	* Trying to fix 'delete', I discovered that the ID/Etag of a newly
 	  created
@@ -1031,55 +805,28 @@
 	  Those fields are essential to later to operations on an entry.
 	  
 	  Right now it is not still working.
-
-2009-02-04 15:50  adasilva
-
 	* Adding better error handling and using QByteArray instead of
 	  qPrintable.
-
-2009-02-04 15:07  adasilva
-
 	* Enabling retrieve of full payload. Now 'add' is working fine.
-
-2009-02-04 13:13  adasilva
-
 	* Using QByteArray to get contacts details (seems to be the
 	  prefered way to
 	  convert QStrings to char *).
-
-2009-02-04 12:58  adasilva
-
 	* Adding debug information, 'add' fails currently.
-
-2009-02-04 12:45  adasilva
-
 	* Aesthetics.
-
-2009-02-04 12:27  adasilva
-
 	* Returning the item (patch by krake).
 
-2009-02-03 20:54  krake
+2009-02-03  krake
 
 	* Make it possible to build as part of the playground/pim directory
-
-2009-02-03 20:49  krake
-
 	* Fixing initialization ordering
 
-2009-02-03 18:08  cgiboudeaux
+2009-02-03  cgiboudeaux
 
 	* KdepimLibs is required
-
-2009-02-03 18:03  cgiboudeaux
-
 	* Add a missing include
-
-2009-02-03 18:00  cgiboudeaux
-
 	* KDE4_DATA_DIR -> KDEPIMLIBS_DATA_DIR
 
-2009-02-03 17:48  adasilva
+2009-02-03  adasilva
 
 	* Importing google data akonadi resource. For whole development
 	  history,
