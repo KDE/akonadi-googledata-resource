@@ -437,8 +437,13 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		return;
 	}
 
-	if (item.hasPayload<KABC::Addressee>())
+	if (item.hasPayload<KABC::Addressee>()) {
 		addressee = item.payload<KABC::Addressee>();
+		if (addressee.isEmpty()) {
+			kError() << "itemAdded: Null contact! Returning...";
+			return;
+		}
+	}
 
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
@@ -553,8 +558,13 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		return;
 	}
 
-	if (item.hasPayload<KABC::Addressee>())
+	if (item.hasPayload<KABC::Addressee>()) {
 		addressee = item.payload<KABC::Addressee>();
+		if (addressee.isEmpty()) {
+			kError() << "itemAdded: Null contact! Returning...";
+			return;
+		}
+	}
 
 	if (!(contact = gcal_contact_new(NULL))) {
 		kError() << "Memory allocation error!";

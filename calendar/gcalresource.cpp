@@ -461,6 +461,10 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	if (item.hasPayload<IncidencePtr>()) {
 		ptrEvent = item.payload<IncidencePtr>();
 		kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
+                if (!kevent) {
+                    kError() << "itemAdded: Null event! Returning...";
+                    return;
+                }
 	} else {
 		kError() << "Add without payload!";
 		const QString message = i18nc("@info:status",
@@ -549,6 +553,11 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	if (item.hasPayload<IncidencePtr>()) {
 		ptrEvent = item.payload<IncidencePtr>();
 		kevent = dynamic_cast<KCal::Event *>(ptrEvent.get());
+                if (!kevent) {
+                    kError() << "itemAdded: Null event! Returning...";
+                    return;
+                }
+
 	} else {
 		kError() << "Add without payload!";
 		const QString message = i18nc("@info:status",
