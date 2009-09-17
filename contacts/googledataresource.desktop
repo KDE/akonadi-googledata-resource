@@ -2,6 +2,7 @@
 Name=Akonadi Google Contacts Resource
 Name[bg]=Ресурс за контакти от Гугъл
 Name[de]=Google-Kontakte-Ressource für Akonadi
+Name[en_GB]=Akonadi Google Contacts Resource
 Name[et]=Akonadi Google'i kontaktide ressurss
 Name[gl]=Recurso do Google Contacts para Akonadi
 Name[it]=Risorsa dei contatti di Google per Akonadi
@@ -18,6 +19,7 @@ Name[zh_CN]=Akonadi Google 联系人资源
 Name[zh_TW]=Akonadi Google 聯絡人資源
 Comment=Resource for a google account
 Comment[bg]=Ресурс за потребителска сметка в Гугъл
+Comment[en_GB]=Resource for a google account
 Comment[et]=Google'i konto ressurss
 Comment[gl]=Recurso para unha conta de google
 Comment[it]=Risorsa per un account di Google
