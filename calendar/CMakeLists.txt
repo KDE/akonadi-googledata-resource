@@ -15,6 +15,6 @@ qt4_add_dbus_adaptor(gcalresource_SRCS
 
 kde4_add_executable(akonadi_gcal_resource RUN_UNINSTALLED ${gcalresource_SRCS})
 
-target_link_libraries(akonadi_gcal_resource ${KDEPIMLIBS_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${KDEPIMLIBS_KABC_LIBS} ${KDEPIMLIBS_KCAL_LIBS}  ${LIBGCAL_LIBS})
+target_link_libraries(akonadi_gcal_resource ${KDEPIMLIBS_AKONADI_LIBS} ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${KDEPIMLIBS_KABC_LIBS} ${KDEPIMLIBS_KCAL_LIBS} ${LIBGCAL_LIBRARIES})
 
 install(TARGETS akonadi_gcal_resource ${INSTALL_TARGETS_DEFAULT_ARGS})
