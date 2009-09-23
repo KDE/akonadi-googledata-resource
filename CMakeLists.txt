@@ -21,23 +21,21 @@ macro_log_feature(LIBGCAL_FOUND "libgcal" "C library that allows communication w
 
 include_directories( ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} )
 
-find_program(XSLTPROC_EXECUTABLE xsltproc)
-macro_log_feature(XSLTPROC_EXECUTABLE "xsltproc" "The command line XSLT processor from libxslt" "http://xmlsoft.org/XSLT/" FALSE "" "Needed for building Akonadi resources. Recommended.")
+find_program(XSLTPROC_EXECUTABLE xsltproc REQUIRED)
+macro_log_feature(XSLTPROC_EXECUTABLE "xsltproc" "The command line XSLT processor from libxslt" "http://xmlsoft.org/XSLT/" TRUE "" "Needed for building Akonadi resources.")
 
-if (XSLTPROC_EXECUTABLE)
-  # generates a D-Bus interface description from a KConfigXT file
-  macro( kcfg_generate_dbus_interface _kcfg _name )
-    add_custom_command(
-      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_name}.xml
-      COMMAND ${XSLTPROC_EXECUTABLE} --stringparam interfaceName ${_name}
-              ${KDEPIMLIBS_DATA_DIR}/akonadi-kde/kcfg2dbus.xsl
-              ${_kcfg}
-              > ${CMAKE_CURRENT_BINARY_DIR}/${_name}.xml
-      DEPENDS ${KDEPIMLIBS_DATA_DIR}/akonadi-kde/kcfg2dbus.xsl
-              ${_kcfg}
-    )
-  endmacro( kcfg_generate_dbus_interface )
-endif (XSLTPROC_EXECUTABLE)
+# generates a D-Bus interface description from a KConfigXT file
+macro( kcfg_generate_dbus_interface _kcfg _name )
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_name}.xml
+    COMMAND ${XSLTPROC_EXECUTABLE} --stringparam interfaceName ${_name}
+            ${KDEPIMLIBS_DATA_DIR}/akonadi-kde/kcfg2dbus.xsl
+            ${_kcfg}
+            > ${CMAKE_CURRENT_BINARY_DIR}/${_name}.xml
+    DEPENDS ${KDEPIMLIBS_DATA_DIR}/akonadi-kde/kcfg2dbus.xsl
+            ${_kcfg}
+  )
+endmacro( kcfg_generate_dbus_interface )
 
 if(WIN32)
     set(LIB_INSTALL_DIR ${LIB_INSTALL_DIR}
