@@ -2,6 +2,7 @@
 Name=Akonadi Google Calendar Resource
 Name[bg]=Ресурс за календар от Гугъл
 Name[ca]=Recurs de calendari de Google de l'Akonadi
+Name[ca@valencia]=Recurs de calendari de Google de l'Akonadi
 Name[cs]=Zdroj Akonadi pro kalendář Google
 Name[da]=Akonadi-ressource for Google Calendar
 Name[de]=Google-Kalender-Ressource für Akonadi
@@ -12,6 +13,7 @@ Name[fr]=Resource du calendrier Google pour Akonadi
 Name[ga]=Acmhainn Féilire Google le haghaidh Akonadi
 Name[gl]=Recurso do Google Calendar para Akonadi
 Name[it]=Risorsa del calendario di Google per Akonadi
+Name[lv]=Akonadi Google kalendāra resurss
 Name[nb]=Akonadi Google kalenderressurs
 Name[nds]="Google-Kalenner"-Ressource för Akonadi
 Name[nl]=Akonadi Google agendabron
