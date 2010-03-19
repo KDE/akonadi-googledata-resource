@@ -246,7 +246,7 @@ void GCalResource::doSetOnline(bool online)
 	if (result) {
 		kError() << "Failed setting online.";
 		const QString message = i18nc("@info:status",
-					      "Invalid password.");
+					      "Invalid password or network proxy.");
 		emit error(message);
 		emit status(Broken, message);
 		return;
