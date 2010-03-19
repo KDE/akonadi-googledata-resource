@@ -30,9 +30,10 @@ in contacts and recurrent events are not supported.
 
 == Dependencies ==
 
-It requires libgcal 0.9.2 (hosted accounts, fast-sync workaround for
-gcalendar). Some linux distributions already include the newer version of
-libgcal.
+It requires libgcal 0.9.4 (hosted accounts, fast-sync workaround for
+gcalendar and support for multiple email addresses and telephones).
+
+Some linux distributions already include the newer version of libgcal.
 
 It also requires: boost C++, xsltproc, akonadi devel libraries.
 
