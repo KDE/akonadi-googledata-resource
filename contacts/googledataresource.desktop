@@ -58,6 +58,6 @@ Type=AkonadiResource
 Exec=akonadi_googledata_resource
 Icon=text-directory
 
-X-Akonadi-MimeTypes=text/directory,text/calendar
+X-Akonadi-MimeTypes=text/directory
 X-Akonadi-Capabilities=Resource
 X-Akonadi-Identifier=akonadi_googledata_resource
