@@ -124,6 +124,37 @@ int GoogleContactsResource::authenticationError(const char *msgError, int signal
 	return result;
 }
 
+KABC::PhoneNumber::Type googleLabelToAkonadiType(gcal_phone_type label) {
+	switch ( label ) {
+		case P_HOME:
+			return KABC::PhoneNumber::Home;
+			break;
+		case P_WORK:
+			return KABC::PhoneNumber::Work;
+			break;
+		case P_MOBILE:
+			return KABC::PhoneNumber::Cell;
+			break;
+		case P_CAR:
+			return KABC::PhoneNumber::Car;
+			break;
+		case P_ISDN:
+			return KABC::PhoneNumber::Isdn;
+			break;
+		case P_PAGER:
+			return KABC::PhoneNumber::Pager;
+			break;
+		case P_HOME_FAX:
+			return KABC::PhoneNumber::Home | KABC::PhoneNumber::Fax;
+			break;
+		case P_WORK_FAX:
+			return KABC::PhoneNumber::Work | KABC::PhoneNumber::Fax;
+			break;
+		default:
+			return KABC::PhoneNumber::Home | KABC::PhoneNumber::Work; // other
+	}
+}
+
 void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
@@ -175,32 +206,50 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		contact = gcal_contact_element(&all_contacts, i);
 
 		KABC::Addressee addressee;
-		KABC::PhoneNumber number;
 		KABC::Address address;
 		KABC::Picture photo;
 		QImage image;
 		QString temp;
+		int j;
 
 		/* name */
 		temp = QString::fromUtf8(gcal_contact_get_title(contact));
 		addressee.setNameFromString(temp);
 		/* email */
-		temp = QString::fromUtf8(gcal_contact_get_email(contact));
-		addressee.insertEmail(temp, true);
+		for (j = 0; j < gcal_contact_get_emails_count(contact); j++) {
+			temp = QString::fromUtf8(gcal_contact_get_email_address(contact, j));
+			addressee.insertEmail(temp, (j == gcal_contact_get_pref_email(contact)));
+			temp = QString::number(gcal_contact_get_email_address_type(contact, j));
+			addressee.insertCustom(QString::fromUtf8("Google"),
+					QString::fromUtf8("typeof_email_").append(QString::number(j)), temp);
+		}
 		/* address */
 		temp = QString::fromUtf8(gcal_contact_get_address(contact));
 		address.setExtended(temp);
 		addressee.insertAddress(address);
 		/* telephone */
-		temp = QString::fromUtf8(gcal_contact_get_phone(contact));
-		number.setNumber(temp);
-		addressee.insertPhoneNumber(number);
+		for (j = 0; j < gcal_contact_get_phone_numbers_count(contact); j++) {
+			KABC::PhoneNumber number;
+			temp = QString::fromUtf8(gcal_contact_get_phone_number(contact, j));
+			number.setNumber(temp);
+			number.setType(googleLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
+			addressee.insertPhoneNumber(number);
+		}
 		/* profission */
 		temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 		addressee.setTitle(temp);
 		/* company */
 		temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 		addressee.setOrganization(temp);
+		/* Google group membership */
+		addressee.insertCustom(QString::fromUtf8("Google"),
+					QString::fromUtf8("groupMembership_nr"),
+					QString::number(gcal_contact_get_groupMembership_count(contact)));
+
+		for (j = 0; j < gcal_contact_get_groupMembership_count(contact); j++) {
+			temp = QString::fromUtf8(gcal_contact_get_groupMembership(contact, j));
+			addressee.insertCustom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)), temp);
+		}
 		/* description */
 		temp = QString::fromUtf8(gcal_contact_get_content(contact));
 		addressee.setNote(temp);
@@ -274,6 +323,7 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 	QString temp;
 	KABC::Picture photo;
 	QImage image;
+	int j;
 
 	/* Just in case, I'm not sure when this member function is called */
 	pending.clear();
@@ -290,7 +340,8 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 
 
 	/* Query is inclusive regarding timestamp */
-	if (all_contacts.length == 1) {
+	/* RFC: don't think so... */
+	if (all_contacts.length == 0) {
 		kError() << "no updates, done!";
 		itemsRetrievedIncremental(pending, deleted);
 		return result;
@@ -309,29 +360,46 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 
 		if (!gcal_contact_is_deleted(contact)) {
 			KABC::Addressee addressee;
-			KABC::PhoneNumber number;
 			KABC::Address address;
 			/* name */
 			temp = QString::fromUtf8(gcal_contact_get_title(contact));
 			addressee.setNameFromString(temp);
 			kError() << "index: " << i <<"updated: " << temp;
 			/* email */
-			temp = QString::fromUtf8(gcal_contact_get_email(contact));
-			addressee.insertEmail(temp, true);
+			for (j = 0; j < gcal_contact_get_emails_count(contact); j++) {
+				temp = QString::fromUtf8(gcal_contact_get_email_address(contact, j));
+				addressee.insertEmail(temp, (j == gcal_contact_get_pref_email(contact)));
+				temp = QString::number(gcal_contact_get_email_address_type(contact, j));
+				addressee.insertCustom(QString::fromUtf8("Google"),
+						QString::fromUtf8("typeof_email_").append(QString::number(j)), temp);
+			}
 			/* address */
 			temp = QString::fromUtf8(gcal_contact_get_address(contact));
 			address.setExtended(temp);
 			addressee.insertAddress(address);
 			/* telephone */
-			temp = QString::fromUtf8(gcal_contact_get_phone(contact));
-			number.setNumber(temp);
-			addressee.insertPhoneNumber(number);
+			for (j = 0; j < gcal_contact_get_phone_numbers_count(contact); j++) {
+				KABC::PhoneNumber number;
+				temp = QString::fromUtf8(gcal_contact_get_phone_number(contact, j));
+				number.setNumber(temp);
+				number.setType(googleLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
+				addressee.insertPhoneNumber(number);
+			}
 			/* profission */
 			temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 			addressee.setTitle(temp);
 			/* company */
 			temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 			addressee.setOrganization(temp);
+			/* Google group membership */
+			addressee.insertCustom(QString::fromUtf8("Google"),
+						QString::fromUtf8("groupMembership_nr"),
+						QString::number(gcal_contact_get_groupMembership_count(contact)));
+
+			for (j = 0; j < gcal_contact_get_groupMembership_count(contact); j++) {
+				temp = QString::fromUtf8(gcal_contact_get_groupMembership(contact, j));
+				addressee.insertCustom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)), temp);
+			}
 			/* description */
 			temp = QString::fromUtf8(gcal_contact_get_content(contact));
 			addressee.setNote(temp);
@@ -414,21 +482,56 @@ void GoogleContactsResource::configure( WId windowId )
 	synchronize();
 }
 
+gcal_phone_type akonadiTypeToGoogleLabel(KABC::PhoneNumber::Type type) {
+	switch ( type ) {
+		case KABC::PhoneNumber::Home:
+			return P_HOME;
+			break;
+		case KABC::PhoneNumber::Work:
+			return P_WORK;
+			break;
+		case KABC::PhoneNumber::Cell:
+			return P_MOBILE;
+			break;
+		case KABC::PhoneNumber::Car:
+			return P_CAR;
+			break;
+		case KABC::PhoneNumber::Isdn:
+			return P_ISDN;
+			break;
+		case KABC::PhoneNumber::Pager:
+			return P_PAGER;
+			break;
+		case KABC::PhoneNumber::Home + KABC::PhoneNumber::Fax:
+			return P_HOME_FAX;
+			break;
+		case KABC::PhoneNumber::Work + KABC::PhoneNumber::Fax:
+			return P_WORK_FAX;
+			break;
+		default:
+			return P_OTHER;
+	}
+}
+
 void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 
 	Q_UNUSED(collection);
 
 	KABC::Addressee addressee;
-	KABC::PhoneNumber number;
 	KABC::Address address;
 	gcal_contact_t contact;
 	QString temp;
+	QStringList listEmail;
+	QStringList::const_iterator email;
 	QByteArray t_byte;
 	QList<KABC::Address> listAddress;
 	QList<KABC::PhoneNumber> listNumber;
 	KABC::Picture photo;
 	int result;
+	int num_elem;
+	int j;
+	bool ok;
 
 	if (!authenticated)
 		configure(0);
@@ -453,9 +556,22 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	t_byte = temp.toUtf8();
 	gcal_contact_set_title(contact, t_byte.data());
 
-	temp = addressee.preferredEmail();
-	t_byte = temp.toUtf8();
-	gcal_contact_set_email(contact, t_byte.data());
+	listEmail = addressee.emails();
+	if (!listEmail.empty()) {
+		gcal_contact_delete_email_addresses(contact);
+		for (email = listEmail.constBegin(); email != listEmail.constEnd(); email++) {
+			if (email->length()) {
+				t_byte = email->toUtf8();
+
+				temp = addressee.custom(QString::fromUtf8("Google"),
+						QString::fromUtf8("typeof_email_").append(QString::number(email - listEmail.constBegin())));
+				j = temp.toInt(&ok);
+
+				gcal_contact_add_email_address(contact, t_byte.data(), (ok ? (gcal_email_type)j : E_OTHER),
+							(*email == addressee.preferredEmail()));
+			}
+		}
+	}
 
 	/* Bellow are optional */
 	listAddress = addressee.addresses();
@@ -466,16 +582,18 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 			t_byte = temp.toUtf8();
 			gcal_contact_set_address(contact, t_byte.data());
 		}
-
 	}
 
 	listNumber = addressee.phoneNumbers();
 	if (!listNumber.empty()) {
-		number = listNumber.first();
-		temp = number.number();
-		if (temp.length()) {
-			t_byte = temp.toUtf8();
-			gcal_contact_set_phone(contact, t_byte.data());
+		gcal_contact_delete_phone_numbers(contact);
+		foreach (const KABC::PhoneNumber &number, listNumber) {
+			temp = number.number();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_add_phone_number(contact, t_byte.data(),
+							akonadiTypeToGoogleLabel(number.type()));
+			}
 		}
 	}
 
@@ -489,6 +607,19 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_nr"));
+	num_elem = temp.toInt(&ok);
+	if (ok) {
+		gcal_contact_delete_groupMembership(contact);
+		for (j = 0; j < num_elem; j++) {
+			temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)));
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_add_groupMembership(contact, t_byte.data());
+			}
+		}
 	}
 
 	temp = addressee.note();
@@ -540,15 +671,19 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	Q_UNUSED(parts);
 
 	KABC::Addressee addressee;
-	KABC::PhoneNumber number;
 	KABC::Address address;
 	QList<KABC::Address> listAddress;
+	QStringList listEmail;
+	QStringList::const_iterator email;
 	QList<KABC::PhoneNumber> listNumber;
 	gcal_contact_t contact;
 	QByteArray t_byte;
 	QString temp;
 	KABC::Picture photo;
 	int result;
+	int num_elem;
+	int j;
+	bool ok;
 
 	if (!authenticated)
 		configure(0);
@@ -580,9 +715,22 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	t_byte = temp.toUtf8();
 	gcal_contact_set_title(contact, t_byte.data());
 
-	temp = addressee.preferredEmail();
-	t_byte = temp.toUtf8();
-	gcal_contact_set_email(contact, t_byte.data());
+	listEmail = addressee.emails();
+	if (!listEmail.empty()) {
+		gcal_contact_delete_email_addresses(contact);
+		for (email = listEmail.constBegin(); email != listEmail.constEnd(); email++) {
+			if (email->length()) {
+				t_byte = email->toUtf8();
+
+				temp = addressee.custom(QString::fromUtf8("Google"),
+						QString::fromUtf8("typeof_email_").append(QString::number(email - listEmail.constBegin())));
+				j = temp.toInt(&ok);
+
+				gcal_contact_add_email_address(contact, t_byte.data(), (ok ? (gcal_email_type)j : E_OTHER),
+							(*email == addressee.preferredEmail()));
+			}
+		}
+	}
 
 	/* Bellow are optional */
 	listAddress = addressee.addresses();
@@ -597,13 +745,15 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 
 	listNumber = addressee.phoneNumbers();
 	if (!listNumber.empty()) {
-		number = listNumber.first();
-		temp = number.number();
-		if (temp.length()) {
-			t_byte = temp.toUtf8();
-			gcal_contact_set_phone(contact, t_byte.data());
+		gcal_contact_delete_phone_numbers(contact);
+		foreach (const KABC::PhoneNumber &number, listNumber) {
+			temp = number.number();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_add_phone_number(contact, t_byte.data(),
+							akonadiTypeToGoogleLabel(number.type()));
+			}
 		}
-
 	}
 
 	temp = addressee.title();
@@ -616,6 +766,19 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_nr"));
+	num_elem = temp.toInt(&ok);
+	if (ok) {
+		gcal_contact_delete_groupMembership(contact);
+		for (j = 0; j < num_elem; j++) {
+			temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)));
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_add_groupMembership(contact, t_byte.data());
+			}
+		}
 	}
 
 	temp = addressee.note();
