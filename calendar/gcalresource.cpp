@@ -142,7 +142,6 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	retrieveTimestamp(timestamp);
 	t_byte = timestamp.toUtf8();
 	if (t_byte.length() > TIMESTAMP_SIZE) {
-		//TODO: implement getUpdated
 		result = getUpdated(t_byte.data());
 		return;
 	}
