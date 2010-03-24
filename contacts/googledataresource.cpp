@@ -20,12 +20,12 @@
 /***********************************************************************/
 
 /* TODO:
+ * - code cleanup: remove multiple calls to authenticate()
  * - dialog displaying (kwallet + user account) is a bit confusing right
  * now, should display unlock dialog only if user got authenticated.
  * - support more than 1 user account
  * - Some duplicated code must be moved to a common function (setting
  * KABC::Addressee data in gcal_contact_t).
- * - code cleanup
  * - unit tests: not sure if really required, libgcal already has lots
  * of tests
  * - nice to have: a libqcal (using Qt for both networking and XML/XPath parsing)
@@ -169,6 +169,12 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 
 	if (!authenticated)
 		configure(0);
+	if (!authenticated) {
+		ResourceBase::cancelTask(QString("Failed retrieving contacts!"));
+		ResourceBase::doSetOnline(false);
+		emit error(QString("retrieveItems: not authenticated!"));
+		return;
+	}
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
@@ -652,7 +658,9 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 					      "Failed adding new contact.");
 		emit error(message);
 		emit status(Broken, message);
-
+		ResourceBase::cancelTask(QString("Failed adding contact!"));
+		ResourceBase::doSetOnline(false);
+		return;
 	}
 
 	/* remoteID: edit_url */
@@ -711,7 +719,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 					      "Failed to create gcal_contact.");
 		emit error(message);
 		emit status(Broken, message);
-		return;
+		exit(1);
 	}
 
 	/* This 2 fields are required! */
@@ -815,7 +823,9 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 					      "Failed editing new contact.");
 		emit error(message);
 		emit status(Broken, message);
-
+		ResourceBase::cancelTask(QString("Failed editing contact!"));
+		ResourceBase::doSetOnline(false);
+		return;
 	}
 
 	/* remoteID: edit_url */
@@ -854,6 +864,7 @@ void GoogleContactsResource::itemRemoved( const Akonadi::Item &item )
 					      "Failed to create gcal_contact.");
 		emit error(message);
 		emit status(Broken, message);
+		exit(1);
 		return;
 	}
 

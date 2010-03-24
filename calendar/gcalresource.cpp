@@ -128,15 +128,8 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	QByteArray t_byte;
 
 	kError() << "\n............. retrieveItems ...........\n";
-	if (!authenticated) {
-		kError() << "No authentication for Google calendar available";
-		const QString message = i18nc("@info:status",
-					      "Not yet authenticated for"
-					      " use of Google calendar.");
-		emit error(message);
-		emit status(Broken, message);
-		return;
-	}
+	if (!authenticated)
+		configure(0);
 
 	/* Query by updated */
 	retrieveTimestamp(timestamp);
@@ -459,6 +452,8 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
+		ResourceBase::cancelTask(QString("Failed adding event!"));
+		ResourceBase::doSetOnline(false);
 		return;
 	}
 
@@ -484,6 +479,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
+		exit(1);
 		return;
 	}
 
@@ -522,6 +518,8 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
+		ResourceBase::cancelTask(QString("Failed adding event!"));
+		ResourceBase::doSetOnline(false);
 	}
 
 	KUrl url(gcal_event_get_url(event));
@@ -551,6 +549,9 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
+		ResourceBase::cancelTask(QString("Failed editing event!"));
+		ResourceBase::doSetOnline(false);
+
 		return;
 	}
 
@@ -577,6 +578,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
+		exit(1);
 		return;
 	}
 
@@ -621,6 +623,8 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
+		ResourceBase::cancelTask(QString("Failed editing event!"));
+		ResourceBase::doSetOnline(false);
 	}
 
 	temp = gcal_event_get_url(event);
@@ -651,6 +655,8 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 					      "use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
+		ResourceBase::cancelTask(QString("Failed deleting event!"));
+		ResourceBase::doSetOnline(false);
 	}
 
 	if (!(event = gcal_event_new(NULL))) {
@@ -659,6 +665,7 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 					      "Failed to create gcal_event.");
 		emit error(message);
 		emit status(Broken, message);
+		exit(1);
 	}
 
 	KUrl url(item.remoteId());
