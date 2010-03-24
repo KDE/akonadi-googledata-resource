@@ -66,10 +66,12 @@ GoogleContactsResource::GoogleContactsResource( const QString &id )
 
 	if (!(gcal = gcal_new(GCONTACT)))
 		exit(1);
+
 	gcal_set_store_xml(gcal, 1);
 	all_contacts.length = 0;
 	all_contacts.entries = NULL;
 
+        setNeedsNetwork(true);
 }
 
 GoogleContactsResource::~GoogleContactsResource()
@@ -177,11 +179,13 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	}
 	kError() << "First retrieve";
 
-	/* Downloading the contacts can be slow and it is blocking. Will
-	 * it mess up with akonadi?
+	/* Downloading the contacts can be slow and it is blocking.
 	 */
-	if ((result = gcal_get_contacts(gcal, &all_contacts)))
-		exit(1);
+	if ((result = gcal_get_contacts(gcal, &all_contacts))) {
+		ResourceBase::cancelTask(QString("Failed contacts retrieving!"));
+		ResourceBase::doSetOnline(false);
+		return;
+        }
 
 	/* Contacts return last updated entry as last element */
 	contact = gcal_contact_element(&all_contacts, all_contacts.length - 1);

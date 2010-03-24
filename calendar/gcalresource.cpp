@@ -64,9 +64,11 @@ GCalResource::GCalResource( const QString &id )
 
 	if (!(gcal = gcal_new(GCALENDAR)))
 		exit(1);
+
 	gcal_set_store_xml(gcal, 1);
 	all_events.length = 0;
 	all_events.entries = NULL;
+        setNeedsNetwork(true);
 }
 
 GCalResource::~GCalResource()
@@ -146,8 +148,11 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	}
 	kError() << "First retrieve";
 
-	if ((result = gcal_get_events(gcal, &all_events)))
-		exit(1);
+	if ((result = gcal_get_events(gcal, &all_events))) {
+		ResourceBase::cancelTask(QString("Failed events retrieving!"));
+		ResourceBase::doSetOnline(false);
+		return;
+	}
 
 	/* GCalendar returns last updated entry as first element */
 	event = gcal_event_element(&all_events, 0);
