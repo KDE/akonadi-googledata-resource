@@ -170,7 +170,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	if (!authenticated)
 		configure(0);
 	if (!authenticated) {
-		ResourceBase::cancelTask(QString("Failed retrieving contacts!"));
+		ResourceBase::cancelTask(i18n("Failed retrieving contacts!"));
 		ResourceBase::doSetOnline(false);
 		emit error(QString("retrieveItems: not authenticated!"));
 		return;
@@ -188,7 +188,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	/* Downloading the contacts can be slow and it is blocking.
 	 */
 	if ((result = gcal_get_contacts(gcal, &all_contacts))) {
-		ResourceBase::cancelTask(QString("Failed contacts retrieving!"));
+		ResourceBase::cancelTask(i18n("Failed contacts retrieving!"));
 		ResourceBase::doSetOnline(false);
 		return;
         }
@@ -658,7 +658,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 					      "Failed adding new contact.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(QString("Failed adding contact!"));
+		ResourceBase::cancelTask(i18n("Failed adding contact!"));
 		ResourceBase::doSetOnline(false);
 		return;
 	}
