@@ -126,7 +126,7 @@ int GoogleContactsResource::authenticationError(const char *msgError, int signal
 	return result;
 }
 
-KABC::PhoneNumber::Type googleLabelToAkonadiType(gcal_phone_type label) {
+KABC::PhoneNumber::Type googlePhoneLabelToAkonadiType(gcal_phone_type label) {
 	switch ( label ) {
 		case P_HOME:
 			return KABC::PhoneNumber::Home;
@@ -157,6 +157,22 @@ KABC::PhoneNumber::Type googleLabelToAkonadiType(gcal_phone_type label) {
 	}
 }
 
+KABC::Address::Type googleAddressLabelToAkonadiType(gcal_address_type label) {
+	switch ( label ) {
+		case A_HOME:
+			return KABC::Address::Home;
+			break;
+		case A_WORK:
+			return KABC::Address::Work;
+			break;
+		case A_OTHER:
+			return KABC::Address::Postal;
+			break;
+		default:
+			return KABC::Address::Home; // other
+	}
+}
+
 void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collection )
 {
 	Q_UNUSED( collection );
@@ -170,7 +186,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	if (!authenticated)
 		configure(0);
 	if (!authenticated) {
-		ResourceBase::cancelTask(i18n("Failed retrieving contacts!"));
+		ResourceBase::cancelTask(QString("Failed retrieving contacts!"));
 		ResourceBase::doSetOnline(false);
 		emit error(QString("retrieveItems: not authenticated!"));
 		return;
@@ -188,7 +204,7 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 	/* Downloading the contacts can be slow and it is blocking.
 	 */
 	if ((result = gcal_get_contacts(gcal, &all_contacts))) {
-		ResourceBase::cancelTask(i18n("Failed contacts retrieving!"));
+		ResourceBase::cancelTask(QString("Failed contacts retrieving!"));
 		ResourceBase::doSetOnline(false);
 		return;
         }
@@ -216,33 +232,109 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		contact = gcal_contact_element(&all_contacts, i);
 
 		KABC::Addressee addressee;
-		KABC::Address address;
 		KABC::Picture photo;
 		QImage image;
 		QString temp;
+		QDateTime tempDate;
+		KUrl tempUrl;
+		gcal_structured_subvalues_t structured_entry;
+		int structured_entry_count;
 		int j;
-
-		/* name */
-		temp = QString::fromUtf8(gcal_contact_get_title(contact));
-		addressee.setNameFromString(temp);
+		bool fill_entry;
+		
+		/* structured name */
+		structured_entry = gcal_contact_get_structured_name(contact);
+		fill_entry = 1;
+		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
+		addressee.setGivenName(temp);
+		if(temp.length())
+			fill_entry = 0;
+		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+		addressee.setAdditionalName(temp);
+		if(temp.length())
+			fill_entry = 0;
+		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+		addressee.setFamilyName(temp);
+		if(temp.length())
+			fill_entry = 0;
+		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+		addressee.setPrefix(temp);
+		if(temp.length())
+			fill_entry = 0;
+		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+		addressee.setSuffix(temp);
+		if(temp.length())
+			fill_entry = 0;
+		if(fill_entry)
+		{
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+			addressee.setNameFromString(temp);
+			if(temp.length())
+				fill_entry = 0;
+		}
+		if(fill_entry)
+		{
+			/* name */
+			temp = QString::fromUtf8(gcal_contact_get_title(contact));
+			addressee.setNameFromString(temp);
+		}
+		/* nickname */
+		temp = QString::fromUtf8(gcal_contact_get_nickname(contact));
+		addressee.setNickName(temp);
 		/* email */
 		for (j = 0; j < gcal_contact_get_emails_count(contact); j++) {
 			temp = QString::fromUtf8(gcal_contact_get_email_address(contact, j));
 			addressee.insertEmail(temp, (j == gcal_contact_get_pref_email(contact)));
 			temp = QString::number(gcal_contact_get_email_address_type(contact, j));
 			addressee.insertCustom(QString::fromUtf8("Google"),
-					QString::fromUtf8("typeof_email_").append(QString::number(j)), temp);
+				QString::fromUtf8("typeof_email_").append(QString::number(j)), temp);
 		}
+		
 		/* address */
-		temp = QString::fromUtf8(gcal_contact_get_address(contact));
-		address.setExtended(temp);
-		addressee.insertAddress(address);
+		structured_entry = gcal_contact_get_structured_address(contact);
+		structured_entry_count = gcal_contact_get_structured_address_count(contact);
+		for (j = 0; j < structured_entry_count; j++) {
+			KABC::Address address;
+			fill_entry = 1;
+			address.setType(googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count)));
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"street"));
+			address.setStreet(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"pobox"));
+			address.setPostOfficeBox(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"city"));
+			address.setLocality(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"region"));
+			address.setRegion(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"postcode"));
+			address.setPostalCode(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"country"));
+			address.setCountry(temp);
+			if(temp.length())
+				fill_entry = 0;
+			if(fill_entry)
+			{
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"formattedAddress"));
+				address.setStreet(temp);
+			}
+			addressee.insertAddress(address);
+		}
+		
 		/* telephone */
 		for (j = 0; j < gcal_contact_get_phone_numbers_count(contact); j++) {
 			KABC::PhoneNumber number;
 			temp = QString::fromUtf8(gcal_contact_get_phone_number(contact, j));
 			number.setNumber(temp);
-			number.setType(googleLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
+			number.setType(googlePhoneLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
 			addressee.insertPhoneNumber(number);
 		}
 		/* profission */
@@ -260,9 +352,20 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 			temp = QString::fromUtf8(gcal_contact_get_groupMembership(contact, j));
 			addressee.insertCustom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)), temp);
 		}
-		/* description */
+		/* note */
 		temp = QString::fromUtf8(gcal_contact_get_content(contact));
 		addressee.setNote(temp);
+		/* url */
+		tempUrl = KUrl::fromPathOrUrl(QString::fromUtf8(gcal_contact_get_homepage(contact)));
+		addressee.setUrl(tempUrl);
+		/* blog */
+		tempUrl = KUrl::fromPathOrUrl(QString::fromUtf8(gcal_contact_get_blog(contact)));
+		addressee.insertCustom("KADDRESSBOOK","BlogFeed",tempUrl.prettyUrl());
+		/* birthday */
+		tempDate = QDateTime::fromString(gcal_contact_get_birthday(contact),"yyyy-MM-dd");
+		if(!tempDate.isValid())
+			tempDate = QDateTime::fromString(gcal_contact_get_birthday(contact),"--MM-dd");
+		addressee.setBirthday(tempDate);
 		/* photo */
 		if (gcal_contact_get_photolength(contact)) {
 			QByteArray ba(gcal_contact_get_photo(contact),
@@ -331,9 +434,14 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
+	QDateTime tempDate;
+	KUrl tempUrl; 
 	KABC::Picture photo;
 	QImage image;
+	gcal_structured_subvalues_t structured_entry;
+	int structured_entry_count;
 	int j;
+	bool fill_entry;
 
 	/* Just in case, I'm not sure when this member function is called */
 	pending.clear();
@@ -370,11 +478,46 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 
 		if (!gcal_contact_is_deleted(contact)) {
 			KABC::Addressee addressee;
-			KABC::Address address;
-			/* name */
-			temp = QString::fromUtf8(gcal_contact_get_title(contact));
-			addressee.setNameFromString(temp);
-			kError() << "index: " << i <<"updated: " << temp;
+			/* structured name */
+			structured_entry = gcal_contact_get_structured_name(contact);
+			fill_entry = 1;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
+			addressee.setGivenName(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+			addressee.setAdditionalName(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+			addressee.setFamilyName(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+			addressee.setPrefix(temp);
+			if(temp.length())
+				fill_entry = 0;
+			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+			addressee.setSuffix(temp);
+			if(temp.length())
+				fill_entry = 0;
+			if(fill_entry)
+			{
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+				addressee.setNameFromString(temp);
+				if(temp.length())
+					fill_entry = 0;
+			}
+			if(fill_entry)
+			{
+				/* name */
+				temp = QString::fromUtf8(gcal_contact_get_title(contact));
+				addressee.setNameFromString(temp);
+				kError() << "index: " << i <<"updated: " << temp;
+			}
+			/* nickname */
+			temp = QString::fromUtf8(gcal_contact_get_nickname(contact));
+			addressee.setNickName(temp);
 			/* email */
 			for (j = 0; j < gcal_contact_get_emails_count(contact); j++) {
 				temp = QString::fromUtf8(gcal_contact_get_email_address(contact, j));
@@ -383,16 +526,52 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 				addressee.insertCustom(QString::fromUtf8("Google"),
 						QString::fromUtf8("typeof_email_").append(QString::number(j)), temp);
 			}
+			
 			/* address */
-			temp = QString::fromUtf8(gcal_contact_get_address(contact));
-			address.setExtended(temp);
-			addressee.insertAddress(address);
+			structured_entry = gcal_contact_get_structured_address(contact);
+			structured_entry_count = gcal_contact_get_structured_address_count(contact);
+			for (j = 0; j < structured_entry_count; j++) {
+				KABC::Address address;
+				fill_entry = 1;
+				address.setType(googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count)));
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"street"));
+				address.setStreet(temp);
+				if(temp.length())
+					fill_entry = 0;
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"pobox"));
+				address.setPostOfficeBox(temp);
+				if(temp.length())
+					fill_entry = 0;
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"city"));
+				address.setLocality(temp);
+				if(temp.length())
+					fill_entry = 0;
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"region"));
+				address.setRegion(temp);
+				if(temp.length())
+					fill_entry = 0;
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"postcode"));
+				address.setPostalCode(temp);
+				if(temp.length())
+					fill_entry = 0;
+				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"country"));
+				address.setCountry(temp);
+				if(temp.length())
+					fill_entry = 0;
+				if(fill_entry)
+				{
+					temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"formattedAddress"));
+					address.setStreet(temp);
+				}
+				addressee.insertAddress(address);
+			}
+			
 			/* telephone */
 			for (j = 0; j < gcal_contact_get_phone_numbers_count(contact); j++) {
 				KABC::PhoneNumber number;
 				temp = QString::fromUtf8(gcal_contact_get_phone_number(contact, j));
 				number.setNumber(temp);
-				number.setType(googleLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
+				number.setType(googlePhoneLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
 				addressee.insertPhoneNumber(number);
 			}
 			/* profission */
@@ -410,9 +589,20 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 				temp = QString::fromUtf8(gcal_contact_get_groupMembership(contact, j));
 				addressee.insertCustom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_").append(QString::number(j)), temp);
 			}
-			/* description */
+			/* note */
 			temp = QString::fromUtf8(gcal_contact_get_content(contact));
 			addressee.setNote(temp);
+			/* url */
+			tempUrl = KUrl::fromPathOrUrl(QString::fromUtf8(gcal_contact_get_homepage(contact)));
+			addressee.setUrl(tempUrl);
+			/* blog */
+			tempUrl = KUrl::fromPathOrUrl(QString::fromUtf8(gcal_contact_get_blog(contact)));
+			addressee.insertCustom("KADDRESSBOOK","BlogFeed",tempUrl.prettyUrl());
+			/* birthday */
+			tempDate = QDateTime::fromString(gcal_contact_get_birthday(contact),"yyyy-MM-dd");
+			if(!tempDate.isValid())
+				tempDate = QDateTime::fromString(gcal_contact_get_birthday(contact),"--MM-dd");
+			addressee.setBirthday(tempDate);
 			/* photo */
 			if (gcal_contact_get_photolength(contact)) {
 				QByteArray ba(gcal_contact_get_photo(contact),
@@ -492,7 +682,7 @@ void GoogleContactsResource::configure( WId windowId )
 	synchronize();
 }
 
-gcal_phone_type akonadiTypeToGoogleLabel(KABC::PhoneNumber::Type type) {
+gcal_phone_type akonadiPhoneTypeToGoogleLabel(KABC::PhoneNumber::Type type) {
 	switch ( type ) {
 		case KABC::PhoneNumber::Home:
 			return P_HOME;
@@ -523,6 +713,28 @@ gcal_phone_type akonadiTypeToGoogleLabel(KABC::PhoneNumber::Type type) {
 	}
 }
 
+
+gcal_address_type akonadiAddressTypeToGoogleLabel(KABC::Address::Type type) {
+	switch ( type ) {
+		case KABC::Address::Home:
+			return A_HOME;
+			break;
+		case KABC::Address::Work:
+			return A_WORK;
+			break;
+		case KABC::Address::Dom + 
+		  KABC::Address::Intl + 
+		  KABC::Address::Postal + 
+		  KABC::Address::Parcel +
+		  KABC::Address::Pref:
+			return A_OTHER;
+			break;
+		default:
+			return A_OTHER;
+	}
+}
+
+
 void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
 
@@ -531,7 +743,11 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	KABC::Addressee addressee;
 	KABC::Address address;
 	gcal_contact_t contact;
+	gcal_structured_subvalues_t structured_entry;
+	int structured_entry_nr, structured_entry_count;
 	QString temp;
+	QDateTime tempDate;
+	KUrl tempUrl;
 	QStringList listEmail;
 	QStringList::const_iterator email;
 	QByteArray t_byte;
@@ -542,6 +758,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	int num_elem;
 	int j;
 	bool ok;
+	bool fill_entry;
 
 	if (!authenticated)
 		configure(0);
@@ -561,11 +778,67 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	if (!(contact = gcal_contact_new(NULL)))
 		exit(1);
 
-	/* This 2 fields are required! */
-	temp = addressee.realName();
-	t_byte = temp.toUtf8();
-	gcal_contact_set_title(contact, t_byte.data());
-
+	/* structured name */
+	fill_entry = 1;
+	structured_entry = gcal_contact_get_structured_name(contact);
+	gcal_contact_delete_structured_entry(structured_entry,NULL,NULL);
+	/* First Name */
+	temp = addressee.givenName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "givenName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Additional Name */
+	temp = addressee.additionalName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "additionalName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Family Name */
+	temp = addressee.familyName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "familyName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Prefix */
+	temp = addressee.prefix();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "namePrefix", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Suffix */
+	temp = addressee.suffix();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "nameSuffix", t_byte.data());
+		fill_entry = 0;
+	}
+	
+	if(fill_entry)
+	{
+		/* This 2 fields are required! */
+		temp = addressee.realName();
+		t_byte = temp.toUtf8();
+		gcal_contact_set_title(contact, t_byte.data());
+	}
+// 	/* All the Name Parts */
+// 	temp = addressee.realName();
+// 	if (temp.length()) {
+// 		t_byte = temp.toUtf8();
+// 		gcal_contact_set_structured_entry(structured_entry,0,1, "fullName", t_byte.data());
+// 	}
+	
+	/* nickname */
+	temp = addressee.nickName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_nickname(contact, t_byte.data());
+	}
+	
 	listEmail = addressee.emails();
 	if (!listEmail.empty()) {
 		gcal_contact_delete_email_addresses(contact);
@@ -586,11 +859,67 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	/* Bellow are optional */
 	listAddress = addressee.addresses();
 	if (!listAddress.empty()) {
-		address = listAddress.first();
-		temp = address.extended();
-		if (temp.length()) {
-			t_byte = temp.toUtf8();
-			gcal_contact_set_address(contact, t_byte.data());
+		structured_entry = gcal_contact_get_structured_address(contact);
+		gcal_contact_delete_structured_entry(structured_entry,gcal_contact_get_structured_address_count_obj(contact),gcal_contact_get_structured_address_type_obj(contact));
+		foreach (const KABC::Address &address, listAddress) {
+			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,akonadiAddressTypeToGoogleLabel(address.type()));
+			structured_entry_count = gcal_contact_get_structured_address_count(contact);
+			fill_entry = 1;
+			/* Street */
+			temp = address.street();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "street", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* PO Box */
+			temp = address.postOfficeBox();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "pobox", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* City */
+			temp = address.locality();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "city", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Region */
+			temp = address.region();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "region", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Postcode */
+			temp = address.postalCode();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "postcode", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Country */
+			temp = address.country();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "country", t_byte.data());
+				fill_entry = 0;
+			}
+			/* Extended */
+			temp = address.extended();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "formattedAddress", t_byte.data());
+				if(fill_entry)
+					gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "street", t_byte.data());
+			}
 		}
 	}
 
@@ -602,7 +931,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 			if (temp.length()) {
 				t_byte = temp.toUtf8();
 				gcal_contact_add_phone_number(contact, t_byte.data(),
-							akonadiTypeToGoogleLabel(number.type()));
+							akonadiPhoneTypeToGoogleLabel(number.type()));
 			}
 		}
 	}
@@ -638,6 +967,27 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		gcal_contact_set_content(contact, t_byte.data());
 	}
 
+	tempUrl = addressee.url();
+	temp = tempUrl.prettyUrl();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_homepage(contact, t_byte.data());
+	}
+	
+	tempUrl = addressee.custom("KADDRESSBOOK","BlogFeed");
+	temp = tempUrl.prettyUrl();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_blog(contact, t_byte.data());
+	}
+	
+	tempDate = addressee.birthday();
+	temp = tempDate.toString("yyyy-MM-dd");
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_birthday(contact, t_byte.data());
+	}
+
 	photo = addressee.photo();
 	if (!photo.isEmpty()) {
 		QImage raw = photo.data();
@@ -658,7 +1008,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 					      "Failed adding new contact.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed adding contact!"));
+		ResourceBase::cancelTask(QString("Failed adding contact!"));
 		ResourceBase::doSetOnline(false);
 		return;
 	}
@@ -689,13 +1039,18 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	QStringList::const_iterator email;
 	QList<KABC::PhoneNumber> listNumber;
 	gcal_contact_t contact;
+	gcal_structured_subvalues_t structured_entry;
+	int structured_entry_nr, structured_entry_count;
 	QByteArray t_byte;
 	QString temp;
+	QDateTime tempDate;
+	KUrl tempUrl;
 	KABC::Picture photo;
 	int result;
 	int num_elem;
 	int j;
 	bool ok;
+	bool fill_entry;
 
 	if (!authenticated)
 		configure(0);
@@ -722,11 +1077,67 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		exit(1);
 	}
 
-	/* This 2 fields are required! */
-	temp = addressee.realName();
-	t_byte = temp.toUtf8();
-	gcal_contact_set_title(contact, t_byte.data());
-
+	/* structured name */
+	fill_entry = 1;
+	structured_entry = gcal_contact_get_structured_name(contact);
+	gcal_contact_delete_structured_entry(structured_entry,NULL,NULL);
+	/* First Name */
+	temp = addressee.givenName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "givenName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Additional Name */
+	temp = addressee.additionalName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "additionalName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Family Name */
+	temp = addressee.familyName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "familyName", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Prefix */
+	temp = addressee.prefix();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "namePrefix", t_byte.data());
+		fill_entry = 0;
+	}
+	/* Suffix */
+	temp = addressee.suffix();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_structured_entry(structured_entry,0,1, "nameSuffix", t_byte.data());
+		fill_entry = 0;
+	}
+	
+	if(fill_entry)
+	{
+		/* This 2 fields are required! */
+		temp = addressee.realName();
+		t_byte = temp.toUtf8();
+		gcal_contact_set_title(contact, t_byte.data());
+	}
+// 	/* All the Name Parts */
+// 	temp = addressee.realName();
+// 	if (temp.length()) {
+// 		t_byte = temp.toUtf8();
+// 		gcal_contact_set_structured_entry(structured_entry,0,1, "fullName", t_byte.data());
+// 	}
+	
+	/* nickname */
+	temp = addressee.nickName();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_nickname(contact, t_byte.data());
+	}
+	
 	listEmail = addressee.emails();
 	if (!listEmail.empty()) {
 		gcal_contact_delete_email_addresses(contact);
@@ -747,11 +1158,67 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	/* Bellow are optional */
 	listAddress = addressee.addresses();
 	if (!listAddress.empty()) {
-		address = listAddress.first();
-		temp = address.extended();
-		if (temp.length()) {
-			t_byte = temp.toUtf8();
-			gcal_contact_set_address(contact, t_byte.data());
+		structured_entry = gcal_contact_get_structured_address(contact);
+		gcal_contact_delete_structured_entry(structured_entry,gcal_contact_get_structured_address_count_obj(contact),gcal_contact_get_structured_address_type_obj(contact));
+		foreach (const KABC::Address &address, listAddress) {
+			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,akonadiAddressTypeToGoogleLabel(address.type()));
+			structured_entry_count = gcal_contact_get_structured_address_count(contact);
+			fill_entry = 1;
+			/* Street */
+			temp = address.street();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "street", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* PO Box */
+			temp = address.postOfficeBox();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "pobox", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* City */
+			temp = address.locality();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "city", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Region */
+			temp = address.region();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "region", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Postcode */
+			temp = address.postalCode();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "postcode", t_byte.data());
+				fill_entry = 0;
+			}
+			
+			/* Country */
+			temp = address.country();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "country", t_byte.data());
+				fill_entry = 0;
+			}
+			/* Extended */
+			temp = address.extended();
+			if (temp.length()) {
+				t_byte = temp.toUtf8();
+				gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "formattedAddress", t_byte.data());
+				if(fill_entry)
+					gcal_contact_set_structured_entry(structured_entry, structured_entry_nr, structured_entry_count, "street", t_byte.data());
+			}
 		}
 	}
 
@@ -763,7 +1230,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 			if (temp.length()) {
 				t_byte = temp.toUtf8();
 				gcal_contact_add_phone_number(contact, t_byte.data(),
-							akonadiTypeToGoogleLabel(number.type()));
+							akonadiPhoneTypeToGoogleLabel(number.type()));
 			}
 		}
 	}
@@ -797,6 +1264,27 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
 		gcal_contact_set_content(contact, t_byte.data());
+	}
+
+	tempUrl = addressee.url();
+	temp = tempUrl.prettyUrl();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_homepage(contact, t_byte.data());
+	}
+	
+	tempUrl = addressee.custom("KADDRESSBOOK","BlogFeed");
+	temp = tempUrl.prettyUrl();
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_blog(contact, t_byte.data());
+	}
+
+	tempDate = addressee.birthday();
+	temp = tempDate.toString("yyyy-MM-dd");
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_birthday(contact, t_byte.data());
 	}
 
 	photo = addressee.photo();
