@@ -17,15 +17,19 @@ Passwords will be stored in KWallet, for while only 1 account is allowed
 possible to query by updates automatically whenever akonadi/kde is
 restarted *without* re-entering the account details).
 
-For hosted accounts (i.e. joe.bar@whatever.com), just input the whole user id plus server
-name in configuration dialog (i.e. joe.bar@whatever.com). For normal google accounts
+For hosted accounts (i.e. joe.bar@whatever.com), just input the whole user id
+plus server name in configuration dialog (i.e. joe.bar@whatever.com). For
+normal google accounts
 (i.e. joe@gmail.com), just the username is required (i.e. joe).
 
 
 === Restrictions ===
 
-Only the main calendar is supported, there are some missing fields
-in contacts and recurrent events are not supported.
+Only the main calendar is supported.
+
+Recurrent events are not supported, the reason: google uses an invalid
+iCal inside of the XML to represent recurrence).
+http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html#CreatingRecurring
 
 
 == Dependencies ==
@@ -47,6 +51,8 @@ In ubuntu, the packages are: libcurl4-openssl-dev, libxml2-dev, ca-certificates.
 
  - checkout the code:
  $git clone git://repo.or.cz/libgcal.git
+ or
+ $git clone git://gitorious.org/libgcal/libgcal.git
 
  - configure and compile, you can use either autotools or cmake based
  buildsystem (but *not both*).
