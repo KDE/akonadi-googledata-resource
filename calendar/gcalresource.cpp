@@ -141,7 +141,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 	kError() << "First retrieve";
 
 	if ((result = gcal_get_events(gcal, &all_events))) {
-		ResourceBase::cancelTask(i18n("Failed events retrieving!"));
+		ResourceBase::cancelTask(i18n("Failed to retrieve events."));
 		ResourceBase::doSetOnline(false);
 		return;
 	}
@@ -452,7 +452,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed adding event!"));
+		ResourceBase::cancelTask(i18n("Failed to add event."));
 		ResourceBase::doSetOnline(false);
 		return;
 	}
@@ -518,7 +518,7 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed adding event!"));
+		ResourceBase::cancelTask(i18n("Failed to add event."));
 		ResourceBase::doSetOnline(false);
 	}
 
@@ -549,7 +549,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 					      " use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed editing event!"));
+		ResourceBase::cancelTask(i18n("Failed to edit event."));
 		ResourceBase::doSetOnline(false);
 
 		return;
@@ -623,7 +623,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 					      "Failed adding new calendar.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed editing event!"));
+		ResourceBase::cancelTask(i18n("Failed to edit event."));
 		ResourceBase::doSetOnline(false);
 	}
 
@@ -655,7 +655,7 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 					      "use of Google calendar.");
 		emit error(message);
 		emit status(Broken, message);
-		ResourceBase::cancelTask(i18n("Failed deleting event!"));
+		ResourceBase::cancelTask(i18n("Failed to delete event."));
 		ResourceBase::doSetOnline(false);
 	}
 
