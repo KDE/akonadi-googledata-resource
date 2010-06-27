@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Akonadi Google Contacts Resource
-Name[bg]=Ресурс за контакти от Гугъл
+Name[bg]=Ресурс за контакти от Google
 Name[ca]=Recurs de contactes de Google de l'Akonadi
 Name[ca@valencia]=Recurs de contactes de Google de l'Akonadi
 Name[cs]=Zdroj Akonadi pro kontakty Google
@@ -36,7 +36,7 @@ Name[x-test]=xxAkonadi Google Contacts Resourcexx
 Name[zh_CN]=Akonadi Google 联系人资源
 Name[zh_TW]=Akonadi Google 聯絡人資源
 Comment=Resource for a google account
-Comment[bg]=Ресурс за потребителска сметка в Гугъл
+Comment[bg]=Ресурс за потребителска сметка в Google
 Comment[ca]=Recurs per a un compte de Google
 Comment[ca@valencia]=Recurs per a un compte de Google
 Comment[cs]=Zdroj pro účet google
