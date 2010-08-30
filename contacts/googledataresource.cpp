@@ -874,35 +874,35 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	temp = addressee.givenName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "givenName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry,0, 1, "givenName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Additional Name */
 	temp = addressee.additionalName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "additionalName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry,0, 1, "additionalName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Family Name */
 	temp = addressee.familyName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "familyName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry,0, 1, "familyName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Prefix */
 	temp = addressee.prefix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "namePrefix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry,0, 1, "namePrefix", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Suffix */
 	temp = addressee.suffix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "nameSuffix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry,0, 1, "nameSuffix", t_byte.data());
 		fill_entry = 0;
 	}
 
@@ -1200,35 +1200,35 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	temp = addressee.givenName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "givenName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "givenName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Additional Name */
 	temp = addressee.additionalName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "additionalName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "additionalName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Family Name */
 	temp = addressee.familyName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "familyName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "familyName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Prefix */
 	temp = addressee.prefix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "namePrefix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "namePrefix", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Suffix */
 	temp = addressee.suffix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0,1, "nameSuffix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "nameSuffix", t_byte.data());
 		fill_entry = 0;
 	}
 
@@ -1360,6 +1360,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		if (temp2.length())
 			ok = 1;
 	}
+
 	if (ok) {
 		gcal_contact_delete_im(contact);
 		foreach (temp, listImTypes) {
