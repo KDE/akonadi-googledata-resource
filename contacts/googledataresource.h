@@ -55,6 +55,8 @@ protected:
 
 	int authenticationError(const char *msgError, int signal);
 
+	QString extractStructuredField(gcal_structured_subvalues_t structured_entry, char *fieldName, int index1 = 0, int index2 = 1);
+
 	/* Contact array */
 	struct gcal_contact_array all_contacts;
 	/* Contact itens update lists */

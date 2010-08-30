@@ -54,6 +54,13 @@ extern "C" {
 
 using namespace Akonadi;
 
+QString GoogleContactsResource::extractStructuredField(gcal_structured_subvalues_t structured_entry, char *fieldName, int index1, int index2)
+{
+    QString res;
+    res = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, index1, index2,"givenName"));
+    return res;
+}
+
 GoogleContactsResource::GoogleContactsResource( const QString &id )
 	: ResourceBase(id)
 {
