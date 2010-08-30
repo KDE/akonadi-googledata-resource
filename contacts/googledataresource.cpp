@@ -317,38 +317,38 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 				temp_address_type = temp_address_type | KABC::Address::Pref;
 			address.setType(temp_address_type);
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"street"));
+                        temp = extractStructuredField(structured_entry, "street", j, structured_entry_count);
 			address.setStreet(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"pobox"));
+                        temp = extractStructuredField(structured_entry, "pobox", j, structured_entry_count);
 			address.setPostOfficeBox(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"city"));
+                        temp = extractStructuredField(structured_entry, "city", j, structured_entry_count);
 			address.setLocality(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"region"));
+                        temp = extractStructuredField(structured_entry, "region", j, structured_entry_count);
 			address.setRegion(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"postcode"));
+                        temp = extractStructuredField(structured_entry, "postcode", j, structured_entry_count);
 			address.setPostalCode(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"country"));
+                        temp = extractStructuredField(structured_entry, "country", j, structured_entry_count);
 			address.setCountry(temp);
 			if (temp.length())
 				fill_entry = 0;
 
 			if (fill_entry) {
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"formattedAddress"));
+				temp = extractStructuredField(structured_entry, "formattedAddress", j, structured_entry_count);
 				address.setStreet(temp);
 			}
 			addressee.insertAddress(address);
