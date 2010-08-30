@@ -221,6 +221,7 @@ void GCalResource::aboutToQuit()
 {
 	// TODO: any cleanup you need to do while there is still an active
 	// event loop. The resource will terminate after this method returns
+    gcal_final_cleanup();
 }
 
 void GCalResource::doSetOnline(bool online)

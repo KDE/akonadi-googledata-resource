@@ -440,6 +440,7 @@ void GoogleContactsResource::aboutToQuit()
 {
 	// TODO: any cleanup you need to do while there is still an active
 	// event loop. The resource will terminate after this method returns
+    gcal_final_cleanup();
 }
 
 void GoogleContactsResource::doSetOnline(bool online)
@@ -524,7 +525,6 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			/* structured name */
 			structured_entry = gcal_contact_get_structured_name(contact);
 			fill_entry = 1;
-			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
                         temp = extractStructuredField(structured_entry, "givenName");
 			addressee.setGivenName(temp);
 			if (temp.length())
