@@ -233,8 +233,11 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 
 		KABC::Addressee addressee;
 		KABC::Picture photo;
+		KABC::Address::Type temp_address_type;
 		QImage image;
 		QString temp;
+		QStringList listImTypes;
+		listImTypes << "AIM" << "MSN" << "YAHOO" << "SKYPE" << "ICQ" << "JABBER" << "QQ";
 		QDateTime tempDate;
 		KUrl tempUrl;
 		gcal_structured_subvalues_t structured_entry;
@@ -296,7 +299,10 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		for (j = 0; j < structured_entry_count; j++) {
 			KABC::Address address;
 			fill_entry = 1;
-			address.setType(googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count)));
+			temp_address_type = googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count));
+			if(j == gcal_contact_get_pref_structured_address(contact))
+				temp_address_type = temp_address_type | KABC::Address::Pref;
+			address.setType(temp_address_type);
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"street"));
 			address.setStreet(temp);
 			if(temp.length())
@@ -337,12 +343,26 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 			number.setType(googlePhoneLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
 			addressee.insertPhoneNumber(number);
 		}
+		/* im */
+		for (j = 0; j < gcal_contact_get_im_count(contact); j++) {
+			temp = QString::fromUtf8(gcal_contact_get_im_protocol(contact, j));
+			if(listImTypes.contains(temp)) {
+				if( temp == QString::fromUtf8("JABBER") )
+					temp = QString::fromUtf8("xmpp");
+				addressee.insertCustom(QString::fromUtf8("messaging/").append(temp.toLower()),
+						QString::fromUtf8("All"),
+						QString::fromUtf8(gcal_contact_get_im_address(contact, j)));
+			}
+		}
 		/* profission */
 		temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 		addressee.setTitle(temp);
 		/* company */
 		temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 		addressee.setOrganization(temp);
+		/* occupation/profession */
+		temp = QString::fromUtf8(gcal_contact_get_occupation(contact));
+		addressee.insertCustom("KADDRESSBOOK","X-Profession",temp);
 		/* Google group membership */
 		addressee.insertCustom(QString::fromUtf8("Google"),
 					QString::fromUtf8("groupMembership_nr"),
@@ -434,9 +454,12 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 	gcal_contact_t contact;
 	QString newerTimestamp;
 	QString temp;
+	QStringList listImTypes;
+	listImTypes << "AIM" << "MSN" << "YAHOO" << "SKYPE" << "ICQ" << "JABBER" << "QQ";
 	QDateTime tempDate;
 	KUrl tempUrl;
 	KABC::Picture photo;
+	KABC::Address::Type temp_address_type;
 	QImage image;
 	gcal_structured_subvalues_t structured_entry;
 	int structured_entry_count;
@@ -533,7 +556,10 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			for (j = 0; j < structured_entry_count; j++) {
 				KABC::Address address;
 				fill_entry = 1;
-				address.setType(googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count)));
+				temp_address_type = googleAddressLabelToAkonadiType(gcal_contact_get_structured_address_type(contact,j,structured_entry_count));
+				if(j == gcal_contact_get_pref_structured_address(contact))
+					temp_address_type = temp_address_type | KABC::Address::Pref;
+				address.setType(temp_address_type);
 				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,j,structured_entry_count,"street"));
 				address.setStreet(temp);
 				if(temp.length())
@@ -574,12 +600,26 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 				number.setType(googlePhoneLabelToAkonadiType(gcal_contact_get_phone_number_type(contact, j)));
 				addressee.insertPhoneNumber(number);
 			}
+			/* im */
+			for (j = 0; j < gcal_contact_get_im_count(contact); j++) {
+				temp = QString::fromUtf8(gcal_contact_get_im_protocol(contact, j));
+				if(listImTypes.contains(temp)) {
+					if( temp == QString::fromUtf8("JABBER") )
+						temp = QString::fromUtf8("xmpp");
+					addressee.insertCustom(QString::fromUtf8("messaging/").append(temp.toLower()),
+							QString::fromUtf8("All"),
+							QString::fromUtf8(gcal_contact_get_im_address(contact, j)));
+				}
+			}
 			/* profission */
 			temp = QString::fromUtf8(gcal_contact_get_profission(contact));
 			addressee.setTitle(temp);
 			/* company */
 			temp = QString::fromUtf8(gcal_contact_get_organization(contact));
 			addressee.setOrganization(temp);
+			/* occupation/profession */
+			temp = QString::fromUtf8(gcal_contact_get_occupation(contact));
+			addressee.insertCustom("KADDRESSBOOK","X-Profession",temp);
 			/* Google group membership */
 			addressee.insertCustom(QString::fromUtf8("Google"),
 						QString::fromUtf8("groupMembership_nr"),
@@ -722,18 +762,29 @@ gcal_address_type akonadiAddressTypeToGoogleLabel(KABC::Address::Type type) {
 		case KABC::Address::Work:
 			return A_WORK;
 			break;
-		case KABC::Address::Dom +
-		  KABC::Address::Intl +
-		  KABC::Address::Postal +
-		  KABC::Address::Parcel +
-		  KABC::Address::Pref:
-			return A_OTHER;
-			break;
 		default:
 			return A_OTHER;
 	}
 }
 
+gcal_address_type prefAkonadiAddressTypeToGoogleLabel(KABC::Address::Type type) {
+	switch ( type ) {
+		case KABC::Address::Home + KABC::Address::Pref:
+			return A_HOME;
+			break;
+		case KABC::Address::Work + KABC::Address::Pref:
+			return A_WORK;
+			break;
+		case KABC::Address::Dom + KABC::Address::Pref:
+		case KABC::Address::Intl + KABC::Address::Pref:
+		case KABC::Address::Postal + KABC::Address::Pref:
+		case KABC::Address::Parcel + KABC::Address::Pref:
+			return A_OTHER;
+			break;
+		default:
+			return A_INVALID;
+	}
+}
 
 void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collection &collection )
 {
@@ -745,12 +796,15 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	gcal_contact_t contact;
 	gcal_structured_subvalues_t structured_entry;
 	int structured_entry_nr, structured_entry_count;
-	QString temp;
+	gcal_address_type temp_address_type;
+	QString temp,temp2;
 	QDateTime tempDate;
 	KUrl tempUrl;
 	QStringList listEmail;
+	QStringList listImTypes;
+	listImTypes << "aim" << "msn" << "yahoo" << "skype" << "icq" << "xmpp" << "qq";
 	QStringList::const_iterator email;
-	QByteArray t_byte;
+	QByteArray t_byte,t_byte2;
 	QList<KABC::Address> listAddress;
 	QList<KABC::PhoneNumber> listNumber;
 	KABC::Picture photo;
@@ -825,12 +879,6 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		t_byte = temp.toUtf8();
 		gcal_contact_set_title(contact, t_byte.data());
 	}
-// 	/* All the Name Parts */
-// 	temp = addressee.realName();
-// 	if (temp.length()) {
-// 		t_byte = temp.toUtf8();
-// 		gcal_contact_set_structured_entry(structured_entry,0,1, "fullName", t_byte.data());
-// 	}
 
 	/* nickname */
 	temp = addressee.nickName();
@@ -862,7 +910,11 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		structured_entry = gcal_contact_get_structured_address(contact);
 		gcal_contact_delete_structured_entry(structured_entry,gcal_contact_get_structured_address_count_obj(contact),gcal_contact_get_structured_address_type_obj(contact));
 		foreach (const KABC::Address &address, listAddress) {
-			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,akonadiAddressTypeToGoogleLabel(address.type()));
+			if((temp_address_type=prefAkonadiAddressTypeToGoogleLabel(address.type())) != A_INVALID)
+				gcal_contact_set_pref_structured_address(contact,gcal_contact_get_structured_address_count(contact));
+			else
+				temp_address_type=akonadiAddressTypeToGoogleLabel(address.type());
+			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,temp_address_type);
 			structured_entry_count = gcal_contact_get_structured_address_count(contact);
 			fill_entry = 1;
 			/* Street */
@@ -936,6 +988,26 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 		}
 	}
 
+	ok = 0;
+	foreach (temp, listImTypes) {
+		temp2 = addressee.custom(QString::fromUtf8("messaging/").append(temp),"All");
+		if (temp2.length())
+			ok = 1;
+	}
+	if(ok) {
+		gcal_contact_delete_im(contact);
+		foreach (temp, listImTypes) {
+			temp2 = addressee.custom(QString::fromUtf8("messaging/").append(temp),"All");
+			if (temp2.length()) {
+				if( temp == QString::fromUtf8("xmpp") )
+					temp = QString::fromUtf8("jabber");
+				t_byte = temp.toUpper().toUtf8();
+				t_byte2 = temp2.toUtf8();
+				gcal_contact_add_im(contact,t_byte.data(),t_byte2.data(),I_OTHER,0);
+			}
+		}
+	}
+
 	temp = addressee.title();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
@@ -946,6 +1018,12 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.custom("KADDRESSBOOK","X-Profession");
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_occupation(contact, t_byte.data());
 	}
 
 	temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_nr"));
@@ -1035,14 +1113,17 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	KABC::Addressee addressee;
 	KABC::Address address;
 	QList<KABC::Address> listAddress;
+	QStringList listImTypes;
+	listImTypes << "aim" << "msn" << "yahoo" << "skype" << "icq" << "xmpp" << "qq";
 	QStringList listEmail;
 	QStringList::const_iterator email;
 	QList<KABC::PhoneNumber> listNumber;
 	gcal_contact_t contact;
 	gcal_structured_subvalues_t structured_entry;
 	int structured_entry_nr, structured_entry_count;
-	QByteArray t_byte;
-	QString temp;
+	gcal_address_type temp_address_type;
+	QByteArray t_byte,t_byte2;
+	QString temp,temp2;
 	QDateTime tempDate;
 	KUrl tempUrl;
 	KABC::Picture photo;
@@ -1161,7 +1242,11 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		structured_entry = gcal_contact_get_structured_address(contact);
 		gcal_contact_delete_structured_entry(structured_entry,gcal_contact_get_structured_address_count_obj(contact),gcal_contact_get_structured_address_type_obj(contact));
 		foreach (const KABC::Address &address, listAddress) {
-			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,akonadiAddressTypeToGoogleLabel(address.type()));
+			if((temp_address_type=prefAkonadiAddressTypeToGoogleLabel(address.type())) != A_INVALID)
+				gcal_contact_set_pref_structured_address(contact,gcal_contact_get_structured_address_count(contact));
+			else
+				temp_address_type=akonadiAddressTypeToGoogleLabel(address.type());
+			structured_entry_nr = gcal_contact_set_structured_address_nr(contact,temp_address_type);
 			structured_entry_count = gcal_contact_get_structured_address_count(contact);
 			fill_entry = 1;
 			/* Street */
@@ -1235,6 +1320,26 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 		}
 	}
 
+	ok = 0;
+	foreach (temp, listImTypes) {
+		temp2 = addressee.custom(QString::fromUtf8("messaging/").append(temp),"All");
+		if (temp2.length())
+			ok = 1;
+	}
+	if(ok) {
+		gcal_contact_delete_im(contact);
+		foreach (temp, listImTypes) {
+			temp2 = addressee.custom(QString::fromUtf8("messaging/").append(temp),"All");
+			if (temp2.length()) {
+				if( temp == QString::fromUtf8("xmpp") )
+					temp = QString::fromUtf8("jabber");
+				t_byte = temp.toUpper().toUtf8();
+				t_byte2 = temp2.toUtf8();
+				gcal_contact_add_im(contact,t_byte.data(),t_byte2.data(),I_OTHER,0);
+			}
+		}
+	}
+
 	temp = addressee.title();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
@@ -1245,6 +1350,12 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
 		gcal_contact_set_organization(contact, t_byte.data());
+	}
+
+	temp = addressee.custom("KADDRESSBOOK","X-Profession");
+	if (temp.length()) {
+		t_byte = temp.toUtf8();
+		gcal_contact_set_occupation(contact, t_byte.data());
 	}
 
 	temp = addressee.custom(QString::fromUtf8("Google"), QString::fromUtf8("groupMembership_nr"));
