@@ -523,35 +523,42 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			/* structured name */
 			structured_entry = gcal_contact_get_structured_name(contact);
 			fill_entry = 1;
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
+			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
+                        temp = extractStructuredField(structured_entry, "givenName");
 			addressee.setGivenName(temp);
 			if (temp.length())
 				fill_entry = 0;
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+                        temp = extractStructuredField(structured_entry, "additionalName");
 			addressee.setAdditionalName(temp);
 			if (temp.length())
 				fill_entry = 0;
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+                        temp = extractStructuredField(structured_entry, "familyName");
 			addressee.setFamilyName(temp);
 			if (temp.length())
 				fill_entry = 0;
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+
+			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+                        temp = extractStructuredField(structured_entry, "namePrefix");
 			addressee.setPrefix(temp);
 			if (temp.length())
 				fill_entry = 0;
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+
+			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+                        temp = extractStructuredField(structured_entry, "nameSuffix");
 			addressee.setSuffix(temp);
 			if (temp.length())
 				fill_entry = 0;
-			if (fill_entry)
-			{
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+			if (fill_entry) {
+                            //temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+				temp = extractStructuredField(structured_entry, "fullName");
 				addressee.setNameFromString(temp);
 				if (temp.length())
 					fill_entry = 0;
 			}
-			if (fill_entry)
-			{
+
+			if (fill_entry) {
 				/* name */
 				temp = QString::fromUtf8(gcal_contact_get_title(contact));
 				addressee.setNameFromString(temp);
@@ -579,33 +586,38 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 				if (j == gcal_contact_get_pref_structured_address(contact))
 					temp_address_type = temp_address_type | KABC::Address::Pref;
 				address.setType(temp_address_type);
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"street"));
+
+                                temp = extractStructuredField(structured_entry, "street", j, structured_entry_count);
 				address.setStreet(temp);
 				if (temp.length())
 					fill_entry = 0;
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"pobox"));
+
+                                temp = extractStructuredField(structured_entry, "pobox", j, structured_entry_count);
 				address.setPostOfficeBox(temp);
 				if (temp.length())
 					fill_entry = 0;
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"city"));
+
+                                temp = extractStructuredField(structured_entry, "city", j, structured_entry_count);
 				address.setLocality(temp);
 				if (temp.length())
 					fill_entry = 0;
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"region"));
+
+                                temp = extractStructuredField(structured_entry, "region", j, structured_entry_count);
 				address.setRegion(temp);
 				if (temp.length())
 					fill_entry = 0;
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"postcode"));
+
+                                temp = extractStructuredField(structured_entry, "postcode", j, structured_entry_count);
 				address.setPostalCode(temp);
 				if (temp.length())
 					fill_entry = 0;
-				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"country"));
+
+                                temp = extractStructuredField(structured_entry, "country", j, structured_entry_count);
 				address.setCountry(temp);
 				if (temp.length())
 					fill_entry = 0;
-				if (fill_entry)
-				{
-					temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"formattedAddress"));
+				if (fill_entry) {
+                                        temp = extractStructuredField(structured_entry, "formattedAddress", j, structured_entry_count);
 					address.setStreet(temp);
 				}
 				addressee.insertAddress(address);
