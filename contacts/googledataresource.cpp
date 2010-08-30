@@ -529,30 +529,30 @@ int GoogleContactsResource::getUpdated(char *timestamp)
 			addressee.setGivenName(temp);
 			if (temp.length())
 				fill_entry = 0;
-			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+
                         temp = extractStructuredField(structured_entry, "additionalName");
 			addressee.setAdditionalName(temp);
 			if (temp.length())
 				fill_entry = 0;
-			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+
                         temp = extractStructuredField(structured_entry, "familyName");
 			addressee.setFamilyName(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+
                         temp = extractStructuredField(structured_entry, "namePrefix");
 			addressee.setPrefix(temp);
 			if (temp.length())
 				fill_entry = 0;
 
-			//temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+
                         temp = extractStructuredField(structured_entry, "nameSuffix");
 			addressee.setSuffix(temp);
 			if (temp.length())
 				fill_entry = 0;
 			if (fill_entry) {
-                            //temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+
 				temp = extractStructuredField(structured_entry, "fullName");
 				addressee.setNameFromString(temp);
 				if (temp.length())
@@ -875,35 +875,35 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 	temp = addressee.givenName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0, 1, "givenName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "givenName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Additional Name */
 	temp = addressee.additionalName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0, 1, "additionalName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "additionalName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Family Name */
 	temp = addressee.familyName();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0, 1, "familyName", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "familyName", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Prefix */
 	temp = addressee.prefix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0, 1, "namePrefix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "namePrefix", t_byte.data());
 		fill_entry = 0;
 	}
 	/* Suffix */
 	temp = addressee.suffix();
 	if (temp.length()) {
 		t_byte = temp.toUtf8();
-		gcal_contact_set_structured_entry(structured_entry,0, 1, "nameSuffix", t_byte.data());
+		gcal_contact_set_structured_entry(structured_entry, 0, 1, "nameSuffix", t_byte.data());
 		fill_entry = 0;
 	}
 
@@ -1038,7 +1038,7 @@ void GoogleContactsResource::itemAdded( const Akonadi::Item &item, const Akonadi
 					temp = QString::fromUtf8("jabber");
 				t_byte = temp.toUpper().toUtf8();
 				t_byte2 = temp2.toUtf8();
-				gcal_contact_add_im(contact,t_byte.data(),t_byte2.data(),I_OTHER,0);
+				gcal_contact_add_im(contact, t_byte.data(), t_byte2.data(), I_OTHER, 0);
 			}
 		}
 	}
@@ -1371,7 +1371,7 @@ void GoogleContactsResource::itemChanged( const Akonadi::Item &item, const QSet<
 					temp = QString::fromUtf8("jabber");
 				t_byte = temp.toUpper().toUtf8();
 				t_byte2 = temp2.toUtf8();
-				gcal_contact_add_im(contact,t_byte.data(),t_byte2.data(),I_OTHER,0);
+				gcal_contact_add_im(contact, t_byte.data(), t_byte2.data(),I_OTHER, 0);
 			}
 		}
 	}
