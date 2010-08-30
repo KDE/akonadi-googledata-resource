@@ -28,8 +28,8 @@ class QString;
 typedef long unsigned int WId;
 
 extern "C" {
-#include <gcalendar.h>
-#include <gcontact.h>
+#include <libgcal/gcalendar.h>
+#include <libgcal/gcontact.h>
 }
 
 class GoogleData {

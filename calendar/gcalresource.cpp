@@ -46,8 +46,8 @@
 typedef boost::shared_ptr<KCal::Incidence> IncidencePtr;
 
 extern "C" {
-#include <gcalendar.h>
-#include <gcal_status.h>
+#include <libgcal/gcalendar.h>
+#include <libgcal/gcal_status.h>
 }
 
 using namespace Akonadi;
