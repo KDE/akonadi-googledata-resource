@@ -57,7 +57,7 @@ using namespace Akonadi;
 QString GoogleContactsResource::extractStructuredField(gcal_structured_subvalues_t structured_entry, char *fieldName, int index1, int index2)
 {
     QString res;
-    res = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, index1, index2,"givenName"));
+    res = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, index1, index2, fieldName));
     return res;
 }
 
@@ -255,33 +255,33 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 		/* structured name */
 		structured_entry = gcal_contact_get_structured_name(contact);
 		fill_entry = 1;
-		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"givenName"));
+		temp = extractStructuredField(structured_entry, "givenName");
 		addressee.setGivenName(temp);
 		if (temp.length())
 			fill_entry = 0;
 
-		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"additionalName"));
+		temp = extractStructuredField(structured_entry, "additionalName");
 		addressee.setAdditionalName(temp);
 		if (temp.length())
 			fill_entry = 0;
 
-		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"familyName"));
+		temp = extractStructuredField(structured_entry, "familyName");
 		addressee.setFamilyName(temp);
 		if (temp.length())
 			fill_entry = 0;
 
-		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"namePrefix"));
+		temp = extractStructuredField(structured_entry, "namePrefix");
 		addressee.setPrefix(temp);
 		if (temp.length())
 			fill_entry = 0;
 
-		temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"nameSuffix"));
+		temp = extractStructuredField(structured_entry, "nameSuffix");
 		addressee.setSuffix(temp);
 		if (temp.length())
 			fill_entry = 0;
 
 		if (fill_entry) {
-			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry,0,1,"fullName"));
+			temp = extractStructuredField(structured_entry, "fullName");
 			addressee.setNameFromString(temp);
 			if (temp.length())
 				fill_entry = 0;
@@ -316,32 +316,38 @@ void GoogleContactsResource::retrieveItems( const Akonadi::Collection &collectio
 			if (j == gcal_contact_get_pref_structured_address(contact))
 				temp_address_type = temp_address_type | KABC::Address::Pref;
 			address.setType(temp_address_type);
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"street"));
 			address.setStreet(temp);
 			if (temp.length())
 				fill_entry = 0;
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"pobox"));
 			address.setPostOfficeBox(temp);
 			if (temp.length())
 				fill_entry = 0;
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"city"));
 			address.setLocality(temp);
 			if (temp.length())
 				fill_entry = 0;
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"region"));
 			address.setRegion(temp);
 			if (temp.length())
 				fill_entry = 0;
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"postcode"));
 			address.setPostalCode(temp);
 			if (temp.length())
 				fill_entry = 0;
+
 			temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"country"));
 			address.setCountry(temp);
 			if (temp.length())
 				fill_entry = 0;
-			if (fill_entry)
-			{
+
+			if (fill_entry) {
 				temp = QString::fromUtf8(gcal_contact_get_structured_entry(structured_entry, j, structured_entry_count,"formattedAddress"));
 				address.setStreet(temp);
 			}
