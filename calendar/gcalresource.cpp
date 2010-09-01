@@ -234,6 +234,8 @@ void GCalResource::doSetOnline(bool online)
 	WId window = winIdForDialogs();
 
 	if (online)
+		//FIXME: we need to save the user name in config file
+		//since it is part now of the keyname
 		if (!retrieveFromWallet(user, password, window,
                                         QString("gcal")))
 			if (!(result = authenticate(user, password))) {

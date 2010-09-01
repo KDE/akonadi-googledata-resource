@@ -453,6 +453,8 @@ void GoogleContactsResource::doSetOnline(bool online)
 	WId window = winIdForDialogs();
 
 	if (online)
+		//FIXME: we need to save the user name in config file
+		//since it is part now of the keyname
 		if (!retrieveFromWallet(user, password, window,
                                         QString("gcont")))
 			if (!(result = authenticate(user, password))) {
