@@ -45,10 +45,10 @@ GoogleData::~GoogleData()
 
 int GoogleData::saveToWallet(const QString &user, const QString &pass,
 			     const WId &window, const QString &folder,
-			     const QString &awallet)
+			     const QString &awallet,
+                             const QString &keyname)
 {
 	int result = -1;
-	const QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(awallet, window);
 
@@ -62,7 +62,7 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 		QMap<QString, QString> data;
 		data["login"] = user;
 		data["password"] = pass;
-		wallet->writeMap(gaccount, data);
+		wallet->writeMap(keyname + user, data);
 		wallet->sync();
 		result = 0;
 	}
@@ -73,10 +73,10 @@ int GoogleData::saveToWallet(const QString &user, const QString &pass,
 int GoogleData::retrieveFromWallet(QString &user,
 				   QString &pass,
 				   const WId &window,
-				   const QString &folder)
+				   const QString &folder,
+				   const QString &keyname)
 {
 	int result = -1;
-	const QString gaccount("googleAccount");
 	if (wallet == 0)
 		wallet = Wallet::openWallet(Wallet::NetworkWallet(), window);
 
@@ -88,7 +88,7 @@ int GoogleData::retrieveFromWallet(QString &user,
 			return result;
 		wallet->setFolder(folder);
 		QMap<QString, QString> data;
-		if (!wallet->readMap(gaccount, data)) {
+		if (!wallet->readMap(keyname + user, data)) {
 			user = data["login"];
 			pass = data["password"];
 			result = 0;

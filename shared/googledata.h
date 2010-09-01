@@ -43,12 +43,14 @@ protected:
 	int saveToWallet(const QString &user, const QString &pass,
 			 const WId &window,
 			 const QString &folder = "akonadigoogle",
-			 const QString &awallet = "kdewallet");
+			 const QString &awallet = "kdewallet",
+			 const QString &keyname = "googleAccount");
 
 
 	int retrieveFromWallet(QString &user, QString &pass,
 			       const WId &window,
-			       const QString &folder = "akonadigoogle");
+			       const QString &folder = "akonadigoogle",
+			       const QString &keyname = "googleAccount");
 
 	int authenticate(const QString &user, const QString &password);
 

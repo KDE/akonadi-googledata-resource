@@ -453,7 +453,8 @@ void GoogleContactsResource::doSetOnline(bool online)
 	WId window = winIdForDialogs();
 
 	if (online)
-		if (!retrieveFromWallet(user, password, window))
+		if (!retrieveFromWallet(user, password, window,
+                                        QString("gcont")))
 			if (!(result = authenticate(user, password))) {
 				ResourceBase::doSetOnline(online);
 				synchronize();
@@ -749,7 +750,7 @@ void GoogleContactsResource::configure( WId windowId )
 
 	int walletRes = saveToWallet(dlgConf->eAccount->text(),
 				     dlgConf->ePass->text(),
-				     windowId);
+				     windowId, QString("gcont"));
 	if (walletRes)
 		kError() << "Cannot save user info: is user using kwallet?.";
 

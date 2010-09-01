@@ -234,7 +234,8 @@ void GCalResource::doSetOnline(bool online)
 	WId window = winIdForDialogs();
 
 	if (online)
-		if (!retrieveFromWallet(user, password, window))
+		if (!retrieveFromWallet(user, password, window,
+                                        QString("gcal")))
 			if (!(result = authenticate(user, password))) {
 				authenticated = true;
 				ResourceBase::doSetOnline(online);
@@ -426,8 +427,8 @@ void GCalResource::configure( WId windowId )
 	}
 
 	const int walletRes = saveToWallet(dlgConf->eAccount->text(),
-				     dlgConf->ePass->text(),
-				     windowId);
+                                           dlgConf->ePass->text(),
+                                           windowId, QString("gcal"));
 	if (walletRes)
 		kError() << "Cannot save user info: is user using kwallet?.";
 
