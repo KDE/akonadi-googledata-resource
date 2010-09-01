@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="lbAccount">
        <property name="text">
-        <string>Your Google mail username (@gmail.com will be appended)</string>
+        <string>Your Google mail username (or user@whatever.domain.com)</string>
        </property>
        <property name="buddy">
         <cstring>eAccount</cstring>
