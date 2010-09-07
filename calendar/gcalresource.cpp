@@ -89,6 +89,16 @@ void GCalResource::saveTimestamp(QString &timestamp)
 	Settings::self()->writeConfig();
 }
 
+void GCalResource::retrieveUsername(QString &username)
+{
+	username = Settings::self()->username();
+}
+
+void GCalResource::saveUsername(QString &username)
+{
+	Settings::self()->setUsername(username);
+	Settings::self()->writeConfig();
+}
 
 void GCalResource::retrieveCollections()
 {
@@ -232,17 +242,19 @@ void GCalResource::doSetOnline(bool online)
 	QString password;
 	int result = 0;
 	WId window = winIdForDialogs();
+        retrieveUsername(user);
 
-	if (online)
-		//FIXME: we need to save the user name in config file
-		//since it is part now of the keyname
-		if (!retrieveFromWallet(user, password, window,
+	if (online) {
+            if (!user.isEmpty()) {
+                if (!retrieveFromWallet(user, password, window,
                                         QString("gcal")))
-			if (!(result = authenticate(user, password))) {
-				authenticated = true;
-				ResourceBase::doSetOnline(online);
-				synchronize();
-			}
+                    if (!(result = authenticate(user, password))) {
+                        authenticated = true;
+                        ResourceBase::doSetOnline(online);
+                        synchronize();
+                    }
+            }
+        }
 
 	if (result) {
 		kError() << "Failed setting online.";
@@ -431,6 +443,9 @@ void GCalResource::configure( WId windowId )
 	const int walletRes = saveToWallet(dlgConf->eAccount->text(),
                                            dlgConf->ePass->text(),
                                            windowId, QString("gcal"));
+        QString user(dlgConf->eAccount->text());
+        saveUsername(user);
+
 	if (walletRes)
 		kError() << "Cannot save user info: is user using kwallet?.";
 

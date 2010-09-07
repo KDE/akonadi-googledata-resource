@@ -51,6 +51,9 @@ protected:
 	void retrieveTimestamp(QString &timestamp);
 	void saveTimestamp(QString &timestamp);
 
+	void retrieveUsername(QString &username);
+	void saveUsername(QString &username);
+
 	int getUpdated(char *timestamp);
 
 	int authenticationError(const char *msgError, int signal);

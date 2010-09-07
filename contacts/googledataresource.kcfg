@@ -9,6 +9,10 @@
       <label>A timestamp in RFC 3339 format (e.g. 2008-09-10T21:00:00Z.)</label>
       <default></default>
     </entry>
+    <entry name="username" type="Path">
+      <label>The username login (e.g. john.doe@gmail.com)</label>
+      <default></default>
+    </entry>
     <entry name="ReadOnly" type="Bool">
       <label>Do not change the actual backend data.</label>
       <default>false</default>

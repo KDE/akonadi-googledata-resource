@@ -101,6 +101,16 @@ void GoogleContactsResource::saveTimestamp(QString &timestamp)
  	Settings::self()->writeConfig();
 }
 
+void GoogleContactsResource::retrieveUsername(QString &username)
+{
+	username = Settings::self()->username();
+}
+
+void GoogleContactsResource::saveUsername(QString &username)
+{
+	Settings::self()->setUsername(username);
+	Settings::self()->writeConfig();
+}
 
 void GoogleContactsResource::retrieveCollections()
 {
@@ -451,16 +461,19 @@ void GoogleContactsResource::doSetOnline(bool online)
 	QString password;
 	int result = 0;
 	WId window = winIdForDialogs();
+        retrieveUsername(user);
 
-	if (online)
-		//FIXME: we need to save the user name in config file
-		//since it is part now of the keyname
+	if (online) {
+            if (!user.isEmpty()) {
+
 		if (!retrieveFromWallet(user, password, window,
                                         QString("gcont")))
-			if (!(result = authenticate(user, password))) {
-				ResourceBase::doSetOnline(online);
-				synchronize();
-			}
+                    if (!(result = authenticate(user, password))) {
+                        ResourceBase::doSetOnline(online);
+                        synchronize();
+                    }
+            }
+        }
 
 	if (result) {
 		kError() << "Failed setting online.";
@@ -753,6 +766,9 @@ void GoogleContactsResource::configure( WId windowId )
 	int walletRes = saveToWallet(dlgConf->eAccount->text(),
 				     dlgConf->ePass->text(),
 				     windowId, QString("gcont"));
+        QString user(dlgConf->eAccount->text());
+        saveUsername(user);
+
 	if (walletRes)
 		kError() << "Cannot save user info: is user using kwallet?.";
 
