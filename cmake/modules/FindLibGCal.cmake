@@ -13,8 +13,7 @@ find_path(LIBGCAL_INCLUDE_DIR
           NAMES gcal.h libgcal/gcal.h
          )
 
-set(LIBGCAL_NAMES ${LIBGCAL_NAMES} gcal)
-find_library(LIBGCAL_LIBRARY NAMES ${LIBGCAL_NAMES})
+find_library(LIBGCAL_LIBRARY gcal)
 
 # handle the QUIETLY and REQUIRED arguments and set LIBGCAL_FOUND to TRUE if
 # all listed variables are TRUE
