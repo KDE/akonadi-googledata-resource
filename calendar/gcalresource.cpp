@@ -60,6 +60,7 @@ GCalResource::GCalResource( const QString &id )
 		QLatin1String( "/Settings" ), Settings::self(),
 		QDBusConnection::ExportAdaptors );
 
+	changeRecorder()->fetchCollection( true );
 	changeRecorder()->itemFetchScope().fetchFullPayload();
 
 	if (!(gcal = gcal_new(GCALENDAR)))
