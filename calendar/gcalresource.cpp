@@ -203,12 +203,16 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		temp = gcal_event_get_end(event);
 		end = end.fromString(temp, KDateTime::ISODate);
 		kevent->setDtStart(start);
+		
+		if (end.isDateOnly()) {
+			// KCal::Event::dtEnd() is inclusive, not exclusive.
+			// ( When serializing back to ICal, +1 is added internaly, to respect ical rfc )
+			end = end.addDays(-1);
+		}
 		kevent->setDtEnd(end);
-
+		
 		qDebug() << "start: " << start.dateTime()
 			 << "\tend: " << end.dateTime();
-
-
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_event_get_url(event));
 		item.setRemoteId(urlEtag.url());
@@ -379,8 +383,15 @@ int GCalResource::getUpdated(char *timestamp)
 			temp = gcal_event_get_end(event);
 			end = end.fromString(temp, KDateTime::ISODate);
 			kevent->setDtStart(start);
-			kevent->setDtEnd(end);
+			
+			if (end.isDateOnly()) {
+				// KCal::Event::dtEnd() is inclusive, not exclusive.
+				// ( When serializing back to ICal, +1 is added internaly, to respect ical rfc )			  
+				end = end.addDays(-1);
+			}
 
+			kevent->setDtEnd(end);
+			
 			url = gcal_event_get_url(event);
 			item.setRemoteId(url.url());
 			item.setPayload(IncidencePtr(kevent));
