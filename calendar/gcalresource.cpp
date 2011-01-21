@@ -538,6 +538,12 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	gcal_event_set_start(event, t_byte.data());
 
 	time = kevent->dtEnd();
+	
+	if (time.isDateOnly()) {
+		// KCal::Event::dtEnd() is inclusive, not exclusive.
+		time = time.addDays(1);
+	}
+	
 	temp = time.toString(KDateTime::ISODate);
 	t_byte = temp.toUtf8();
 	gcal_event_set_end(event, t_byte.data());
@@ -638,6 +644,12 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	gcal_event_set_start(event, t_byte.data());
 
 	time = kevent->dtEnd();
+
+	if (time.isDateOnly()) {
+		// KCal::Event::dtEnd() is inclusive, not exclusive.
+		time = time.addDays(1);
+	}
+
 	temp = time.toString(KDateTime::ISODate);
 	t_byte = temp.toUtf8();
 	gcal_event_set_end(event, t_byte.data());
