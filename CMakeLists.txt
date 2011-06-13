@@ -16,7 +16,7 @@ macro_log_feature(Boost_FOUND "Boost" "Boost C++ Libraries" "http://www.boost.or
 
 #libgcal implements google data protocols 2.0
 find_package(LibGCal)
-macro_log_feature(LIBGCAL_FOUND "libgcal" "C library that allows communication with Google calendar and contacts" "http://code.google.com/p/libgcal/" TRUE "0.9.4" "Required to build the Googledata Akonadi resource.")
+macro_log_feature(LIBGCAL_FOUND "libgcal" "C library that allows communication with Google calendar and contacts" "http://code.google.com/p/libgcal/" TRUE "0.9.7" "Required to build the Googledata Akonadi resource.")
 
 
 include_directories( ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} )

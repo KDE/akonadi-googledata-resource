@@ -34,8 +34,8 @@ http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html#Cre
 
 == Dependencies ==
 
-It requires libgcal 0.9.4 (hosted accounts, fast-sync workaround for
-gcalendar and support for multiple email addresses and telephones).
+It requires libgcal 0.9.7 (hosted accounts, fast-sync workaround for
+gcalendar, support for multiple email addresses and telephones, recurrent events).
 
 Some linux distributions already include the newer version of libgcal.
 
@@ -50,8 +50,6 @@ ca-certificates to do authentication with google) to compile libgcal.
 In ubuntu, the packages are: libcurl4-openssl-dev, libxml2-dev, ca-certificates.
 
  - checkout the code:
- $git clone git://repo.or.cz/libgcal.git
- or
  $git clone git://gitorious.org/libgcal/libgcal.git
 
  - configure and compile, you can use either autotools or cmake based
