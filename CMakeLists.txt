@@ -20,6 +20,8 @@ macro_log_feature(LIBGCAL_FOUND "libgcal" "C library that allows communication w
 
 
 include_directories( ${KDE4_INCLUDES} ${KDEPIMLIBS_INCLUDE_DIR} ${LIBGCAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} )
+add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_USE_FAST_OPERATOR_PLUS)
+
 
 find_program(XSLTPROC_EXECUTABLE xsltproc REQUIRED)
 macro_log_feature(XSLTPROC_EXECUTABLE "xsltproc" "The command line XSLT processor from libxslt" "http://xmlsoft.org/XSLT/" TRUE "" "Needed for building Akonadi resources.")
