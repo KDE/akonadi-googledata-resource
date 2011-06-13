@@ -20,7 +20,6 @@
 /***********************************************************************/
 
 /* TODO:
- * - support for recurrent events (it will require changes on libgcal)
  * - Some duplicated code must be moved to a common function (setting
  * KCal::Event data in gcal_event_t).
  */
@@ -35,6 +34,7 @@
 #include <kabc/key.h>
 #include <kabc/errorhandler.h>
 #include <kcal/event.h>
+#include <kcal/icalformat.h>
 #include <kdatetime.h>
 #include <qstring.h>
 #include <KWindowSystem>
@@ -181,6 +181,30 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		QString temp;
 		event = gcal_event_element(&all_events, i);
 
+		//if recurrent get starttime endtime and rrule from ical
+		temp = gcal_event_get_recurrent(event);
+		if(temp.isEmpty())
+		{
+		  KDateTime start, end;
+		  temp = gcal_event_get_start(event);
+		  start = start.fromString(temp, KDateTime::ISODate);
+		  temp = gcal_event_get_end(event);
+		  end = end.fromString(temp, KDateTime::ISODate);
+		  kevent->setDtStart(start);
+                  if (end.isDateOnly())
+                      end = end.addDays(-1);
+		  kevent->setDtEnd(end);
+
+		  qDebug() << "start: " << start.dateTime()
+			 << "\tend: " << end.dateTime();
+		}
+		else
+		{
+		  KCal::ICalFormat *format = new KCal::ICalFormat;
+		  temp = creatValidICal(temp);
+		  kevent = dynamic_cast<KCal::Event *>( format->fromString(temp) );
+		}
+
 		temp = QString::fromUtf8(gcal_event_get_title(event));
 		kevent->setSummary(temp);
 
@@ -197,22 +221,6 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		temp = QString::fromUtf8(gcal_event_get_content(event));
 		kevent->setDescription(temp);
 
-		KDateTime start, end;
-		temp = gcal_event_get_start(event);
-		start = start.fromString(temp, KDateTime::ISODate);
-		temp = gcal_event_get_end(event);
-		end = end.fromString(temp, KDateTime::ISODate);
-		kevent->setDtStart(start);
-		
-		if (end.isDateOnly()) {
-			// KCal::Event::dtEnd() is inclusive, not exclusive.
-			// ( When serializing back to ICal, +1 is added internaly, to respect ical rfc )
-			end = end.addDays(-1);
-		}
-		kevent->setDtEnd(end);
-		
-		qDebug() << "start: " << start.dateTime()
-			 << "\tend: " << end.dateTime();
 		/* remoteID: edit_url */
 		KUrl urlEtag(gcal_event_get_url(event));
 		item.setRemoteId(urlEtag.url());
@@ -367,6 +375,31 @@ int GCalResource::getUpdated(char *timestamp)
 		if (!gcal_event_is_deleted(event)) {
 
 			kevent = new KCal::Event;
+			//if recurrent get starttime endtime and rrule from ical
+			temp = gcal_event_get_recurrent(event);
+			if(temp.isEmpty())
+			{
+			  temp = gcal_event_get_start(event);
+			  start = start.fromString(temp, KDateTime::ISODate);
+			  temp = gcal_event_get_end(event);
+			  end = end.fromString(temp, KDateTime::ISODate);
+			  kevent->setDtStart(start);
+                          if (end.isDateOnly())
+                              end = end.addDays(-1);
+
+
+			  kevent->setDtEnd(end);
+
+			  qDebug() << "start: " << start.dateTime()
+				<< "\tend: " << end.dateTime();
+			}
+			else
+			{
+			  KCal::ICalFormat *format = new KCal::ICalFormat;
+			  temp = creatValidICal(temp);
+			  kevent = dynamic_cast<KCal::Event *>( format->fromString(temp) );
+			}
+
 			kevent->setStatus(status);
 
 			temp = QString::fromUtf8(gcal_event_get_title(event));
@@ -378,20 +411,7 @@ int GCalResource::getUpdated(char *timestamp)
 			temp = QString::fromUtf8(gcal_event_get_content(event));
 			kevent->setDescription(temp);
 
-			temp = gcal_event_get_start(event);
-			start = start.fromString(temp, KDateTime::ISODate);
-			temp = gcal_event_get_end(event);
-			end = end.fromString(temp, KDateTime::ISODate);
-			kevent->setDtStart(start);
-			
-			if (end.isDateOnly()) {
-				// KCal::Event::dtEnd() is inclusive, not exclusive.
-				// ( When serializing back to ICal, +1 is added internaly, to respect ical rfc )			  
-				end = end.addDays(-1);
-			}
 
-			kevent->setDtEnd(end);
-			
 			url = gcal_event_get_url(event);
 			item.setRemoteId(url.url());
 			item.setPayload(IncidencePtr(kevent));
@@ -474,7 +494,6 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 	QByteArray t_byte;
 	QString temp;
 	KDateTime time;
-	//TODO: test for recurrence (and ignore creation for while)
 
 	if (!authenticated) {
 		kError() << "No authentication for Google calendar available";
@@ -532,21 +551,32 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
 		gcal_event_set_where(event, t_byte);
 	}
 
-	time = kevent->dtStart();
-	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toUtf8();
-	gcal_event_set_start(event, t_byte.data());
 
-	time = kevent->dtEnd();
-	
-	if (time.isDateOnly()) {
-		// KCal::Event::dtEnd() is inclusive, not exclusive.
-		time = time.addDays(1);
+	if( !kevent->recurs() )
+	{
+            time = kevent->dtStart();
+            temp = time.toString(KDateTime::ISODate);
+            t_byte = temp.toUtf8();
+            gcal_event_set_start(event, t_byte.data());
+
+            //TODO
+            // if (time.isDateOnly()) {
+	    //     // KCal::Event::dtEnd() is inclusive, not exclusive.
+	    //     time = time.addDays(1);
+            // }
+            time = kevent->dtEnd();
+            temp = time.toString(KDateTime::ISODate);
+            t_byte = temp.toUtf8();
+            gcal_event_set_end(event, t_byte.data());
 	}
-	
-	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toUtf8();
-	gcal_event_set_end(event, t_byte.data());
+	else
+	{
+            KCal::ICalFormat *format = new KCal::ICalFormat;
+            temp = format->toString(kevent);
+            temp = creatGoogleRecurringICal(temp);
+            t_byte = temp.toUtf8();
+            gcal_event_set_recurrent(event, t_byte.data());
+	}
 
 	if ((gcal_add_event(gcal, event))) {
 		kError() << "Failed adding new calendar"
@@ -577,7 +607,6 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	QByteArray t_byte;
 	QString temp;
 	KDateTime time;
-	//TODO: test for recurrence (and ignore creation for while)
 
 	if (!authenticated) {
 		kError() << "No authentication for Google calendar available";
@@ -638,21 +667,31 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 	}
 
 	/* Only this fields are being successfuly extracted */
-	time = kevent->dtStart();
-	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toUtf8();
-	gcal_event_set_start(event, t_byte.data());
+	if (!kevent->recurs())
+	{
+		time = kevent->dtStart();
+		temp = time.toString(KDateTime::ISODate);
+		t_byte = temp.toUtf8();
+		gcal_event_set_start(event, t_byte.data());
 
-	time = kevent->dtEnd();
+                time = kevent->dtEnd();
+                if (time.isDateOnly()) {
+                    // KCal::Event::dtEnd() is inclusive, not exclusive.
+                    time = time.addDays(1);
+                }
 
-	if (time.isDateOnly()) {
-		// KCal::Event::dtEnd() is inclusive, not exclusive.
-		time = time.addDays(1);
+		temp = time.toString(KDateTime::ISODate);
+		t_byte = temp.toUtf8();
+		gcal_event_set_end(event, t_byte.data());
 	}
-
-	temp = time.toString(KDateTime::ISODate);
-	t_byte = temp.toUtf8();
-	gcal_event_set_end(event, t_byte.data());
+	else
+	{
+		KCal::ICalFormat *format = new KCal::ICalFormat;
+		temp = format->toString(kevent);
+		temp = creatGoogleRecurringICal(temp);
+		t_byte = temp.toUtf8();
+		gcal_event_set_recurrent(event, t_byte.data());
+        }
 
 	KUrl url(item.remoteId());
 	temp = url.url();
@@ -730,6 +769,40 @@ void GCalResource::itemRemoved( const Akonadi::Item &item )
 	kDebug() << "done deleting!!";
 }
 
+QString GCalResource::creatValidICal(QString gRecRule)
+{
+	int pos;
+
+	pos = gRecRule.indexOf( QString("BEGIN:VTIMEZONE") );
+	if (pos >=0)
+	{
+		gRecRule.insert(pos,QString("END:VEVENT\n"));
+	}
+	else
+	{
+		gRecRule.append(QString("\nEND:VEVENT"));
+	}
+	return QString("BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\n") + gRecRule + QString("\nEND:VCALENDAR");
+}
+
+QString GCalResource::creatGoogleRecurringICal(QString ical)
+{
+	QString gRule;
+	int posBegin;
+	int posEnd;
+	posBegin = ical.indexOf( QString("RRULE:") );
+	posEnd = ical.indexOf( QString("\n"),posBegin );
+	gRule = ical.mid(posBegin,posEnd-posBegin-1) + QString("\n");
+	posBegin = ical.indexOf( QString("DTSTART") );
+	posEnd = ical.indexOf( QString("\n"),posBegin );
+	gRule += ical.mid(posBegin,posEnd-posBegin-1) + QString("\n");
+	posBegin = ical.indexOf( QString("DTEND") );
+	posEnd = ical.indexOf( QString("\n"),posBegin );
+	gRule += ical.mid(posBegin,posEnd-posBegin-1) + QString("\n");
+	return gRule;
+}
+
 AKONADI_RESOURCE_MAIN( GCalResource )
+
 
 #include "gcalresource.moc"
