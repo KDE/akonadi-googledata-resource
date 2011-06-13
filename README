@@ -25,12 +25,8 @@ normal google accounts
 
 === Restrictions ===
 
+TODO: add a UI for handling this, as libgcal 0.9.7 has support.
 Only the main calendar is supported.
-
-Recurrent events are not supported, the reason: google uses an invalid
-iCal inside of the XML to represent recurrence).
-http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html#CreatingRecurring
-
 
 == Dependencies ==
 
