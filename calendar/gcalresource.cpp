@@ -191,8 +191,7 @@ void GCalResource::retrieveItems( const Akonadi::Collection &collection )
 		  temp = gcal_event_get_end(event);
 		  end = end.fromString(temp, KDateTime::ISODate);
 		  kevent->setDtStart(start);
-                  if (end.isDateOnly())
-                      end = end.addDays(-1);
+                  fixOffset(end);
 		  kevent->setDtEnd(end);
 
 		  qDebug() << "start: " << start.dateTime()
@@ -558,13 +557,8 @@ void GCalResource::itemAdded( const Akonadi::Item &item, const Akonadi::Collecti
             temp = time.toString(KDateTime::ISODate);
             t_byte = temp.toUtf8();
             gcal_event_set_start(event, t_byte.data());
-
-            //TODO
-            // if (time.isDateOnly()) {
-	    //     // KCal::Event::dtEnd() is inclusive, not exclusive.
-	    //     time = time.addDays(1);
-            // }
             time = kevent->dtEnd();
+            fixOffset(time, true);
             temp = time.toString(KDateTime::ISODate);
             t_byte = temp.toUtf8();
             gcal_event_set_end(event, t_byte.data());
@@ -675,11 +669,7 @@ void GCalResource::itemChanged( const Akonadi::Item &item, const QSet<QByteArray
 		gcal_event_set_start(event, t_byte.data());
 
                 time = kevent->dtEnd();
-                if (time.isDateOnly()) {
-                    // KCal::Event::dtEnd() is inclusive, not exclusive.
-                    time = time.addDays(1);
-                }
-
+                fixOffset(time, true);
 		temp = time.toString(KDateTime::ISODate);
 		t_byte = temp.toUtf8();
 		gcal_event_set_end(event, t_byte.data());
@@ -801,6 +791,19 @@ QString GCalResource::creatGoogleRecurringICal(QString ical)
 	gRule += ical.mid(posBegin,posEnd-posBegin-1) + QString("\n");
 	return gRule;
 }
+
+
+void GCalResource::fixOffset(KDateTime &date, bool toGoogle)
+{
+    // fix for issue #57: GCal events end on 00:00:00 on the next day
+    if(date.isDateOnly()) {
+        if(toGoogle)
+            date = date.addDays(1);
+        else
+            date = date.addDays(-1);
+    }
+}
+
 
 AKONADI_RESOURCE_MAIN( GCalResource )
 

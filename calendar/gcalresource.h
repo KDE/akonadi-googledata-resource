@@ -60,9 +60,10 @@ protected:
 	/* Event itens update lists */
 	Akonadi::Item::List pending;
 	Akonadi::Item::List deleted;
-	
+
 	QString creatValidICal(QString gRecRule);
 	QString creatGoogleRecurringICal(QString ical);
+	void fixOffset(KDateTime &date, bool toGoogle = false);
 };
 
 #endif
