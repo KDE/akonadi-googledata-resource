@@ -67,6 +67,7 @@ Comment[sl]=Vir za račun Google
 Comment[sv]=Resurs för ett Google-konto
 Comment[uk]=Ресурс облікового запису Google
 Comment[x-test]=xxResource for a Google accountxx
+Comment[zh_CN]=Google 账户的资源
 Comment[zh_TW]=Google 帳號的資源
 Type=AkonadiResource
 Exec=akonadi_googledata_resource
