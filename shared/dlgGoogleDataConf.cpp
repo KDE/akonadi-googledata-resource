@@ -28,7 +28,7 @@ dlgGoogleDataConf::dlgGoogleDataConf(QWidget *parent): QDialog(parent)
 
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-        connect(eAccount, SIGNAL(textChanged ( const QString &)),this,SLOT(accountChanged(const QString&)));
+        connect(eAccount, SIGNAL(textChanged(QString)),this,SLOT(accountChanged(QString)));
         accountChanged(eAccount->text());
 }
 
